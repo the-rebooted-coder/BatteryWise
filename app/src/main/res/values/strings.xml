@@ -2,4 +2,6 @@
     <string name="app_name">BatteryWise</string>
     <string name="enable">ENABLE</string>
     <string name="enabled">ENABLED</string>
+    <string name="disable">DISABLE</string>
+    <string name="productInfo">Say goodbye to unnecessary wear and tear on your battery and hello to a longer-lasting, more reliable mobile experience.</string>
 </resources>

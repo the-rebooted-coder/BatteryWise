@@ -10,9 +10,11 @@
         android:id="@+id/batterySaveText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Turn on battery protect after 80%?"
+        android:text="@string/productInfo"
+        android:textAlignment="center"
+        android:padding="10dp"
+        android:layout_above="@+id/saveBatteryBtn"
         android:fontFamily="@font/productsansbold"
-        android:layout_centerInParent="true"
         android:textSize="18sp"/>
 
     <com.google.android.material.button.MaterialButton
@@ -21,7 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/enable"
-        android:layout_below="@+id/batterySaveText"
         android:fontFamily="@font/productsans"
         android:layout_centerInParent="true"/>
 
