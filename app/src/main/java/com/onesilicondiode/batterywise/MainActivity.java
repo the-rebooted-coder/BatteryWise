@@ -1,7 +1,5 @@
 package com.onesilicondiode.batterywise;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,11 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving, stopSaving;
-    private boolean isServiceRunning = false;
     private static final String PREFS_NAME = "MyPrefsFile";
 
     @Override
@@ -30,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if the service is running and update button visibility
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        isServiceRunning = prefs.getBoolean("isServiceRunning", false);
+        boolean isServiceRunning = prefs.getBoolean("isServiceRunning", false);
 
         if (isServiceRunning) {
             startSaving.setVisibility(View.INVISIBLE);

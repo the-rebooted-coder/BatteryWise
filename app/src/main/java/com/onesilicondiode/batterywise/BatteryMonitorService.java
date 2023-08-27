@@ -10,14 +10,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.os.IBinder;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-
-import com.onesilicondiode.batterywise.R;
 
 public class BatteryMonitorService extends Service {
     private MediaPlayer mediaPlayer;
