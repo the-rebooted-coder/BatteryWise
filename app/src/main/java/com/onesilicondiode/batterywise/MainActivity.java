@@ -12,9 +12,6 @@ import com.google.android.material.button.MaterialButton;
 public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving;
 
-    public MainActivity(BroadcastReceiver batteryReceiver) {
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
