@@ -1,6 +1,8 @@
 package com.onesilicondiode.batterywise;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -32,9 +34,11 @@ import androidx.transition.TransitionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
-    MaterialButton startSaving, stopSaving;
     private static final String PREFS_NAME = "MyPrefsFile";
+    MaterialButton startSaving, stopSaving;
     private FirebaseAnalytics mFirebaseAnalytics;
     private Vibrator vibrator;
 
@@ -43,6 +47,16 @@ public class MainActivity extends AppCompatActivity {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startSaving = findViewById(R.id.saveBatteryBtn);
+        stopSaving = findViewById(R.id.closeBatteryBtn);
+        if (isMyServiceRunning()){
+            startSaving.setVisibility(View.INVISIBLE);
+            stopSaving.setVisibility(View.VISIBLE);
+        }
+        else {
+            startSaving.setVisibility(View.VISIBLE);
+            stopSaving.setVisibility(View.INVISIBLE);
+        }
         TextView batterySaveText = findViewById(R.id.batterySaveText);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         batterySaveText.setOnClickListener(view -> {
@@ -78,22 +92,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkNotificationPermission();
         }
-        // Initialize the MediaPlayer
-        startSaving = findViewById(R.id.saveBatteryBtn);
-        stopSaving = findViewById(R.id.closeBatteryBtn);
-
-        // Check if the service is running and update button visibility
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        boolean isServiceRunning = prefs.getBoolean("isServiceRunning", false);
-
-        if (isServiceRunning) {
-            startSaving.setVisibility(View.INVISIBLE);
-            stopSaving.setVisibility(View.VISIBLE);
-        } else {
-            startSaving.setVisibility(View.VISIBLE);
-            stopSaving.setVisibility(View.INVISIBLE);
-        }
-
         startSaving.setOnClickListener(view -> {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
             startService(serviceIntent);
@@ -101,11 +99,6 @@ public class MainActivity extends AppCompatActivity {
             vibrate();
             stopSaving.setVisibility(View.VISIBLE);
             Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
-
-            // Update shared preferences
-            SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-            editor.putBoolean("isServiceRunning", true);
-            editor.apply();
             finish();
         });
 
@@ -118,13 +111,31 @@ public class MainActivity extends AppCompatActivity {
                 stopSaving.setVisibility(View.INVISIBLE);
                 startSaving.setVisibility(View.VISIBLE);
                 vibrate();
-                // Update shared preferences
-                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-                editor.putBoolean("isServiceRunning", false);
-                editor.apply();
             }
         });
     }
+
+    private boolean isMyServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        // Get the list of running app processes
+        List<ActivityManager.RunningAppProcessInfo> runningProcesses = manager.getRunningAppProcesses();
+        if (runningProcesses != null) {
+            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                // Check if the service's component name is in the process's package list
+                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    String[] packageList = processInfo.pkgList;
+                    for (String packageName : packageList) {
+                        if (packageName.equals(getPackageName())) {
+                            return true; // Your service is running in the foreground
+                        }
+                    }
+                }
+            }
+        }
+
+        return false; // Your service is not running
+    }
+
     private void vibrate() {
         long[] customPattern = {0, 1000, 500, 500};
         // Create a VibrationEffect
@@ -132,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         // Vibrate with the custom pattern
         vibrator.vibrate(vibrationEffect);
     }
+
     private void checkNotificationPermission() {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
 
@@ -146,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
             requestNotificationPermission.launch(permission);
         }
     }
+
     private void showPermissionRationaleDialog() {
         // For example, you can use a AlertDialog:
         new AlertDialog.Builder(this)
@@ -172,5 +185,4 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Permission denied, cannot post notification to keep app alive 😔", Toast.LENGTH_LONG).show();
                 }
             });
-
 }
