@@ -3,5 +3,5 @@
     <string name="enable">ENABLE</string>
     <string name="enabled">ENABLED</string>
     <string name="disable">DISABLE</string>
-    <string name="productInfo">Say goodbye to unnecessary wear and tear on your battery and hello to a longer-lasting, battery.\n\nDevice will alert you when it charges beyond 80%.</string>
+    <string name="productInfo">Say goodbye to unnecessary wear and tear on your battery and hello to a longer-lasting, battery.\n\nDevice will alert you when it charges beyond 85%.</string>
 </resources>

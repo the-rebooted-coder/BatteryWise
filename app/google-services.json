@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "538537715391",
+    "project_id": "batterywise-007",
+    "storage_bucket": "batterywise-007.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538537715391:android:05e34b65dc96732abbc80a",
+        "android_client_info": {
+          "package_name": "com.onesilicondiode.batterywise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "538537715391-6kd7r28miskn3s7hmh98o9am25nnkjnq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7D9SIBHBh4tkVrev4JR2xZkClo-uLrlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "538537715391-6kd7r28miskn3s7hmh98o9am25nnkjnq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

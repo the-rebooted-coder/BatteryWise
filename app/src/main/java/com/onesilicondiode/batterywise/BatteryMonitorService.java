@@ -41,7 +41,7 @@ public class BatteryMonitorService extends Service {
             public void onReceive(Context context, Intent intent) {
                 BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
                 int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                if (batteryPercent > 80 && !alertPlayed) {
+                if (batteryPercent > 85 && !alertPlayed) {
                     Toast.makeText(context, "Battery Levels More Than 80%", Toast.LENGTH_SHORT).show();
                     // Increase volume to 80 before playing the alert tone
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -103,7 +103,7 @@ public class BatteryMonitorService extends Service {
     private Notification createNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
                 .setContentTitle("SafeCharge")
-                .setContentText("Alerting when battery goes >80%")
+                .setContentText("Alerting when battery goes >85%")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setColor(ContextCompat.getColor(this, R.color.green))
