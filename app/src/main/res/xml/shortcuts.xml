@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="compose"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_icon"
+        android:shortcutShortLabel="@string/shortcutInfo"
+        android:shortcutLongLabel="@string/shortcutDetail">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.onesilicondiode.batterywise"
+            android:targetClass="com.onesilicondiode.batterywise.ShortcutHandler" />
+    </shortcut>
+    <!-- Specify more shortcuts here. -->
+</shortcuts>
