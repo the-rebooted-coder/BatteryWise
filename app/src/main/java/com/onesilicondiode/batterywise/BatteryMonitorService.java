@@ -75,7 +75,7 @@ public class BatteryMonitorService extends Service {
                 this,
                 0,
                 mainActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE // Add FLAG_IMMUTABLE
         );
 
         // Create a notification channel (required for Android 8.0 and above)
