@@ -7,15 +7,30 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/batterySaveText"
+        android:id="@+id/productInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/productInfo"
         android:textAlignment="center"
         android:padding="10dp"
-        android:layout_above="@+id/saveBatteryBtn"
+        android:layout_above="@+id/batterySaveText"
         android:fontFamily="@font/productsansbold"
         android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/batterySaveText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/learn_more"
+        android:layout_margin="10dp"
+        android:textAlignment="center"
+        android:textColor="#3F51B5"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/saveBatteryBtn"
+        android:fontFamily="@font/productsans"
+        android:drawablePadding="5dp"
+        android:textSize="18sp"
+        app:drawableLeftCompat="@drawable/baseline_info_24" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/saveBatteryBtn"

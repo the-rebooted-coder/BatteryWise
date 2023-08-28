@@ -6,7 +6,15 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,6 +23,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
+import androidx.transition.Transition;
+import androidx.transition.TransitionInflater;
+import androidx.transition.TransitionManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -30,6 +41,37 @@ public class MainActivity extends AppCompatActivity {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextView batterySaveText = findViewById(R.id.batterySaveText);
+
+        batterySaveText.setOnClickListener(view -> {
+            // Create a LayoutInflater
+            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+            View popupView = inflater.inflate(R.layout.popup_info, null);
+
+            // Create a PopupWindow
+            int width = LayoutParams.MATCH_PARENT;
+            int height = LayoutParams.WRAP_CONTENT;
+            boolean focusable = true;
+            PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+            // Set a custom background for the popup
+            popupWindow.setBackgroundDrawable(getDrawable(R.drawable.popup_background));
+
+            // Show the popup with custom animations
+            popupWindow.setAnimationStyle(0); // Disable the default animation
+            Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_enter_animation);
+            popupView.startAnimation(enterAnimation);
+
+            popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+            // Dismiss the popup with exit animation when needed
+            popupView.setOnClickListener(v -> {
+                Animation exitAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_exit_animation);
+                popupView.startAnimation(exitAnimation);
+                popupWindow.dismiss();
+            });
+        });
+
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkNotificationPermission();
