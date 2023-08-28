@@ -103,17 +103,6 @@ public class BatteryMonitorService extends Service {
         startForeground(FOREGROUND_SERVICE_ID, notification);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // Retrieve the boolean value from the intent
-        boolean isUserStarted = intent.getBooleanExtra("isUserStarted", false);
-        // Use the boolean value as needed
-        if (isUserStarted) {
-           //TODO
-        }
-        // Service should continue running and restart if killed
-        return START_STICKY;
-    }
 
     @Override
     public void onDestroy() {

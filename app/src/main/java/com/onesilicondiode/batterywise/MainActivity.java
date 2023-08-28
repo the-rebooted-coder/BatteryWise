@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         startSaving.setOnClickListener(view -> {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
-            serviceIntent.putExtra("isUserStarted", true);
             startService(serviceIntent);
             startSaving.setVisibility(View.INVISIBLE);
             stopSaving.setVisibility(View.VISIBLE);
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putBoolean("isServiceRunning", false);
                 editor.apply();
-                finish();
             }
         });
     }
