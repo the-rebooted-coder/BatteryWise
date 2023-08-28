@@ -11,8 +11,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -23,9 +25,10 @@ public class BatteryMonitorService extends Service {
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
     private int previousVolume; // Store the previous volume level
+    private PendingIntent pendingIntent; // Declare pendingIntent as a member variable
 
     private static final int FOREGROUND_SERVICE_ID = 101;
-    private static final String CHANNEL_ID = "BatteryMonitorChannel";
+    private static final String NOTIF_CHANNEL_ID = "SafeCharge";
 
     @Override
     public void onCreate() {
@@ -39,6 +42,7 @@ public class BatteryMonitorService extends Service {
                 BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
                 int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
                 if (batteryPercent > 80 && !alertPlayed) {
+                    Toast.makeText(context, "Battery Levels More Than 80%", Toast.LENGTH_SHORT).show();
                     // Increase volume to 80 before playing the alert tone
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                     previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -71,38 +75,47 @@ public class BatteryMonitorService extends Service {
 
         // Create an intent to open the MainActivity when the notification is tapped
         Intent mainActivityIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
+        pendingIntent = PendingIntent.getActivity(
                 this,
                 0,
                 mainActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE // Add FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
         // Create a notification channel (required for Android 8.0 and above)
         NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                "Battery Monitor",
+                NOTIF_CHANNEL_ID,
+                "SafeCharge",
                 NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle), null); // Set custom sound
 
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
 
         // Create a notification for the foreground service with the PendingIntent
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("SafeCharge")
-                .setContentText("Alert when battery goes >80%")
-                .setSmallIcon(R.drawable.ic_notification)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setColor(ContextCompat.getColor(this, R.color.green))
-                .setColorized(true)
-                .setContentIntent(pendingIntent) // Set the PendingIntent to open MainActivity
-                .setAutoCancel(true) // Auto-cancel the notification when tapped
-                .build();
+        Notification notification = createNotification();
 
         // Start the service as a foreground service
         startForeground(FOREGROUND_SERVICE_ID, notification);
     }
 
+    // Create a custom notification
+    private Notification createNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
+                .setContentTitle("SafeCharge")
+                .setContentText("Alerting when battery goes >80%")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setColor(ContextCompat.getColor(this, R.color.green))
+                .setColorized(true)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        // Set custom sound for the notification
+        Uri customSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle);
+        builder.setSound(customSoundUri);
+        return builder.build();
+    }
 
     @Override
     public void onDestroy() {
