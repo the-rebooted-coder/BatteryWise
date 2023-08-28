@@ -12,5 +12,9 @@ public class BootReceiver extends BroadcastReceiver {
             Intent serviceIntent = new Intent(context, BatteryMonitorService.class);
             context.startForegroundService(serviceIntent);
         }
+        else if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())){
+            Intent serviceIntent = new Intent(context, BatteryMonitorService.class);
+            context.startForegroundService(serviceIntent);
+        }
     }
 }
