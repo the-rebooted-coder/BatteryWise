@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving, stopSaving;
     private static final String PREFS_NAME = "MyPrefsFile";
     private FirebaseAnalytics mFirebaseAnalytics;
-
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView batterySaveText = findViewById(R.id.batterySaveText);
-
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         batterySaveText.setOnClickListener(view -> {
             // Create a LayoutInflater
             LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
             startService(serviceIntent);
             startSaving.setVisibility(View.INVISIBLE);
+            vibrate();
             stopSaving.setVisibility(View.VISIBLE);
             Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
 
@@ -114,13 +117,20 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Service Stopped", Toast.LENGTH_SHORT).show();
                 stopSaving.setVisibility(View.INVISIBLE);
                 startSaving.setVisibility(View.VISIBLE);
-
+                vibrate();
                 // Update shared preferences
                 SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putBoolean("isServiceRunning", false);
                 editor.apply();
             }
         });
+    }
+    private void vibrate() {
+        long[] customPattern = {0, 1000, 500, 500};
+        // Create a VibrationEffect
+        VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
+        // Vibrate with the custom pattern
+        vibrator.vibrate(vibrationEffect);
     }
     private void checkNotificationPermission() {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
