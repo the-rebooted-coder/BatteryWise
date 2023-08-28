@@ -10,7 +10,7 @@ public class BootReceiver extends BroadcastReceiver {
         // Check if the device has finished booting
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context, BatteryMonitorService.class);
-            context.startService(serviceIntent);
+            context.startForegroundService(serviceIntent);
         }
     }
 }
