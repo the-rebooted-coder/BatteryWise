@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving, stopSaving;
     private FirebaseAnalytics mFirebaseAnalytics;
     private Vibrator vibrator;
+    TextView productInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +50,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
+        productInfo = findViewById(R.id.productInfo);
+        String manufacturer = Build.MANUFACTURER;
+        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " " + getString(R.string.productInfo_partTwo);
 
+        productInfo.setText(productInfoText);
         boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
-
         if (isServiceRunning) {
             startSaving.setVisibility(View.GONE);
             stopSaving.setVisibility(View.VISIBLE);

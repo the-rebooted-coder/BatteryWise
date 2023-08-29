@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.BatteryWise" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:fontFamily">@font/psb</item>
-
+        <item name="colorPrimary">@color/green</item>
     </style>
 
     <style name="Theme.BatteryWise" parent="Base.Theme.BatteryWise" />
