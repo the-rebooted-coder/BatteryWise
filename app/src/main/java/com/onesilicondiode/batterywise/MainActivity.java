@@ -49,9 +49,13 @@ public class MainActivity extends AppCompatActivity {
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
         String manufacturer = Build.MANUFACTURER;
-        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo)+" "+"85%";
-        productInfo.setText(productInfoText);
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+        selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
+        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+        productInfo.setText(productInfoText);
+        int seekBarProgress = selectedBatteryLevel - 80;
+        batteryLevelSeekBar.setProgress(seekBarProgress);
         batteryLevelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
