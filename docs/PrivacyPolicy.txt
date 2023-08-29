@@ -1,0 +1,33 @@
+SafeCharge App Privacy Policy
+
+Effective Date: 30/08/2023
+Thank you for choosing SafeCharge, the app designed to help you monitor your device's battery status. This Privacy Policy outlines our commitment to your privacy while using SafeCharge.
+
+1. Introduction:
+SafeCharge is a battery monitoring app dedicated to providing you with timely alerts when your phone's battery level exceeds 85%. We respect your privacy and are committed to safeguarding your personal information.
+
+2. Information We Do Not Collect:
+SafeCharge is designed to be a minimalistic and privacy-conscious app. We do not collect, store, or share any personal data or information. We want to assure you that:
+
+We do not collect or access any personal information, such as your name, email address, phone number, or home address.
+We do not track your location or access your device's GPS.
+We do not collect data about how you use the app, including the pages you visit or the features you interact with.
+We do not access your device's contact list or collect any information about your contacts.
+
+3. Alerts and Battery Monitoring:
+SafeCharge's primary function is to monitor your device's battery status and provide alerts when it reaches or exceeds 85%. This is done solely for the purpose of enhancing your device's battery management, and we do not retain any historical data or information related to your battery usage.
+
+4. Third-Party Services:
+SafeCharge does not integrate with any third-party services, including social media platforms or analytics tools. We do not share your battery status or any other data with external organizations.
+
+5. Data Security:
+We take your privacy seriously, and even though we do not collect data, we have implemented security measures to protect any app-related data. These measures include encryption and regular app updates to maintain a high level of security.
+
+6. Contact Us:
+If you have any questions or concerns regarding your privacy while using SafeCharge, please do not hesitate to contact us at connectwithspandan@gmail.com
+
+7. Changes to this Privacy Policy:
+SafeCharge may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new Privacy Policy on this page.
+
+By using SafeCharge, you agree to the terms outlined in this Privacy Policy. Please review this Privacy Policy periodically for any updates or changes.
+Your privacy is of utmost importance to us, and we are committed to maintaining the trust you place in us. Thank you for using SafeCharge.
