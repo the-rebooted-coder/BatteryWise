@@ -49,11 +49,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
-        if (isMyServiceRunning()){
+
+        boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
+
+        if (isServiceRunning) {
             startSaving.setVisibility(View.GONE);
             stopSaving.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             startSaving.setVisibility(View.VISIBLE);
             stopSaving.setVisibility(View.GONE);
         }
@@ -114,7 +116,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
     private boolean isMyServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         // Get the list of running app processes
