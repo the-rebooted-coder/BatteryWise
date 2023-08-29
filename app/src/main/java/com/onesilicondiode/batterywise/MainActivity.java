@@ -18,6 +18,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,30 @@ public class MainActivity extends AppCompatActivity {
         productInfo = findViewById(R.id.productInfo);
         String manufacturer = Build.MANUFACTURER;
         String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo);
+        SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
+        batteryLevelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // Calculate the selected battery level based on the progress
+                int selectedBatteryLevel = 80 + progress;
 
+                // Update a shared preference or perform any action with the selectedBatteryLevel
+                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
+                editor.apply();
+
+                // Display the selected battery level to the user
+                Toast.makeText(MainActivity.this, "Selected Battery Level: " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
         productInfo.setText(productInfoText);
         boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
         if (isServiceRunning) {
