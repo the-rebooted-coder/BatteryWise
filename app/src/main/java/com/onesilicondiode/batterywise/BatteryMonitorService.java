@@ -106,9 +106,7 @@ public class BatteryMonitorService extends Service {
 
     // Create a custom notification
     private Notification createNotification() {
-        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
-        int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
-        String notificationText = "Alerting when battery goes >" + selectedBatteryLevel + "%";
+        String notificationText = "Alerting when battery is charged optimally.";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
                 .setContentTitle("Monitoring Charge Levels")
                 .setContentText(notificationText)
