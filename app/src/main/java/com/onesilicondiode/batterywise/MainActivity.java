@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
         String manufacturer = Build.MANUFACTURER;
-        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " " + getString(R.string.productInfo_partTwo);
+        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo);
 
         productInfo.setText(productInfoText);
         boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
