@@ -1,54 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/productInfo"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_contacts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/productInfo"
-        android:textAlignment="center"
-        android:padding="10dp"
-        android:layout_above="@+id/batterySaveText"
-        android:fontFamily="@font/productsansbold"
-        android:textSize="18sp"/>
+        android:layout_margin="16dp"
+        android:scaleType="center"
+        android:backgroundTint="#F3F3F3"
+        android:src="@drawable/green"
+        app:maxImageSize="40dp"
+        app:tint="@color/green"
+        app:layout_anchor="@id/layoutHolder"
+        app:layout_anchorGravity="center|top" />
 
-    <TextView
-        android:id="@+id/batterySaveText"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/layoutHolder"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/learn_more"
-        android:layout_margin="10dp"
-        android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/saveBatteryBtn"
-        android:fontFamily="@font/productsans"
-        android:drawablePadding="5dp"
-        android:textSize="18sp"
-        app:drawableLeftCompat="@drawable/baseline_info_24_white" />
+        android:layout_gravity="center"
+        android:elevation="20dp"
+        android:layout_margin="8dp"
+        android:backgroundTint="#B8B8B8"
+        app:cardCornerRadius="8dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/saveBatteryBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/enable"
-        android:fontFamily="@font/productsans"
-        android:layout_centerInParent="true"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="30dp"
+            android:orientation="vertical">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/closeBatteryBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/disable"
-        android:visibility="gone"
-        android:fontFamily="@font/productsans"
-        android:layout_centerInParent="true"/>
+            <TextView
+                android:id="@+id/productInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsansbold"
+                android:textColor="@color/black"
+                android:padding="10dp"
+                android:text="@string/productInfo"
+                android:textAlignment="center"
+                android:textSize="18sp" />
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/batterySaveText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/productsans"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:text="@string/learn_more"
+                android:textAlignment="center"
+                android:textColor="#1C2557"
+                android:textSize="18sp"
+                app:drawableLeftCompat="@drawable/baseline_info_24" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveBatteryBtn"
+                android:layout_width="wrap_content"
+                android:backgroundTint="#36276C"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsans"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:text="@string/enable" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/closeBatteryBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsans"
+                android:backgroundTint="#36276C"
+                android:textColor="@color/white"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:text="@string/disable"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

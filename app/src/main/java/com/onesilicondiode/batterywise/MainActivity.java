@@ -50,12 +50,12 @@ public class MainActivity extends AppCompatActivity {
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
         if (isMyServiceRunning()){
-            startSaving.setVisibility(View.INVISIBLE);
+            startSaving.setVisibility(View.GONE);
             stopSaving.setVisibility(View.VISIBLE);
         }
         else {
             startSaving.setVisibility(View.VISIBLE);
-            stopSaving.setVisibility(View.INVISIBLE);
+            stopSaving.setVisibility(View.GONE);
         }
         TextView batterySaveText = findViewById(R.id.batterySaveText);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         startSaving.setOnClickListener(view -> {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
             startService(serviceIntent);
-            startSaving.setVisibility(View.INVISIBLE);
+            startSaving.setVisibility(View.GONE);
             vibrate();
             stopSaving.setVisibility(View.VISIBLE);
             Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
                 stopService(serviceIntent);
                 Toast.makeText(MainActivity.this, "Service Stopped", Toast.LENGTH_SHORT).show();
-                stopSaving.setVisibility(View.INVISIBLE);
+                stopSaving.setVisibility(View.GONE);
                 startSaving.setVisibility(View.VISIBLE);
                 vibrate();
             }
