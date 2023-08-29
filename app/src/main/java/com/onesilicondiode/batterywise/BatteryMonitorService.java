@@ -9,12 +9,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -30,6 +30,7 @@ public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -41,8 +42,12 @@ public class BatteryMonitorService extends Service {
             public void onReceive(Context context, Intent intent) {
                 BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
                 int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                if (batteryPercent > 85 && !alertPlayed) {
-                    Toast.makeText(context, "Battery Levels More Than 85%", Toast.LENGTH_SHORT).show();
+                // Retrieve the selected battery level from SharedPreferences
+                SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+                int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
+
+                if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
+                    Toast.makeText(context, "Battery Levels More Than "+selectedBatteryLevel+"%", Toast.LENGTH_SHORT).show();
                     // Increase volume to 85 before playing the alert tone
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                     previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);

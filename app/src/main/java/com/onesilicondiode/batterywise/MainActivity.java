@@ -13,7 +13,6 @@ import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -28,9 +27,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
-import androidx.transition.Transition;
-import androidx.transition.TransitionInflater;
-import androidx.transition.TransitionManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -38,11 +34,11 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String PREFS_NAME = "MyPrefsFile";
     MaterialButton startSaving, stopSaving;
     private FirebaseAnalytics mFirebaseAnalytics;
     private Vibrator vibrator;
     TextView productInfo;
+    int selectedBatteryLevel = 85;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,21 +49,23 @@ public class MainActivity extends AppCompatActivity {
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
         String manufacturer = Build.MANUFACTURER;
-        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo);
+        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo)+" "+"85%";
+        productInfo.setText(productInfoText);
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
         batteryLevelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // Calculate the selected battery level based on the progress
-                int selectedBatteryLevel = 80 + progress;
+                selectedBatteryLevel = 80 + progress;
 
                 // Update a shared preference or perform any action with the selectedBatteryLevel
-                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
                 editor.apply();
 
-                // Display the selected battery level to the user
-                Toast.makeText(MainActivity.this, "Selected Battery Level: " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
+                // Update the TextView to display the selected battery level
+                String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+                productInfo.setText(productInfoText);
             }
 
             @Override
