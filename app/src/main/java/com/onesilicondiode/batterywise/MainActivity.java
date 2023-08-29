@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -31,14 +32,25 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
+    private final ActivityResultLauncher<String> requestNotificationPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission granted, perform your action
+                    Toast.makeText(this, "Continue to Enable the Service", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    // Permission denied
+                    Toast.makeText(this, "Permission denied, cannot post notification to keep app alive 😔", Toast.LENGTH_LONG).show();
+                }
+            });
     MaterialButton startSaving, stopSaving;
-    private FirebaseAnalytics mFirebaseAnalytics;
-    private Vibrator vibrator;
     TextView productInfo;
     int selectedBatteryLevel = 85;
+    boolean seekTouch = false;
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private Vibrator vibrator;
+    private String manufacturer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
-        String manufacturer = Build.MANUFACTURER;
+        manufacturer = Build.MANUFACTURER;
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
@@ -56,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         productInfo.setText(productInfoText);
         int seekBarProgress = selectedBatteryLevel - 80;
         batteryLevelSeekBar.setProgress(seekBarProgress);
+        batteryLevelSeekBar.setMax(10);
         batteryLevelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -74,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                if (!seekTouch) {
+                    Toast.makeText(MainActivity.this, "You can set more precisely using volume buttons", Toast.LENGTH_LONG).show();
+                    seekTouch = true;
+                }
             }
 
             @Override
@@ -146,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private boolean isServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -155,29 +173,25 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-    private boolean isMyServiceRunning() {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        // Get the list of running app processes
-        List<ActivityManager.RunningAppProcessInfo> runningProcesses = manager.getRunningAppProcesses();
-        if (runningProcesses != null) {
-            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
-                // Check if the service's component name is in the process's package list
-                if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    String[] packageList = processInfo.pkgList;
-                    for (String packageName : packageList) {
-                        if (packageName.equals(getPackageName())) {
-                            return true; // Your service is running in the foreground
-                        }
-                    }
-                }
-            }
-        }
-
-        return false; // Your service is not running
-    }
 
     private void vibrate() {
         long[] customPattern = {0, 1000, 500, 500};
+        // Create a VibrationEffect
+        VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
+        // Vibrate with the custom pattern
+        vibrator.vibrate(vibrationEffect);
+    }
+
+    private void vibrateKeys() {
+        long[] customPattern = {0, 200, 500, 400};
+        // Create a VibrationEffect
+        VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
+        // Vibrate with the custom pattern
+        vibrator.vibrate(vibrationEffect);
+    }
+
+    private void vibrateTouch() {
+        long[] customPattern = {0, 290};
         // Create a VibrationEffect
         VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
         // Vibrate with the custom pattern
@@ -214,15 +228,42 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .show();
     }
-    private final ActivityResultLauncher<String> requestNotificationPermission =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Permission granted, perform your action
-                    Toast.makeText(this, "Continue to Enable the Service", Toast.LENGTH_SHORT).show();
 
-                } else {
-                    // Permission denied
-                    Toast.makeText(this, "Permission denied, cannot post notification to keep app alive 😔", Toast.LENGTH_LONG).show();
-                }
-            });
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
+
+            // Calculate the selected battery level based on the current seek bar progress
+            int seekBarProgress = batteryLevelSeekBar.getProgress();
+            int newSeekBarProgress;
+
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                // Increase the progress (increase battery level) if within bounds
+                newSeekBarProgress = seekBarProgress + 1;
+                newSeekBarProgress = Math.min(10, newSeekBarProgress); // Limit to 10
+            } else {
+                // Decrease the progress (decrease battery level) if within bounds
+                newSeekBarProgress = seekBarProgress - 1;
+                newSeekBarProgress = Math.max(0, newSeekBarProgress); // Limit to 0
+            }
+
+            // Update the seek bar progress
+            batteryLevelSeekBar.setProgress(newSeekBarProgress);
+
+            // Update the selectedBatteryLevel and save it to SharedPreferences
+            selectedBatteryLevel = 80 + newSeekBarProgress;
+            SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit();
+            editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
+            editor.apply();
+
+            // Update the TextView to display the selected battery level
+            String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+            productInfo.setText(productInfoText);
+            vibrateKeys();
+            return true; // Consume the volume key press event
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
 }

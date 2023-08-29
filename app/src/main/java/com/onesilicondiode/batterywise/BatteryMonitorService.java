@@ -126,7 +126,6 @@ public class BatteryMonitorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Release MediaPlayer and unregister BroadcastReceiver
         mediaPlayer.release();
         unregisterReceiver(batteryReceiver);
     }
