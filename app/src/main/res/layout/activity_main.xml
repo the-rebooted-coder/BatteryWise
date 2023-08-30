@@ -59,7 +59,6 @@
                 android:textColor="#B9C3FB"
                 android:textSize="18sp"
                 app:drawableLeftCompat="@drawable/baseline_info_24_white" />
-
             <androidx.cardview.widget.CardView
                 android:layout_width="250dp"
                 android:layout_height="match_parent"
@@ -67,7 +66,14 @@
                 android:layout_marginTop="10dp"
                 android:backgroundTint="#1B1B1B"
                 app:cardCornerRadius="8dp">
-
+                <TextView
+                    android:id="@+id/seekBarValueOverlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="50dp"
+                    android:visibility="invisible"/>
                 <androidx.appcompat.widget.AppCompatSeekBar
                     android:id="@+id/batteryLevelSeekBar"
                     android:layout_width="250dp"

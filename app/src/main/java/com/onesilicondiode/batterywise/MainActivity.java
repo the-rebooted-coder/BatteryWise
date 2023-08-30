@@ -1,6 +1,8 @@
 package com.onesilicondiode.batterywise;
 
 import android.Manifest;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -45,12 +47,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
     MaterialButton startSaving, stopSaving;
+    private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
+    private float scaleFactorOriginal = 1.0f;
+
     TextView productInfo;
     int selectedBatteryLevel = 85;
     boolean seekTouch = false;
     private FirebaseAnalytics mFirebaseAnalytics;
     private Vibrator vibrator;
     private String manufacturer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
+        Animation showAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_show);
+        Animation hideAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_hide);
+        TextView seekBarValueOverlay = findViewById(R.id.seekBarValueOverlay);
         manufacturer = Build.MANUFACTURER;
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
@@ -74,7 +83,11 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // Calculate the selected battery level based on the progress
                 selectedBatteryLevel = 80 + progress;
-
+                String progressText = selectedBatteryLevel + "%";
+                seekBarValueOverlay.setText(progressText);
+                // Display the overlay
+                seekBarValueOverlay.startAnimation(showAnimation);
+                seekBarValueOverlay.setVisibility(View.VISIBLE);
                 // Update a shared preference or perform any action with the selectedBatteryLevel
                 SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
@@ -88,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 vibrateTouch();
+                scaleSeekBar(seekBar, 1.2f);
             }
 
             @Override
@@ -96,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "You can set more precisely using volume buttons", Toast.LENGTH_LONG).show();
                     seekTouch = true;
                 }
+                scaleSeekBar(seekBar, 1.0f);
+                seekBarValueOverlay.startAnimation(hideAnimation);
+                seekBarValueOverlay.setVisibility(View.INVISIBLE);
             }
         });
         productInfo.setText(productInfoText);
@@ -163,6 +180,17 @@ public class MainActivity extends AppCompatActivity {
                 vibrate();
             }
         });
+    }
+
+    private void scaleSeekBar(SeekBar seekBar, float scaleFactor) {
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(seekBar, "scaleX", scaleFactor);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(seekBar, "scaleY", scaleFactor);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(scaleX, scaleY);
+        animatorSet.setDuration(200); // Adjust the duration as needed
+
+        animatorSet.start();
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {
