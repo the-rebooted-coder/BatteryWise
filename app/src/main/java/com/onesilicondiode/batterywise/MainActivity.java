@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.HapticFeedbackConstants;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -204,11 +205,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] customPattern = {0, 1000, 500, 500};
-        // Create a VibrationEffect
-        VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
-        // Vibrate with the custom pattern
-        vibrator.vibrate(vibrationEffect);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            vibrator.vibrate(
+                    VibrationEffect.startComposition()
+                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
+                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
+                            .compose());
+        }
+        else{
+            long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
+            vibrator.vibrate(vibrationEffect);
+        }
     }
 
     private void vibrateKeys() {
