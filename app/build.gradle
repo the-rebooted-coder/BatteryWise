@@ -11,8 +11,8 @@ android {
         applicationId "com.onesilicondiode.batterywise"
         minSdk 26
         targetSdk 33
-        versionCode 1
-        versionName "Juice"
+        versionCode 2
+        versionName "Juice+"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

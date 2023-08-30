@@ -87,14 +87,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if (!seekTouch) {
-                    Toast.makeText(MainActivity.this, "You can set more precisely using volume buttons", Toast.LENGTH_LONG).show();
-                    seekTouch = true;
-                }
+                vibrateTouch();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (!seekTouch) {
+                    Toast.makeText(MainActivity.this, "You can set more precisely using volume buttons", Toast.LENGTH_LONG).show();
+                    seekTouch = true;
+                }
             }
         });
         productInfo.setText(productInfoText);

@@ -106,9 +106,9 @@ public class BatteryMonitorService extends Service {
 
     // Create a custom notification
     private Notification createNotification() {
-        String notificationText = "Alerting when battery is charged optimally.";
+        String notificationText = "Battery level alerts are on.";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                .setContentTitle("Monitoring Charge Levels")
+                .setContentTitle("Optimised Battery Charging")
                 .setContentText(notificationText)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
