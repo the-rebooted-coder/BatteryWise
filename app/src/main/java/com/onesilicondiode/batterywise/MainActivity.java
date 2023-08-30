@@ -7,7 +7,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.view.HapticFeedbackConstants;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -48,12 +47,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
     MaterialButton startSaving, stopSaving;
-    private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
-    private float scaleFactorOriginal = 1.0f;
-
     TextView productInfo;
     int selectedBatteryLevel = 85;
     boolean seekTouch = false;
+    private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
+    private float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
     private Vibrator vibrator;
     private String manufacturer;
@@ -211,8 +209,7 @@ public class MainActivity extends AppCompatActivity {
                             .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
                             .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
                             .compose());
-        }
-        else{
+        } else {
             long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
