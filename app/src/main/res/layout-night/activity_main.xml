@@ -67,7 +67,14 @@
                 android:layout_marginTop="10dp"
                 android:backgroundTint="#494949"
                 app:cardCornerRadius="8dp">
-
+                <TextView
+                    android:id="@+id/seekBarValueOverlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="50dp"
+                    android:visibility="invisible"/>
                 <androidx.appcompat.widget.AppCompatSeekBar
                     android:id="@+id/batteryLevelSeekBar"
                     android:layout_width="250dp"
