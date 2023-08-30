@@ -80,8 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:max="10"
-                    android:progress="5"
-                    android:theme="@style/Widget.AppCompat.SeekBar.Discrete" />
+                    android:progress="5"/>
             </androidx.cardview.widget.CardView>
 
             <com.google.android.material.button.MaterialButton
