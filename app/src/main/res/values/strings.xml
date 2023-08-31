@@ -5,8 +5,10 @@
     <string name="disable">DISABLE</string>
     <string name="shortcutInfo">QuickStart</string>
     <string name="shortcutDetail">You can use this as to straight enable the SafeCharge Service.</string>
-    <string name="productInfo">Say goodbye to unnecessary wear and tear on your battery and hello to a longer-lasting, battery 👋.\n\nYour</string>
+    <string name="productInfo">Goodbye to battery drain.\nHello to longer life</string>
     <string name="productInfo_partTwo">will alert you when it charges beyond</string>
     <string name="disclaimer">For optimized battery life, your phone should never go below 20% or never above 85%.\n\nIt may put your mind at ease when your smartphone’s battery reads 100% charge, but it’s actually not ideal for the battery.\n\nSo, if you are keen on keeping your battery living as long as possible, you should keep its charge between 20 and 85%.\n\nThis is exactly what SafeCharge serves, it plays an alert tone right when your phone has just went above 85%, alerting you to disconnect the charger.</string>
     <string name="learn_more">Learn More</string>
+    <string name="disclaimer_extended">Your phone should ideally stay within the 20% to 85% charge range.\n\nWhile seeing 100% charge feels good, it\'s not the best for your battery\n\nTo prolong your battery\'s life, consider using SafeCharge.\n\nIt notifies you when your phone crosses the 85% threshold, reminding you to unplug your charger for optimal battery care.</string>
+    <string name="learn_how_safecharge_helps">Learn How SafeCharge Helps</string>
 </resources>
