@@ -1,11 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".About">
 
-    
+    <TextView
+        android:id="@+id/aboutApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:fontFamily="@font/psb"
+        android:text="About"
+        android:textSize="24sp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/initialCard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/aboutApp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="@color/safeGreenBg"
+        app:cardCornerRadius="16dp">
+
+        <TextView
+            android:id="@+id/appsName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/psb"
+            android:paddingStart="20dp"
+            android:paddingEnd="30dp"
+            android:text="@string/app_name"
+            android:textSize="24sp"
+            app:drawableEndCompat="@drawable/green_small" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/secondaryCard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="60dp"
+            android:backgroundTint="@color/green_dark">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/developedBy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:fontFamily="@font/psb"
+                    android:paddingStart="20dp"
+                    android:text="@string/developed_by"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    tools:ignore="RtlSymmetry" />
+                <ImageView
+                    android:id="@+id/ssPhoto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ss"
+                    android:layout_marginRight="2dp"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

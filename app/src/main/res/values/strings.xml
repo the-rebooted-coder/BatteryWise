@@ -11,4 +11,5 @@
     <string name="learn_more">Learn More</string>
     <string name="disclaimer_extended">Your phone should ideally stay within the 20% to 85% charge range.\n\nWhile seeing 100% charge feels good, it\'s not the best for your battery\n\nTo prolong your battery\'s life, consider using SafeCharge.\n\nIt notifies you when your phone crosses the 85% threshold, reminding you to unplug your charger for optimal battery care.</string>
     <string name="learn_how_safecharge_helps">Learn How SafeCharge Helps</string>
+    <string name="developed_by">Developed By:\nSpandan Saxena</string>
 </resources>
