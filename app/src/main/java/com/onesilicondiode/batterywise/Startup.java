@@ -22,14 +22,23 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.swipebutton_library.SwipeButton;
 import com.gauravbhola.ripplepulsebackground.RipplePulseLayout;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
 
 public class Startup extends AppCompatActivity {
     TextView appName;
-    MaterialButton startApp;
+    SwipeButton startApp;
     RipplePulseLayout mRipplePulseLayout;
+
+    public static int getThemeColor(Context context, int colorResId) {
+        TypedValue typedValue = new TypedValue();
+        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
+        int color = typedArray.getColor(0, 0);
+        typedArray.recycle();
+        return color;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +56,7 @@ public class Startup extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f ) ;
+                AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
                 appName.startAnimation(fadeIn);
                 fadeIn.setDuration(1200);
                 appName.setVisibility(View.VISIBLE);
@@ -56,7 +65,7 @@ public class Startup extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                AlphaAnimation fadeIn = new AlphaAnimation(0.0f , 1.0f ) ;
+                AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
                 startApp.startAnimation(fadeIn);
                 fadeIn.setDuration(1200);
                 startApp.setVisibility(View.VISIBLE);
@@ -66,13 +75,5 @@ public class Startup extends AppCompatActivity {
 
     private void startPulse() {
         mRipplePulseLayout.startRippleAnimation();
-    }
-
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
     }
 }

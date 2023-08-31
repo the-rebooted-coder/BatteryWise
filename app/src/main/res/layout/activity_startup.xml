@@ -10,9 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="160dp"
+        android:animateLayoutChanges="true"
         android:fontFamily="@font/psb"
         android:text="Welcome to\nSafeCharge"
-        android:animateLayoutChanges="true"
         android:textSize="24sp"
         android:visibility="invisible" />
 
@@ -36,15 +36,27 @@
             android:src="@drawable/ic_launcher_foreground" />
     </com.gauravbhola.ripplepulsebackground.RipplePulseLayout>
 
-    <com.google.android.material.button.MaterialButton
+    <com.example.swipebutton_library.SwipeButton
         android:id="@+id/startButton"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="BEGIN"
-        android:fontFamily="@font/psb"
-        android:visibility="invisible"
-        android:elevation="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="200dp"
-        android:layout_centerHorizontal="true"/>
+        ripple:button_background_padding="3dp"
+        ripple:button_background_src="@drawable/baseline_start_24"
+        ripple:button_background_tint="@color/green"
+        ripple:button_height="35dp"
+        ripple:button_width="35dp"
+        ripple:has_active_status="true"
+        ripple:has_finish_animation="true"
+        ripple:inner_text="Swipe to Begin"
+        ripple:inner_text_color="@color/green_dark"
+        ripple:inner_text_gravity="center"
+        android:visibility="invisible"
+        ripple:inner_text_padding="8dp"
+        ripple:inner_text_size="14sp"
+        ripple:outer_background_tint="@color/green"
+        ripple:trail_background_tint="#2E5929"
+        ripple:trail_enabled="true" />
 </RelativeLayout>
