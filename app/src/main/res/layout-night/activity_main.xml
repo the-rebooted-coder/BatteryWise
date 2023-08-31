@@ -10,8 +10,8 @@
         android:id="@+id/waveLoadingView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:wlv_waveColor="@color/md_theme_light_secondary"
-        app:wlv_borderColor="@color/md_theme_light_primaryContainer"
+        app:wlv_waveColor="@color/safeGreen"
+        app:wlv_borderColor="@color/safeGreenBg"
         app:wlv_waveAmplitude="15"
         app:wlv_shapeType="rectangle"/>
 
@@ -81,6 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0%"
+                    android:fontFamily="@font/psb"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="50dp"
                     android:visibility="gone"/>

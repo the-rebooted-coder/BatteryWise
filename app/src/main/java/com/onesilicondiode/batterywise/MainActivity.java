@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
-        String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+        String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
         productInfo.setText(productInfoText);
         int seekBarProgress = selectedBatteryLevel - 80;
         batteryLevelSeekBar.setProgress(seekBarProgress);
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
 
                 // Update the TextView to display the selected battery level
-                String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+                String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
                 productInfo.setText(productInfoText);
             }
 
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (!seekTouch) {
-                    Toast.makeText(MainActivity.this, "You can set more precisely using volume buttons", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "You can also use volume buttons", Toast.LENGTH_LONG).show();
                     seekTouch = true;
                 }
                 scaleSeekBar(seekBar, 1.0f);
