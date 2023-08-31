@@ -83,11 +83,14 @@ public class Startup extends AppCompatActivity {
             ActivityOptions options = ActivityOptions
                     .makeSceneTransitionAnimation(Startup.this, sharedImageView, "imageTransition");
             startActivity(intent, options.toBundle());
-            finish();
         });
 
     }
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        finish();
+    }
     private void startPulse() {
         mRipplePulseLayout.startRippleAnimation();
     }
