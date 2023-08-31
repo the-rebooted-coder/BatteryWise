@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/pop_upText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/disclaimer"
-        android:layout_centerInParent="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
         android:fontFamily="@font/psb"
-        android:layout_margin="20dp"
-        android:textAlignment="center"/>
+        android:text="@string/disclaimer"
+        android:textAlignment="center" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/popup_card"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_below="@id/pop_upText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/md_theme_light_inversePrimary"
+        app:cardCornerRadius="8dp">
+
+        <ImageView
+            android:id="@+id/popupButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/more_information" />
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

@@ -195,12 +195,10 @@ public class MainActivity extends AppCompatActivity {
 
             // Set a custom background for the popup
             popupWindow.setBackgroundDrawable(getDrawable(R.drawable.popup_background));
-
             // Show the popup with custom animations
             popupWindow.setAnimationStyle(0); // Disable the default animation
             Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_enter_animation);
             popupView.startAnimation(enterAnimation);
-
             popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
             // Dismiss the popup with exit animation when needed
