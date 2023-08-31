@@ -52,7 +52,7 @@
         ripple:button_height="35dp"
         ripple:button_width="35dp"
         ripple:has_active_status="false"
-        ripple:has_finish_animation="true"
+        ripple:has_finish_animation="false"
         ripple:inner_text="Swipe to Begin"
         ripple:inner_text_color="@color/green_dark"
         ripple:inner_text_gravity="center"

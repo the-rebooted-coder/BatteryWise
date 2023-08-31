@@ -65,7 +65,7 @@
         android:text="@string/disclaimer_extended"
         android:textAlignment="center"
         android:textSize="16sp"
-        android:visibility="visible" />
+        android:visibility="gone" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/finalLaunch"
         android:layout_width="wrap_content"

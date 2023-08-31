@@ -1,8 +1,15 @@
 package com.onesilicondiode.batterywise;
 
+import static com.onesilicondiode.batterywise.Constants.PREFS_NAME;
+
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,10 +22,15 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
 
 public class Second_Startup extends AppCompatActivity {
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String FIRST_LAUNCH_KEY = "firstLaunch";
+    MaterialButton finalLaunch;
     private TextView moreProductInfo, learnMore;
+    private Vibrator vibrator;
 
 
     public static int getThemeColor(Context context, int colorResId) {
@@ -45,7 +57,23 @@ public class Second_Startup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setEnterTransition(null);
         setContentView(R.layout.activity_second_startup);
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         moreProductInfo = findViewById(R.id.moreProductInfo);
+        finalLaunch = findViewById(R.id.finalLaunch);
+        finalLaunch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Second_Startup.this, MainActivity.class);
+                startActivity(intent);
+                vibrate();
+                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean(FIRST_LAUNCH_KEY, false);
+                editor.apply();
+                finish();
+
+            }
+        });
         learnMore = findViewById(R.id.learnMore);
         learnMore.setOnClickListener(v -> {
             // Fade in the "moreProductInfo" TextView
@@ -64,5 +92,19 @@ public class Second_Startup extends AppCompatActivity {
         textView.setVisibility(View.VISIBLE);
         learnMore.setVisibility(View.GONE);
         textView.startAnimation(fadeIn);
+    }
+
+    private void vibrate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            vibrator.vibrate(
+                    VibrationEffect.startComposition()
+                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
+                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
+                            .compose());
+        } else {
+            long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
+            vibrator.vibrate(vibrationEffect);
+        }
     }
 }

@@ -40,7 +40,6 @@ import com.google.android.material.color.DynamicColors;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.InstallState;
 import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
@@ -65,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving, stopSaving;
     TextView productInfo;
     int selectedBatteryLevel = 85;
-    private WaveLoadingView waveLoadingView;
     boolean seekTouch = false;
+    private WaveLoadingView waveLoadingView;
     private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
     private float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-      //  SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
