@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+      //  SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
