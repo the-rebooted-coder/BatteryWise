@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -195,11 +196,25 @@ public class MainActivity extends AppCompatActivity {
 
             // Set a custom background for the popup
             popupWindow.setBackgroundDrawable(getDrawable(R.drawable.popup_background));
+
             // Show the popup with custom animations
             popupWindow.setAnimationStyle(0); // Disable the default animation
             Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_enter_animation);
             popupView.startAnimation(enterAnimation);
             popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+            // Get the ImageView inside the popup
+            ImageView popupButton = popupView.findViewById(R.id.popupButton);
+
+            // Add an OnClickListener to the ImageView
+            popupButton.setOnClickListener(v -> {
+                // Create an Intent to open the NewActivity
+                Intent intent = new Intent(MainActivity.this, About.class);
+                startActivity(intent);
+                vibrate();
+                // Dismiss the popup
+                popupWindow.dismiss();
+            });
 
             // Dismiss the popup with exit animation when needed
             popupView.setOnClickListener(v -> {
