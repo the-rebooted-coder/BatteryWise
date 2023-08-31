@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 selectedBatteryLevel = 80 + progress;
                 String progressText = selectedBatteryLevel + "%";
                 seekBarValueOverlay.setText(progressText);
+                vibrateTouch();
                 // Display the overlay
                 seekBarValueOverlay.startAnimation(showAnimation);
                 seekBarValueOverlay.setVisibility(View.VISIBLE);
@@ -149,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                vibrateTouch();
                 scaleSeekBar(seekBar, 1.2f);
             }
 
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 scaleSeekBar(seekBar, 1.0f);
                 seekBarValueOverlay.startAnimation(hideAnimation);
-                seekBarValueOverlay.setVisibility(View.INVISIBLE);
+                seekBarValueOverlay.setVisibility(View.GONE);
             }
         });
         productInfo.setText(productInfoText);
