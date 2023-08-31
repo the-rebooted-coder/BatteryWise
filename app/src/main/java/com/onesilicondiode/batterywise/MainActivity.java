@@ -33,11 +33,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.InstallState;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_APP_UPDATE = 123;
     private final ActivityResultLauncher<String> requestNotificationPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -58,16 +68,50 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAnalytics mFirebaseAnalytics;
     private Vibrator vibrator;
     private String manufacturer;
+    private AppUpdateManager appUpdateManager;
 
+    public static int getThemeColor(Context context, int colorResId) {
+        TypedValue typedValue = new TypedValue();
+        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
+        int color = typedArray.getColor(0, 0);
+        typedArray.recycle();
+        return color;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(getThemeColor(this,android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        appUpdateManager = AppUpdateManagerFactory.create(this);
+        InstallStateUpdatedListener installStateUpdatedListener = state -> {
+            if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                // The update has been downloaded, trigger the installation
+                appUpdateManager.completeUpdate();
+            }
+        };
+        appUpdateManager.registerListener(installStateUpdatedListener);
+
+        // Check for app updates
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                // An update is available, and it can be installed immediately
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.FLEXIBLE,
+                            this,
+                            REQUEST_CODE_APP_UPDATE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
@@ -187,6 +231,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_APP_UPDATE) {
+            if (resultCode != RESULT_OK) {
+                // If the update is not completed, you can handle it here
+            }
+        }
+    }
+
     private void scaleSeekBar(SeekBar seekBar, float scaleFactor) {
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(seekBar, "scaleX", scaleFactor);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(seekBar, "scaleY", scaleFactor);
@@ -237,13 +292,7 @@ public class MainActivity extends AppCompatActivity {
         // Vibrate with the custom pattern
         vibrator.vibrate(vibrationEffect);
     }
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[] {colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
-    }
+
     private void checkNotificationPermission() {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
 
