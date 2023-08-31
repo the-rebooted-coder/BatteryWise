@@ -11,9 +11,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -21,7 +24,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.swipebutton_library.OnActiveListener;
 import com.example.swipebutton_library.SwipeButton;
 import com.gauravbhola.ripplepulsebackground.RipplePulseLayout;
 import com.google.android.material.button.MaterialButton;
@@ -31,6 +36,7 @@ public class Startup extends AppCompatActivity {
     TextView appName;
     SwipeButton startApp;
     RipplePulseLayout mRipplePulseLayout;
+    private Vibrator vibrator;
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -71,9 +77,31 @@ public class Startup extends AppCompatActivity {
                 startApp.setVisibility(View.VISIBLE);
             }
         }, 2500);
+
+        startApp.setOnActiveListener(new OnActiveListener() {
+            @Override
+            public void onActive() {
+               vibrate();
+            }
+        });
+
     }
 
     private void startPulse() {
         mRipplePulseLayout.startRippleAnimation();
+    }
+
+    private void vibrate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            vibrator.vibrate(
+                    VibrationEffect.startComposition()
+                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
+                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
+                            .compose());
+        } else {
+            long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
+            vibrator.vibrate(vibrationEffect);
+        }
     }
 }

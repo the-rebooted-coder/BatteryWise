@@ -26,8 +26,8 @@
         ripple:endRadius="450dp"
         ripple:rippleColor="#236725"
         ripple:rippleType="fill"
-        ripple:startRadius="65dp"
-        ripple:strokeWidth="12dp">
+        ripple:startRadius="0dp"
+        ripple:strokeWidth="25dp">
 
         <ImageView
             android:layout_width="200dp"
@@ -45,9 +45,9 @@
         ripple:button_background_src="@drawable/baseline_start_24"
         ripple:button_background_tint="@color/green_dark"
         ripple:button_height="35dp"
+        ripple:has_active_status="false"
         ripple:button_width="35dp"
         ripple:outer_background_tint="@color/green_dark"
-        ripple:has_active_status="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="200dp"
         ripple:has_finish_animation="true"
