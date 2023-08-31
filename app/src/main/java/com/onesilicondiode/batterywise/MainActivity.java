@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -46,6 +47,8 @@ import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import me.itangqi.waveloadingview.WaveLoadingView;
+
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_APP_UPDATE = 123;
     private final ActivityResultLauncher<String> requestNotificationPermission =
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving, stopSaving;
     TextView productInfo;
     int selectedBatteryLevel = 85;
+    private WaveLoadingView waveLoadingView;
     boolean seekTouch = false;
     private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
     private float scaleFactorOriginal = 1.0f;
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        waveLoadingView = findViewById(R.id.waveLoadingView); // Initialize the WaveLoadingView
         appUpdateManager = AppUpdateManagerFactory.create(this);
         InstallStateUpdatedListener installStateUpdatedListener = state -> {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
@@ -119,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
         Animation hideAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_hide);
         TextView seekBarValueOverlay = findViewById(R.id.seekBarValueOverlay);
         manufacturer = Build.MANUFACTURER;
+        BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
+        int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        waveLoadingView.setProgressValue(batteryPercent);
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);

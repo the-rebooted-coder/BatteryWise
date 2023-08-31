@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/waveLoadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:wlv_waveColor="@color/md_theme_light_secondary"
+        app:wlv_borderColor="@color/md_theme_light_primaryContainer"
+        app:wlv_waveAmplitude="15"
+        app:wlv_shapeType="rectangle"/>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_contacts"
         android:layout_width="wrap_content"
@@ -17,7 +25,7 @@
         app:layout_anchor="@id/layoutHolder"
         app:layout_anchorGravity="center|top"
         app:maxImageSize="40dp"
-        app:tint="@color/green" />
+        app:tint="@color/green"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/layoutHolder"

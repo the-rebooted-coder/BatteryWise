@@ -41,4 +41,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation "androidx.core:core-splashscreen:1.0.1"
     implementation 'com.google.android.play:app-update:2.1.0'
+    implementation 'com.github.tangqi92:WaveLoadingView:v0.3.5'
+
 }
