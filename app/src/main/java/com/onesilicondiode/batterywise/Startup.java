@@ -1,11 +1,14 @@
 package com.onesilicondiode.batterywise;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.splashscreen.SplashScreen;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,6 +21,7 @@ import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -54,6 +58,8 @@ public class Startup extends AppCompatActivity {
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        ImageView sharedImageView = findViewById(R.id.sharedImageView);
         appName = findViewById(R.id.appName);
         startApp = findViewById(R.id.startButton);
         mRipplePulseLayout = findViewById(R.id.layout_ripplepulse);
@@ -82,6 +88,12 @@ public class Startup extends AppCompatActivity {
             @Override
             public void onActive() {
                vibrate();
+                getWindow().setSharedElementsUseOverlay(true);
+                Intent intent = new Intent(Startup.this, Second_Startup.class);
+                ActivityOptions options = ActivityOptions
+                        .makeSceneTransitionAnimation(Startup.this, sharedImageView, "imageTransition");
+                startActivity(intent, options.toBundle());
+                finish();
             }
         });
 
