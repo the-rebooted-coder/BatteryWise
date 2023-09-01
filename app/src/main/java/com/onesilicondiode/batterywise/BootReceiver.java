@@ -10,11 +10,22 @@ public class BootReceiver extends BroadcastReceiver {
         // Check if the device has finished booting
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context, BatteryMonitorService.class);
-            context.startForegroundService(serviceIntent);
-        }
-        else if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())){
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // Starting foreground service is available starting from Android Oreo (API level 26)
+                context.startForegroundService(serviceIntent);
+            } else {
+                // For Android Nougat (API level 24) and lower, use startService
+                context.startService(serviceIntent);
+            }
+        } else if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context, BatteryMonitorService.class);
-            context.startForegroundService(serviceIntent);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // Starting foreground service is available starting from Android Oreo (API level 26)
+                context.startForegroundService(serviceIntent);
+            } else {
+                // For Android Nougat (API level 24) and lower, use startService
+                context.startService(serviceIntent);
+            }
         }
     }
 }

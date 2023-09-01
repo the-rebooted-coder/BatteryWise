@@ -52,7 +52,7 @@ public class About extends AppCompatActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             String version = pInfo.versionName;
-            String productInfoText = "SafeCharge Version:\n" + version + "\n1.0.6";
+            String productInfoText = "SafeCharge Version:\n" + version + "\n1.0.7";
             versionInfo.setText(productInfoText);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
