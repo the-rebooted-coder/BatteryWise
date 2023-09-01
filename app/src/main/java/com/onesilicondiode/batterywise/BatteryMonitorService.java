@@ -83,7 +83,7 @@ public class BatteryMonitorService extends Service {
 
         // Create a notification channel (required for Android 8.0 and above)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID, "SafeCharge", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID, "SafeCharge", NotificationManager.IMPORTANCE_LOW);
             channel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle), null); // Set custom sound
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -102,8 +102,14 @@ public class BatteryMonitorService extends Service {
 
     // Create a custom notification
     private Notification createNotification() {
-        String notificationText = "Battery level alerts are on.";
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID).setContentTitle("Optimised Battery Charging").setContentText(notificationText).setSmallIcon(R.drawable.ic_notification).setPriority(NotificationCompat.PRIORITY_DEFAULT).setColor(ContextCompat.getColor(this, R.color.green)).setColorized(true).setContentIntent(pendingIntent).setAutoCancel(true);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
+                .setContentTitle("Monitoring Charge Levels")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setColor(ContextCompat.getColor(this, R.color.green))
+                .setColorized(true)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
 
         // Set custom sound for the notification
         Uri customSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle);
