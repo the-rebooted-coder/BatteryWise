@@ -103,9 +103,15 @@ public class Startup extends AppCompatActivity {
                             .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
                             .compose());
         } else {
-            long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
-            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-            vibrator.vibrate(vibrationEffect);
+            long[] pattern = {5,0,5,0,5,1,5,1,5,2,5,2,5,3,5,4,5,4,5,5,5,6,5,6,5,7,5,8,5,8,5,9,5,10,5,10,5,11,5,11,5,12,5,13,5,13,5,14,5,14,5,15,5,15,5,16,5,16,5,17,5,17,5,17,5,18,5,18,5,19,5,19,5,19,5,20,5,20,5,20,5,21,5,21,5,21,5,22,5,22,5,22,5,22,5,23,5,23,5,23,5,23,5,23,5,24,5,24,5,24,5,24,5,24,5,24,5,24,5,24,5,25,5,25,5,25,5,25,5,25,5,25,5,25,5,25,5,25,5,25,5};
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
+                vibrator.vibrate(vibrationEffect);
+            } else {
+                // For versions lower than Oreo
+                vibrator.vibrate(pattern, -1);
+            }
         }
     }
 }

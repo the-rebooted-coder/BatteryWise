@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
             popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
             // Get the ImageView inside the popup
-            ImageView popupButton = popupView.findViewById(R.id.popupButton);
+            MaterialButton popupButton = popupView.findViewById(R.id.popupButton);
 
             // Add an OnClickListener to the ImageView
             popupButton.setOnClickListener(v -> {
@@ -237,17 +237,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
             finish();
         });
-
-        stopSaving.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
-                stopService(serviceIntent);
-                Toast.makeText(MainActivity.this, "Service Stopped", Toast.LENGTH_SHORT).show();
-                stopSaving.setVisibility(View.GONE);
-                startSaving.setVisibility(View.VISIBLE);
-                vibrate();
-            }
+        stopSaving.setOnClickListener(view -> {
+            Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
+            stopService(serviceIntent);
+            Toast.makeText(MainActivity.this, "Service Stopped", Toast.LENGTH_SHORT).show();
+            stopSaving.setVisibility(View.GONE);
+            startSaving.setVisibility(View.VISIBLE);
+            vibrate();
         });
     }
 
@@ -284,38 +280,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            vibrator.vibrate(
-                    VibrationEffect.startComposition()
-                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
-                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
-                            .compose());
-        } else {
-            long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+        long[] pattern = {11,0,11,0,20,2,23,6,10,9,0,12,11,14,0,16,12,17,0,16,10,15,0,13,0,11,15,10,0,10,13,12,16,15,10,18,15,21,13,22,10,22,10,23,18};
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
+        } else {
+            // For versions lower than Oreo
+            vibrator.vibrate(pattern, -1);
         }
     }
 
     private void vibrateKeys() {
-        long[] customPattern = {0, 200, 500, 400};
+        long[] customPattern = {14,0,10,9,10,15,0,11,9,5,12,2,12,4,10,7,0,11,11,14,14,25,11,25,9};
         // Create a VibrationEffect
-        VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
-        // Vibrate with the custom pattern
-        vibrator.vibrate(vibrationEffect);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
+            vibrator.vibrate(vibrationEffect);
+        } else {
+            // For versions lower than Oreo
+            vibrator.vibrate(customPattern, -1);
+        }
     }
 
     private void vibrateTouch() {
-        long[] customPattern = {0, 290};
+        long[] pattern = {7,0,8,1,6,6,6,11,5,15,0,17,5,16,0,13,7,10,6,10,0,14,7,19,6,22,5,22,6}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
         // Create a VibrationEffect
-        VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
-        // Vibrate with the custom pattern
-        vibrator.vibrate(vibrationEffect);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
+            vibrator.vibrate(vibrationEffect);
+        } else {
+            // For versions lower than Oreo
+            vibrator.vibrate(pattern, -1);
+        }
     }
 
     private void checkNotificationPermission() {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
-
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             // Permission already granted, proceed with your action here
             // You can call the method for your action
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
 
             // Update the TextView to display the selected battery level
-            String productInfoText = getString(R.string.productInfo) + " " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+            String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
             productInfo.setText(productInfoText);
             vibrateKeys();
             return true; // Consume the volume key press event

@@ -66,13 +66,13 @@ public class Second_Startup extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Second_Startup.this, MainActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 vibrate();
                 SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean(FIRST_LAUNCH_KEY, false);
                 editor.apply();
                 finish();
-
             }
         });
         learnMore = findViewById(R.id.learnMore);
@@ -94,17 +94,16 @@ public class Second_Startup extends AppCompatActivity {
         learnMore.setVisibility(View.GONE);
         textView.startAnimation(fadeIn);
     }
+
     private void vibrate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            vibrator.vibrate(
-                    VibrationEffect.startComposition()
-                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
-                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
-                            .compose());
-        } else {
-            long[] pattern = {0, 100, 100}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+        long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3, 10, 5, 0, 6, 0, 7, 11, 9, 14, 10, 13, 10, 11, 11, 0, 11, 11, 11, 11, 11, 13, 11, 14, 10, 10, 10, 0, 10, 11, 10, 14, 9, 10, 9, 11, 10, 0, 10, 10, 11, 13, 11, 11, 13, 12, 14, 11, 15, 0, 17, 10, 18, 11, 20, 13, 21, 13, 23, 11, 24, 10, 25, 16};
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
+        } else {
+            // For versions lower than Oreo
+            vibrator.vibrate(pattern, -1);
         }
     }
 }

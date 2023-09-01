@@ -17,20 +17,21 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/popup_card"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/pop_upText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="@color/md_theme_light_inversePrimary"
+        android:backgroundTint="@color/green"
         app:cardCornerRadius="8dp">
-
-        <ImageView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/popupButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/more_information" />
+            android:backgroundTint="#FFFFFF"
+            android:layout_width="wrap_content"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            android:text="ABOUT"/>
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

@@ -9,9 +9,9 @@ android {
 
     defaultConfig {
         applicationId "com.onesilicondiode.batterywise"
-        minSdk 26
+        minSdk 25
         targetSdk 33
-        versionCode 3
+        versionCode 4
         versionName "Amrit - VRelease"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
