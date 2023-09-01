@@ -13,7 +13,7 @@
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:src="@drawable/ic_launcher_foreground"
         android:transitionName="imageTransition" />
 
@@ -46,34 +46,46 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/finalLaunch"
         android:layout_centerHorizontal="true"
-        android:fontFamily="@font/productsans"
-        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/productsans"
         android:text="@string/learn_how_safecharge_helps"
         android:textAlignment="center"
         android:textColor="#37608F" />
 
-    <TextView
-        android:id="@+id/moreProductInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:layout_below="@+id/wavingHandTextView"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/productsans"
-        android:paddingStart="50dp"
-        android:paddingEnd="50dp"
-        android:text="@string/disclaimer_extended"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/moreProductInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/productsans"
+                android:paddingStart="50dp"
+                android:paddingEnd="50dp"
+                android:text="@string/disclaimer_extended"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/finalLaunch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="START"
-        android:fontFamily="@font/psb"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="100dp"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:fontFamily="@font/psb"
+        android:text="START" />
 </RelativeLayout>

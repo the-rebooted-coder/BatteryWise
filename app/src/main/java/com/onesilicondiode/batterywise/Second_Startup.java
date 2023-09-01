@@ -46,6 +46,7 @@ public class Second_Startup extends AppCompatActivity {
         super.onBackPressed();
         // Specify a custom return transition animation
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finishAfterTransition();
     }
 
     @Override
@@ -93,7 +94,6 @@ public class Second_Startup extends AppCompatActivity {
         learnMore.setVisibility(View.GONE);
         textView.startAnimation(fadeIn);
     }
-
     private void vibrate() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             vibrator.vibrate(
