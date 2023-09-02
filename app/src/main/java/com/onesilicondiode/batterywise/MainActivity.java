@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -33,15 +32,11 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
@@ -414,136 +409,136 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-        private void showAlertDialog (String brandName, String componentNamePackage, String
-        componentNameClass){
-            startService();
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            alertDialogBuilder.setTitle("Enable AutoStart");
-            alertDialogBuilder.setMessage("You're using a " + brandName + " Phone, autostart is required to enable SafeCharge on your device.");
-            alertDialogBuilder.setCancelable(false);
+    private void showAlertDialog(String brandName, String componentNamePackage, String
+            componentNameClass) {
+        startService();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Enable AutoStart");
+        alertDialogBuilder.setMessage("You're using a " + brandName + " Phone, autostart is required to enable SafeCharge on your device.");
+        alertDialogBuilder.setCancelable(false);
 
-            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+        alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(componentNamePackage, componentNameClass));
+                startActivity(intent);
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private void showHuaweiAlertDialog() {
+        startService();
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Enable AutoStart");
+        alertDialogBuilder.setMessage("You're using a Huawei Phone, autostart is required to enable SafeCharge on your device.");
+        alertDialogBuilder.setCancelable(false);
+
+        alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
                     Intent intent = new Intent();
-                    intent.setComponent(new ComponentName(componentNamePackage, componentNameClass));
+                    intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity");
                     startActivity(intent);
-                }
-            });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
-
-        private void showHuaweiAlertDialog () {
-            startService();
-
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            alertDialogBuilder.setTitle("Enable AutoStart");
-            alertDialogBuilder.setMessage("You're using a Huawei Phone, autostart is required to enable SafeCharge on your device.");
-            alertDialogBuilder.setCancelable(false);
-
-            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                } catch (Exception e) {
                     try {
                         Intent intent = new Intent();
-                        intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity");
+                        intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
                         startActivity(intent);
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         try {
                             Intent intent = new Intent();
                             intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
                             startActivity(intent);
-                        } catch (Exception ex) {
-                            try {
-                                Intent intent = new Intent();
-                                intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
-                                startActivity(intent);
-                            } catch (Exception exx) {
-                                Log.e("Huawei ki mkb", "App crash bach gaya");
-                            }
+                        } catch (Exception exx) {
+                            Log.e("Huawei ki mkb", "App crash bach gaya");
                         }
                     }
                 }
-            });
+            }
+        });
 
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
-        private void showOppoAlertDialog () {
-            startService();
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            alertDialogBuilder.setTitle("Enable AutoStart");
-            alertDialogBuilder.setMessage("You're using an Oppo Phone, autostart is required to enable SafeCharge on your device.");
-            alertDialogBuilder.setCancelable(false);
+    private void showOppoAlertDialog() {
+        startService();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Enable AutoStart");
+        alertDialogBuilder.setMessage("You're using an Oppo Phone, autostart is required to enable SafeCharge on your device.");
+        alertDialogBuilder.setCancelable(false);
 
-            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+        alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    Intent intent = new Intent();
+                    intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity");
+                    startActivity(intent);
+                } catch (Exception e) {
                     try {
                         Intent intent = new Intent();
-                        intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity");
+                        intent.setClassName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity");
                         startActivity(intent);
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         try {
                             Intent intent = new Intent();
-                            intent.setClassName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity");
+                            intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity");
                             startActivity(intent);
-                        } catch (Exception ex) {
-                            try {
-                                Intent intent = new Intent();
-                                intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity");
-                                startActivity(intent);
-                            } catch (Exception exx) {
-                                Log.e("Oppo ki mkb", "App crash bach gaya");
-                            }
+                        } catch (Exception exx) {
+                            Log.e("Oppo ki mkb", "App crash bach gaya");
                         }
                     }
                 }
-            });
+            }
+        });
 
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
-        private void showVivoAlertDialog () {
-            startService();
+    private void showVivoAlertDialog() {
+        startService();
 
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            alertDialogBuilder.setTitle("Enable AutoStart");
-            alertDialogBuilder.setMessage("You're using a Vivo Phone, autostart is required to enable SafeCharge on your device.");
-            alertDialogBuilder.setCancelable(false);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setTitle("Enable AutoStart");
+        alertDialogBuilder.setMessage("You're using a Vivo Phone, autostart is required to enable SafeCharge on your device.");
+        alertDialogBuilder.setCancelable(false);
 
-            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+        alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
+                    startActivity(intent);
+                } catch (Exception e) {
                     try {
                         Intent intent = new Intent();
-                        intent.setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
+                        intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
                         startActivity(intent);
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         try {
                             Intent intent = new Intent();
-                            intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+                            intent.setClassName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
                             startActivity(intent);
-                        } catch (Exception ex) {
-                            try {
-                                Intent intent = new Intent();
-                                intent.setClassName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
-                                startActivity(intent);
-                            } catch (Exception exx) {
-                                ex.printStackTrace();
-                            }
+                        } catch (Exception exx) {
+                            ex.printStackTrace();
                         }
                     }
                 }
-            });
+            }
+        });
 
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
 
     private void startService() {
         Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
