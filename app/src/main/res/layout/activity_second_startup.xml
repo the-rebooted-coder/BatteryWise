@@ -47,7 +47,7 @@
         android:layout_above="@+id/finalLaunch"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:fontFamily="@font/productsans"
         android:text="@string/learn_how_safecharge_helps"
         android:textAlignment="center"
