@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage("You're using a " + brandName + " Phone, AutoStart is required to enable SafeCharge on your device.")
                 .setCancelable(false)
                 .setView(customView)
-                .setPositiveButton("ALLOW", (dialog, which) -> {
+                .setPositiveButton("Continue", (dialog, which) -> {
                     Intent intent = new Intent();
                     intent.setComponent(new ComponentName(componentNamePackage, componentNameClass));
                     try {
