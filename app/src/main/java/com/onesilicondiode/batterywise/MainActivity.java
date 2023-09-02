@@ -40,6 +40,7 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
@@ -50,18 +51,17 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
+import xyz.kumaraswamy.autostart.Autostart;
+import xyz.kumaraswamy.autostart.Utils;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_APP_UPDATE = 123;
     private final ActivityResultLauncher<String> requestNotificationPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
+                if (!isGranted) {
                     // Permission granted, perform your action
-                    Toast.makeText(this, "Continue to Enable the Service", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission denied, cannot post notification to keep SafeCharge working 😔", Toast.LENGTH_LONG).show();
 
-                } else {
-                    // Permission denied
-                    Toast.makeText(this, "Permission denied, cannot post notification to keep app alive 😔", Toast.LENGTH_LONG).show();
                 }
             });
     MaterialButton startSaving, stopSaving;
@@ -317,27 +317,27 @@ public class MainActivity extends AppCompatActivity {
     private void checkNotificationPermission() {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted, proceed with your action here
-            // You can call the method for your action
+            Toast.makeText(this, "Continue to Enable SafeCharge", Toast.LENGTH_SHORT).show();
         } else if (shouldShowRequestPermissionRationale(permission)) {
             // Permission denied previously, show rationale dialog
             showPermissionRationaleDialog();
         } else {
             // Request notification permission
-            requestNotificationPermission.launch(permission);
+            showPermissionRationaleDialog();
         }
     }
 
     private void showPermissionRationaleDialog() {
-        // For example, you can use a AlertDialog:
-        new AlertDialog.Builder(this)
-                .setTitle("Notification Permission is Required")
-                .setMessage("Permissions are required to show notification in-order to keep the battery monitoring service active.")
-                .setPositiveButton("GRANT", (dialog, which) -> {
-                    // Request permission after explaining
+        View customView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.notification_notify)
+                .setMessage(R.string.notify_desc)
+                .setView(customView)
+                .setPositiveButton("Continue", (dialog, which) -> {
+                    vibrate();
                     requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> {
+                .setNegativeButton("No Thanks", (dialog, which) -> {
                     // Handle if the user cancels the request
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
                 })
@@ -387,7 +387,20 @@ public class MainActivity extends AppCompatActivity {
         String manufacturer = Build.MANUFACTURER;
 
         if (brand.equalsIgnoreCase("xiaomi")) {
-            showAlertDialog("Xiaomi", "com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
+            if (Utils.INSTANCE.isOnMiui()) {
+                boolean enabled = Autostart.INSTANCE.isAutoStartEnabled(this);
+                if (!enabled) {
+                    showAlertDialog("Xiaomi", "com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
+                } else {
+                    Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
+                    startService(serviceIntent);
+                    startSaving.setVisibility(View.GONE);
+                    vibrate();
+                    stopSaving.setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
         } else if (brand.equalsIgnoreCase("Letv")) {
             showAlertDialog("Letv", "com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity");
         } else if (brand.equalsIgnoreCase("Honor")) {
@@ -398,6 +411,8 @@ public class MainActivity extends AppCompatActivity {
             showVivoAlertDialog();
         } else if (manufacturer.contains("asus")) {
             showAlertDialog("Asus", "com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity");
+        } else if (manufacturer.contains("samsung")) {
+            showAlertDialog("Samsung", "com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity");
         } else {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
             startService(serviceIntent);
@@ -409,25 +424,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showAlertDialog(String brandName, String componentNamePackage, String
-            componentNameClass) {
+    private void showAlertDialog(String brandName, String componentNamePackage, String componentNameClass) {
         startService();
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilder.setTitle("Enable AutoStart");
-        alertDialogBuilder.setMessage("You're using a " + brandName + " Phone, autostart is required to enable SafeCharge on your device.");
+        alertDialogBuilder.setMessage("You're using a " + brandName + " Phone, AutoStart is required to enable SafeCharge on your device.");
         alertDialogBuilder.setCancelable(false);
-
-        alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName(componentNamePackage, componentNameClass));
+        alertDialogBuilder.setPositiveButton("ALLOW", (dialog, which) -> {
+            Intent intent = new Intent();
+            intent.setComponent(new ComponentName(componentNamePackage, componentNameClass));
+            try {
                 startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+                showIntentErrorDialog();
             }
         });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    private void showIntentErrorDialog() {
+        AlertDialog.Builder errorDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        errorDialogBuilder.setTitle("Cannot auto-open Settings 😔");
+        errorDialogBuilder.setMessage("SafeCharge tried opening app settings, to help you enable AutoStart but failed to do so.\n\nPlease open App Info Manually and allow SafeCharge to AutoStart/Un-restrict Battery Usage.");
+        errorDialogBuilder.setCancelable(false);
+        errorDialogBuilder.setPositiveButton("OK", (dialog, which) -> {
+            vibrateKeys();
+        });
+
+        AlertDialog errorDialog = errorDialogBuilder.create();
+        errorDialog.show();
     }
 
     private void showHuaweiAlertDialog() {
