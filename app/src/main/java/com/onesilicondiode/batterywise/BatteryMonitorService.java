@@ -103,7 +103,7 @@ public class BatteryMonitorService extends Service {
     // Create a custom notification
     private Notification createNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                .setContentTitle("Monitoring Charge Levels")
+                .setContentText("Monitoring Charge Levels")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(pendingIntent)

@@ -4,7 +4,9 @@ import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -30,11 +33,15 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
@@ -229,13 +236,11 @@ public class MainActivity extends AppCompatActivity {
             checkNotificationPermission();
         }
         startSaving.setOnClickListener(view -> {
-            Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
-            startService(serviceIntent);
-            startSaving.setVisibility(View.GONE);
-            vibrate();
-            stopSaving.setVisibility(View.VISIBLE);
-            Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
-            finish();
+            try {
+                enableAutoStart();
+            } catch (Exception e) {
+                Log.e("Intent Not Found", "autoStartFailed");
+            }
         });
         stopSaving.setOnClickListener(view -> {
             Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
@@ -280,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] pattern = {11,0,11,0,20,2,23,6,10,9,0,12,11,14,0,16,12,17,0,16,10,15,0,13,0,11,15,10,0,10,13,12,16,15,10,18,15,21,13,22,10,22,10,23,18};
+        long[] pattern = {11, 0, 11, 0, 20, 2, 23, 6, 10, 9, 0, 12, 11, 14, 0, 16, 12, 17, 0, 16, 10, 15, 0, 13, 0, 11, 15, 10, 0, 10, 13, 12, 16, 15, 10, 18, 15, 21, 13, 22, 10, 22, 10, 23, 18};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
@@ -291,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrateKeys() {
-        long[] customPattern = {14,0,10,9,10,15,0,11,9,5,12,2,12,4,10,7,0,11,11,14,14,25,11,25,9};
+        long[] customPattern = {14, 0, 10, 9, 10, 15, 0, 11, 9, 5, 12, 2, 12, 4, 10, 7, 0, 11, 11, 14, 14, 25, 11, 25, 9};
         // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
@@ -303,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrateTouch() {
-        long[] pattern = {7,0,8,1,6,6,6,11,5,15,0,17,5,16,0,13,7,10,6,10,0,14,7,19,6,22,5,22,6}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+        long[] pattern = {7, 0, 8, 1, 6, 6, 6, 11, 5, 15, 0, 17, 5, 16, 0, 13, 7, 10, 6, 10, 0, 14, 7, 19, 6, 22, 5, 22, 6}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
         // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
@@ -380,5 +385,171 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void enableAutoStart() {
+        String brand = Build.BRAND;
+        String manufacturer = Build.MANUFACTURER;
+
+        if (brand.equalsIgnoreCase("xiaomi")) {
+            showAlertDialog("Xiaomi", "com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
+        } else if (brand.equalsIgnoreCase("Letv")) {
+            showAlertDialog("Letv", "com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity");
+        } else if (brand.equalsIgnoreCase("Honor")) {
+            showHuaweiAlertDialog();
+        } else if (manufacturer.equalsIgnoreCase("oppo")) {
+            showOppoAlertDialog();
+        } else if (manufacturer.contains("vivo")) {
+            showVivoAlertDialog();
+        } else if (manufacturer.contains("asus")) {
+            showAlertDialog("Asus", "com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity");
+        } else {
+            Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
+            startService(serviceIntent);
+            startSaving.setVisibility(View.GONE);
+            vibrate();
+            stopSaving.setVisibility(View.VISIBLE);
+            Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+        private void showAlertDialog (String brandName, String componentNamePackage, String
+        componentNameClass){
+            startService();
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+            alertDialogBuilder.setTitle("Enable AutoStart");
+            alertDialogBuilder.setMessage("You're using a " + brandName + " Phone, autostart is required to enable SafeCharge on your device.");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName(componentNamePackage, componentNameClass));
+                    startActivity(intent);
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+        private void showHuaweiAlertDialog () {
+            startService();
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+            alertDialogBuilder.setTitle("Enable AutoStart");
+            alertDialogBuilder.setMessage("You're using a Huawei Phone, autostart is required to enable SafeCharge on your device.");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity");
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        try {
+                            Intent intent = new Intent();
+                            intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
+                            startActivity(intent);
+                        } catch (Exception ex) {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
+                                startActivity(intent);
+                            } catch (Exception exx) {
+                                Log.e("Huawei ki mkb", "App crash bach gaya");
+                            }
+                        }
+                    }
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+        private void showOppoAlertDialog () {
+            startService();
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+            alertDialogBuilder.setTitle("Enable AutoStart");
+            alertDialogBuilder.setMessage("You're using an Oppo Phone, autostart is required to enable SafeCharge on your device.");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity");
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        try {
+                            Intent intent = new Intent();
+                            intent.setClassName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity");
+                            startActivity(intent);
+                        } catch (Exception ex) {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity");
+                                startActivity(intent);
+                            } catch (Exception exx) {
+                                Log.e("Oppo ki mkb", "App crash bach gaya");
+                            }
+                        }
+                    }
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+        private void showVivoAlertDialog () {
+            startService();
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+            alertDialogBuilder.setTitle("Enable AutoStart");
+            alertDialogBuilder.setMessage("You're using a Vivo Phone, autostart is required to enable SafeCharge on your device.");
+            alertDialogBuilder.setCancelable(false);
+
+            alertDialogBuilder.setPositiveButton("ALLOW", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        try {
+                            Intent intent = new Intent();
+                            intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
+                            startActivity(intent);
+                        } catch (Exception ex) {
+                            try {
+                                Intent intent = new Intent();
+                                intent.setClassName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
+                                startActivity(intent);
+                            } catch (Exception exx) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+    private void startService() {
+        Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
+        startService(serviceIntent);
+        startSaving.setVisibility(View.GONE);
+        vibrate();
+        stopSaving.setVisibility(View.VISIBLE);
     }
 }
