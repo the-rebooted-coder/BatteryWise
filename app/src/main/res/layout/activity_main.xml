@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="8dp"
-        android:backgroundTint="#232323"
+        android:backgroundTint="#4D6E4B"
         android:elevation="20dp"
         app:cardCornerRadius="8dp">
 
@@ -64,9 +64,10 @@
                 android:fontFamily="@font/productsans"
                 android:text="@string/learn_more"
                 android:textAlignment="center"
-                android:textColor="#B9C3FB"
+                android:textColor="#89E4AA"
                 android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/baseline_info_24_white" />
+                app:drawableLeftCompat="@drawable/baseline_info_24_white"
+                app:drawableTint="#89E4AA" />
             <androidx.cardview.widget.CardView
                 android:layout_width="250dp"
                 android:layout_height="match_parent"

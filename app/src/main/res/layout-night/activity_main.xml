@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#394C36"
     tools:context=".MainActivity">
-
     <me.itangqi.waveloadingview.WaveLoadingView
         android:id="@+id/waveLoadingView"
         android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="8dp"
-        android:backgroundTint="#B8B8B8"
+        android:backgroundTint="#1D4935"
         android:elevation="20dp"
         app:cardCornerRadius="8dp">
 
@@ -52,7 +52,7 @@
                 android:padding="10dp"
                 android:text="@string/productInfo"
                 android:textAlignment="center"
-                android:textColor="@color/black"
+                android:textColor="#E3E3E3"
                 android:textSize="18sp" />
 
             <TextView
@@ -65,8 +65,9 @@
                 android:fontFamily="@font/productsans"
                 android:text="@string/learn_more"
                 android:textAlignment="center"
-                android:textColor="#1C2557"
+                android:textColor="#90D69F"
                 android:textSize="18sp"
+                android:drawableTint="#90D69F"
                 app:drawableLeftCompat="@drawable/baseline_info_24" />
 
             <androidx.cardview.widget.CardView

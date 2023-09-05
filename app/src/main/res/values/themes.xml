@@ -44,4 +44,5 @@
     </style>
     <color name="transparent">#00000000</color>
     <color name="green_dark">#013220</color>
+    <color name="button_dark">#5EB387</color>
 </resources>

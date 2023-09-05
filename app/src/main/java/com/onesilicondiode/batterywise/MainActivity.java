@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -32,8 +31,8 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
@@ -280,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] pattern = {11, 0, 11, 0, 20, 2, 23, 6, 10, 9, 0, 12, 11, 14, 0, 16, 12, 17, 0, 16, 10, 15, 0, 13, 0, 11, 15, 10, 0, 10, 13, 12, 16, 15, 10, 18, 15, 21, 13, 22, 10, 22, 10, 23, 18};
+        long[] pattern = {11, 0, 11, 0, 20, 2, 23, 6, 10, 9, 0, 12, 11, 14, 0, 16, 12, 17, 0, 16, 10, 15, 0, 13};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
@@ -303,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrateTouch() {
-        long[] pattern = {7, 0, 8, 1, 6, 6, 6, 11, 5, 15, 0, 17, 5, 16, 0, 13, 7, 10, 6, 10, 0, 14, 7, 19, 6, 22, 5, 22, 6}; // Vibrate for 100 milliseconds, pause for 100 milliseconds, and repeat
+        long[] pattern = {7, 0, 8, 1, 6, 6, 6, 11, 5, 15, 0, 17, 5};
         // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
@@ -456,93 +455,106 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showHuaweiAlertDialog() {
+        View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
         startService();
         vibrateTouch();
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Enable AutoStart")
                 .setMessage("You're using a Huawei Phone, autostart is required to enable SafeCharge on your device.")
                 .setCancelable(false)
-                .setPositiveButton("ALLOW", (dialog, which) -> {
-                    try {
-                        Intent intent = new Intent();
-                        intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity");
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        try {
-                            Intent intent = new Intent();
-                            intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
-                            startActivity(intent);
-                        } catch (Exception ex) {
+                .setView(customView)
+                .setPositiveButton("Continue", (dialog, which) -> {
+                    Intent[] AUTO_START_HONOR = {
+                            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
+                            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
+                           };
+                    boolean intentLaunched = false;
+                    for (Intent intent : AUTO_START_HONOR) {
+                        if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                             try {
-                                Intent intent = new Intent();
-                                intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
                                 startActivity(intent);
-                            } catch (Exception exx) {
-                                Log.e("Huawei ki mkb", "App crash bach gaya");
+                                intentLaunched = true;
+                                break;
+                            } catch (Exception e) {
+                                Log.e("Honor ki mkb","Crash Bach Gaya");
                             }
                         }
+                    }
+                    if (!intentLaunched) {
+                        // Show the error dialog here because none of the Intents were successfully launched
+                        showIntentErrorDialog();
                     }
                 })
                 .show();
     }
 
     private void showOppoAlertDialog() {
+        View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
         startService();
         vibrateTouch();
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Enable AutoStart")
                 .setMessage("You're using an Oppo Phone, autostart is required to enable SafeCharge on your device.")
+                .setView(customView)
                 .setCancelable(false)
-                .setPositiveButton("ALLOW", (dialog, which) -> {
-                    try {
-                        Intent intent = new Intent();
-                        intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity");
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        try {
-                            Intent intent = new Intent();
-                            intent.setClassName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity");
-                            startActivity(intent);
-                        } catch (Exception ex) {
+                .setPositiveButton("Continue", (dialog, which) -> {
+                    Intent[] AUTO_START_OPPO = {
+                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startup.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupapp.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startup.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.privacypermissionsentry.PermissionTopActivity"))
+                    };
+                    boolean intentLaunched = false;
+                    for (Intent intent : AUTO_START_OPPO) {
+                        if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                             try {
-                                Intent intent = new Intent();
-                                intent.setClassName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity");
                                 startActivity(intent);
-                            } catch (Exception exx) {
-                                Log.e("Oppo ki mkb", "App crash bach gaya");
+                                intentLaunched = true;
+                                break;
+                            } catch (Exception e) {
+                                Log.e("Oppo ki mkb","Crash Bach Gaya");
                             }
                         }
+                    }
+                    if (!intentLaunched) {
+                        // Show the error dialog here because none of the Intents were successfully launched
+                        showIntentErrorDialog();
                     }
                 })
                 .show();
     }
 
     private void showVivoAlertDialog() {
+        View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
         startService();
         vibrateTouch();
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Enable AutoStart")
                 .setMessage("You're using a Vivo Phone, autostart is required to enable SafeCharge on your device.")
                 .setCancelable(false)
-                .setPositiveButton("ALLOW", (dialog, which) -> {
-                    try {
-                        Intent intent = new Intent();
-                        intent.setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity"));
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        try {
-                            Intent intent = new Intent();
-                            intent.setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity"));
-                            startActivity(intent);
-                        } catch (Exception ex) {
+                .setView(customView)
+                .setPositiveButton("Continue", (dialog, which) -> {
+                    Intent[] AUTO_START_VIVO = {
+                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")),
+                            new Intent().setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
+                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager")),
+                    };
+                    boolean intentLaunched = false;
+                    for (Intent intent : AUTO_START_VIVO) {
+                        if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                             try {
-                                Intent intent = new Intent();
-                                intent.setClassName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager");
                                 startActivity(intent);
-                            } catch (Exception exx) {
-                                ex.printStackTrace();
+                                intentLaunched = true;
+                                break;
+                            } catch (Exception e) {
+                                Log.e("Vivo ki mkb","Crash Bach Gaya");
                             }
                         }
+                    }
+                    if (!intentLaunched) {
+                        showIntentErrorDialog();
                     }
                 })
                 .show();
