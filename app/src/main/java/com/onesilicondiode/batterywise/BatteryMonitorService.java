@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,26 +15,26 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.IBinder;
-import android.provider.AlarmClock;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
+    private MediaPlayer mediaPlayer;
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
     private int previousVolume; // Store the previous volume level
-    private MediaPlayer mediaPlayer;
-    private PendingIntent pendingIntent;
-    int selectedBatteryLevel;
+    private PendingIntent pendingIntent; // Declare pendingIntent as a member variable
 
     @Override
     public void onCreate() {
         super.onCreate();
         // Initialize the MediaPlayer
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
+        // Register BroadcastReceiver to monitor battery level changes
         batteryReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -43,10 +42,29 @@ public class BatteryMonitorService extends Service {
                 int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
                 // Retrieve the selected battery level from SharedPreferences
                 SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
-                selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
+                int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
+
                 if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
-                    setTimer();
-                    Toast.makeText(context, "Battery Levels more than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
+                    // Increase volume to 85 before playing the alert tone
+                    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                    float percent = 0.8f;
+                    int seventyVolume = (int) (maxVolume * percent);
+                    audio.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
+
+                    // Play the alert tone only if it hasn't been played yet
+                    mediaPlayer.start();
+
+                    // Set an OnCompletionListener to revert the volume when audio has finished playing
+                    mediaPlayer.setOnCompletionListener(mp -> {
+                        // Revert the volume to the previous level
+                        AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        audioManager1.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
+                    });
+
                     alertPlayed = true;
                 } else if (batteryPercent <= 80) {
                     // Reset the flag when battery drops below 80%
@@ -85,8 +103,7 @@ public class BatteryMonitorService extends Service {
     // Create a custom notification
     private Notification createNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                .setContentText("You may tap and hold to turn off this notification.")
-                .setContentTitle("Optimising Battery and Charge")
+                .setContentText("Monitoring Charge Levels")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(pendingIntent)
@@ -103,43 +120,6 @@ public class BatteryMonitorService extends Service {
         super.onDestroy();
         mediaPlayer.release();
         unregisterReceiver(batteryReceiver);
-    }
-    private String getRingtoneUri() {
-        Uri ringtoneUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification);
-        return ringtoneUri.toString();
-    }
-    private void setTimer() {
-        Intent intent = new Intent(AlarmClock.ACTION_SET_TIMER)
-                .putExtra(AlarmClock.EXTRA_LENGTH, 1)
-                .putExtra(AlarmClock.EXTRA_RINGTONE,getRingtoneUri())
-                .putExtra(AlarmClock.EXTRA_VIBRATE,true)
-                .putExtra(AlarmClock.EXTRA_MESSAGE,"Charged "+selectedBatteryLevel+"%")
-                .putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-        try {
-            //Try setting timer
-            startActivity(intent);
-        } catch (ActivityNotFoundException exception) {
-            //Use Media Player as fallback
-            tryMediaPlayer();
-        }
-    }
-
-    private void tryMediaPlayer() {
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        float percent = 0.8f;
-        int seventyVolume = (int) (maxVolume * percent);
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
-        // Play the alert tone only if it hasn't been played yet
-        mediaPlayer.start();
-        // Set an OnCompletionListener to revert the volume when audio has finished playing
-        mediaPlayer.setOnCompletionListener(mp -> {
-            // Revert the volume to the previous level
-            AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            audioManager1.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
-        });
     }
 
     @Override
