@@ -316,7 +316,6 @@ public class MainActivity extends AppCompatActivity {
     private void checkNotificationPermission() {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Continue to Enable SafeCharge", Toast.LENGTH_SHORT).show();
         } else if (shouldShowRequestPermissionRationale(permission)) {
             // Permission denied previously, show rationale dialog
             showPermissionRationaleDialog();
