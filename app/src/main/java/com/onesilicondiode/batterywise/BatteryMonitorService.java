@@ -1,5 +1,6 @@
 package com.onesilicondiode.batterywise;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,23 +19,45 @@ import android.os.IBinder;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
+    private static final int STOP_ACTION_NOTIFICATION_ID = 103;
+    private static final String STOP_ACTION_CHANNEL_ID = "StopAction";
     private MediaPlayer mediaPlayer;
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
     private int previousVolume; // Store the previous volume level
     private PendingIntent pendingIntent; // Declare pendingIntent as a member variable
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onCreate() {
         super.onCreate();
         // Initialize the MediaPlayer
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
-        // Register BroadcastReceiver to monitor battery level changes
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_LOW);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(stopActionChannel);
+        }
+
+        BroadcastReceiver stopActionReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Stop the media player when the stop action notification is tapped
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.reset();
+                mediaPlayer = MediaPlayer.create(context, R.raw.notification);
+                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                notificationManager.cancel(STOP_ACTION_NOTIFICATION_ID);
+            }
+        };
+        IntentFilter stopActionIntentFilter = new IntentFilter("com.onesilicondiode.batterywise.STOP_ACTION");
+        registerReceiver(stopActionReceiver, stopActionIntentFilter);
         batteryReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -45,6 +68,11 @@ public class BatteryMonitorService extends Service {
                 int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
 
                 if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
+                    Notification stopActionNotification = createStopActionNotification();
+
+                    // Get the notification manager and show the notification
+                    NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                    notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, stopActionNotification);
                     Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
                     // Increase volume to 85 before playing the alert tone
                     AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -57,8 +85,7 @@ public class BatteryMonitorService extends Service {
 
                     // Play the alert tone only if it hasn't been played yet
                     mediaPlayer.start();
-
-                    // Set an OnCompletionListener to revert the volume when audio has finished playing
+                    mediaPlayer.setLooping(true);
                     mediaPlayer.setOnCompletionListener(mp -> {
                         // Revert the volume to the previous level
                         AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -66,8 +93,7 @@ public class BatteryMonitorService extends Service {
                     });
 
                     alertPlayed = true;
-                } else if (batteryPercent <= 80) {
-                    // Reset the flag when battery drops below 80%
+                } else if (batteryPercent <= selectedBatteryLevel) {
                     alertPlayed = false;
                 }
             }
@@ -115,10 +141,33 @@ public class BatteryMonitorService extends Service {
         return builder.build();
     }
 
+    private Notification createStopActionNotification() {
+        Intent stopIntent = new Intent("com.onesilicondiode.batterywise.STOP_ACTION");
+        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        // Create a notification action for the stop button
+        NotificationCompat.Action stopAction =
+                new NotificationCompat.Action.Builder(
+                        R.drawable.baseline_stop_24,
+                        "Stop Playing",
+                        stopPendingIntent
+                ).build();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, STOP_ACTION_CHANNEL_ID)
+                .setContentTitle("Charge alert is playing...")
+                .setContentText("Disconnect the charger")
+                .setSmallIcon(R.drawable.ringing)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setAutoCancel(true)
+                .addAction(stopAction);
+
+        return builder.build();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mediaPlayer.release();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
         unregisterReceiver(batteryReceiver);
     }
 

@@ -47,7 +47,11 @@
         <service
             android:name=".BatteryMonitorService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesilicondiode.batterywise.STOP_ACTION" />
+            </intent-filter>
+        </service>
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
