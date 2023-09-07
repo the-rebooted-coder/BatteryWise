@@ -27,7 +27,7 @@
         app:maxImageSize="40dp"
         app:tint="@color/green"/>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/layoutHolder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,22 +53,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/batterySaveText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="12dp"
-                android:drawablePadding="5dp"
-                android:fontFamily="@font/productsans"
-                android:text="@string/learn_more"
-                android:textAlignment="center"
-                android:textColor="#89E4AA"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/baseline_info_24_white"
-                app:drawableTint="#89E4AA" />
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="250dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -91,7 +76,7 @@
                     android:layout_gravity="center"
                     android:max="10"
                     android:progress="5"/>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBatteryBtn"
@@ -113,6 +98,21 @@
                 android:fontFamily="@font/productsans"
                 android:text="@string/disable"
                 android:visibility="gone" />
+            <TextView
+                android:id="@+id/batterySaveText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/productsans"
+                android:text="@string/learn_more"
+                android:layout_marginBottom="10dp"
+                android:textAlignment="center"
+                android:textColor="#89E4AA"
+                android:textSize="16sp"
+                app:drawableLeftCompat="@drawable/baseline_info_24_white"
+                app:drawableTint="#89E4AA" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

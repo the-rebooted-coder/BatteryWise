@@ -52,14 +52,14 @@ public class About extends AppCompatActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             String version = pInfo.versionName;
-            String productInfoText = "SafeCharge Version:\n" + version + "\n1.0.7";
+            String productInfoText = version + "\n2.0.1";
             versionInfo.setText(productInfoText);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         osdLogo.setOnClickListener(view -> {
             vibrateOSD();
-            Toast.makeText(About.this, "App developed by OneSiliconDiode", Toast.LENGTH_SHORT).show();
+            Toast.makeText(About.this, "App developed by OneSiliconDiode (;", Toast.LENGTH_SHORT).show();
         });
         privacyPolicy.setOnClickListener(view -> {
             vibrateOtherButton();
@@ -120,7 +120,7 @@ public class About extends AppCompatActivity {
         }
     }
     private void vibrateOtherButton() {
-        long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3, 10, 5, 0, 6, 0, 7, 11, 9, 14, 10, 13, 10, 11, 11, 0, 11, 11, 11, 11, 11, 13, 11, 14, 10, 10, 10, 0, 10, 11, 10, 14, 9, 10, 9, 11, 10, 0, 10};
+        long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3, 10, 5, 0, 6, 0, 7, 11, 9, 14, 10, 13, 10, 11, 11, 0, 11, 11, 11, 11, 11};
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
