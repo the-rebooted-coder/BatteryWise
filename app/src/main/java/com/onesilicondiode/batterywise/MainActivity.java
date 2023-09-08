@@ -1,5 +1,7 @@
 package com.onesilicondiode.batterywise;
 
+import static com.onesilicondiode.batterywise.Constants.PREFS_NAME;
+
 import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -32,6 +34,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
@@ -39,6 +42,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
@@ -65,11 +69,12 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton startSaving, stopSaving;
     TextView productInfo;
     int selectedBatteryLevel = 85;
-    boolean seekTouch = false;
     private WaveLoadingView waveLoadingView;
     private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
     private float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private static final String PREF_SEEK_TOUCH = "seekTouch";
+    private boolean seekTouch = false;
     private Vibrator vibrator;
     private String manufacturer;
     private AppUpdateManager appUpdateManager;
@@ -129,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
         int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
         waveLoadingView.setProgressValue(batteryPercent);
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
-        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
         String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
         productInfo.setText(productInfoText);
@@ -147,11 +153,9 @@ public class MainActivity extends AppCompatActivity {
                 // Display the overlay
                 seekBarValueOverlay.startAnimation(showAnimation);
                 seekBarValueOverlay.setVisibility(View.VISIBLE);
-                // Update a shared preference or perform any action with the selectedBatteryLevel
-                SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit();
+                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
                 editor.apply();
-
                 // Update the TextView to display the selected battery level
                 String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
                 productInfo.setText(productInfoText);
@@ -165,8 +169,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (!seekTouch) {
-                    //TODO Make it Snakc!
-                    Toast.makeText(MainActivity.this, "You can also use volume buttons", Toast.LENGTH_LONG).show();
+                    showSnackbar();
                     seekTouch = true;
                 }
                 vibrateTouch();
@@ -233,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
         }
         startSaving.setOnClickListener(view -> {
             try {
-                //TODO ADD EXTRA INTENT TO KEEP SILENCE
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putBoolean(USER_STARTED_KEY, true);
                 editor.apply();
@@ -257,10 +259,28 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CODE_APP_UPDATE) {
             if (resultCode != RESULT_OK) {
+                //DO NOT REMOVE THIS
             }
         }
     }
+    private void showSnackbar() {
+        CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinatorLayout); // Change to your layout ID
 
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, "You can also use the volume buttons to control slider", Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction("OK", view -> {
+            // User clicked OK, save the state to not show it again
+            seekTouch = true;
+            saveSeekTouchState();
+            snackbar.dismiss();
+        });
+        snackbar.show();
+    }
+    private void saveSeekTouchState() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREF_SEEK_TOUCH, seekTouch);
+        editor.apply();
+    }
     private void scaleSeekBar(SeekBar seekBar, float scaleFactor) {
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(seekBar, "scaleX", scaleFactor);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(seekBar, "scaleY", scaleFactor);
@@ -370,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Update the selectedBatteryLevel and save it to SharedPreferences
             selectedBatteryLevel = 80 + newSeekBarProgress;
-            SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit();
+            SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
             editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
             editor.apply();
 
