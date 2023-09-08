@@ -15,7 +15,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -73,7 +75,7 @@ public class BatteryMonitorService extends Service {
                     Notification stopActionNotification = createStopActionNotification();
                     NotificationManager notificationManager = getSystemService(NotificationManager.class);
                     notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, stopActionNotification);
-                    if(!userStarted){
+                    if (!userStarted) {
                         Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
                         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -95,6 +97,9 @@ public class BatteryMonitorService extends Service {
                     editor.apply();
                     alertPlayed = true;
                 } else if (batteryPercent <= selectedBatteryLevel) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean(USER_STARTED_KEY, false);
+                    editor.apply();
                     alertPlayed = false;
                 }
             }
@@ -104,8 +109,14 @@ public class BatteryMonitorService extends Service {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryReceiver, intentFilter);
 
-        // Create an intent to open the MainActivity when the notification is tapped
-        Intent mainActivityIntent = new Intent(this, MainActivity.class);
+        Intent mainActivityIntent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mainActivityIntent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, this.getPackageName())
+                    .putExtra(Settings.EXTRA_CHANNEL_ID, NOTIF_CHANNEL_ID);
+        } else {
+            mainActivityIntent = new Intent(this, MainActivity.class);
+        }
         pendingIntent = PendingIntent.getActivity(this, 0, mainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         // Create a notification channel (required for Android 8.0 and above)
@@ -129,16 +140,33 @@ public class BatteryMonitorService extends Service {
 
     // Create a custom notification
     private Notification createNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                .setContentText("Monitoring Charge Levels")
-                .setSmallIcon(R.drawable.ic_notification)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+        NotificationCompat.Builder builder;
+
+        // Check Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // For Android Oreo (API 26) and above
+            builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
+                    .setContentText("Optimising Battery Use")
+                    .setContentText("You may tap on this notification to hide it")
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true);
+        } else {
+            // For Android versions prior to Oreo
+            builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
+                    .setContentText("Optimising Battery Use")
+                    .setContentText("You may tap-and-hold this notification then hide it.")
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true);
+        }
 
         // Set custom sound for the notification
         Uri customSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle);
         builder.setSound(customSoundUri);
+
         return builder.build();
     }
 

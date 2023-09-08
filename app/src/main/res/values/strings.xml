@@ -14,5 +14,5 @@
     <string name="developed_by">Developed By:\nSpandan Saxena</string>
     <string name="osl">Open Source Licenses</string>
     <string name="notification_notify">Allow SafeCharge to show a notification.</string>
-    <string name="notify_desc">As subtle as a ninja in the shadows!\nTo monitor your battery charge levels, we need notification access.</string>
+    <string name="notify_desc">As subtle as a ninja in the shadows!\nTo monitor your battery charge levels, we need notification access.\n\nYou can always change that later!</string>
 </resources>

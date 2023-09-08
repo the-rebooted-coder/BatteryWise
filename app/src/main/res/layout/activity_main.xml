@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="8dp"
-        android:backgroundTint="#4D6E4B"
+        android:backgroundTint="#F04D6E4B"
         android:elevation="20dp"
         app:cardCornerRadius="8dp">
 

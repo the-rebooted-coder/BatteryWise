@@ -165,9 +165,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (!seekTouch) {
+                    //TODO Make it Snakc!
                     Toast.makeText(MainActivity.this, "You can also use volume buttons", Toast.LENGTH_LONG).show();
                     seekTouch = true;
                 }
+                vibrateTouch();
                 scaleSeekBar(seekBar, 1.0f);
                 seekBarValueOverlay.startAnimation(hideAnimation);
                 seekBarValueOverlay.setVisibility(View.GONE);

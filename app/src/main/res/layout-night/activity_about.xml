@@ -87,7 +87,7 @@
                     ripple:button_width="35dp"
                     ripple:has_active_status="false"
                     ripple:has_finish_animation="true"
-                    ripple:inner_text="Swipe to know about me"
+                    ripple:inner_text="Swipe to know me"
                     ripple:inner_text_color="@color/green_dark"
                     ripple:inner_text_gravity="center"
                     ripple:inner_text_padding="8dp"
