@@ -28,14 +28,14 @@ public class BatteryMonitorService extends Service {
     private MediaPlayer mediaPlayer;
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
-    private int previousVolume; // Store the previous volume level
-    private PendingIntent pendingIntent; // Declare pendingIntent as a member variable
+    private int previousVolume;
+    private PendingIntent pendingIntent;
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onCreate() {
         super.onCreate();
-        // Initialize the MediaPlayer
+        Toast.makeText(getApplicationContext(), "Service Enabled", Toast.LENGTH_SHORT).show();
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_LOW);
@@ -152,9 +152,10 @@ public class BatteryMonitorService extends Service {
                         stopPendingIntent
                 ).build();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, STOP_ACTION_CHANNEL_ID)
-                .setContentTitle("Charge alert is playing...")
+                .setContentTitle("Alert is Ringing...")
                 .setContentText("Disconnect the charger")
                 .setSmallIcon(R.drawable.ringing)
+                .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setAutoCancel(true)
                 .addAction(stopAction);
@@ -169,6 +170,7 @@ public class BatteryMonitorService extends Service {
             mediaPlayer.release();
         }
         unregisterReceiver(batteryReceiver);
+        Toast.makeText(getApplicationContext(), "Service Stopped", Toast.LENGTH_SHORT).show();
     }
 
     @Override

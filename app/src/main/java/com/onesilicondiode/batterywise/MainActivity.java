@@ -231,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         }
         startSaving.setOnClickListener(view -> {
             try {
+                //TODO ADD EXTRA INTENT TO KEEP SILENCE
                 enableAutoStart();
             } catch (Exception e) {
                 showIntentErrorDialog();
@@ -239,7 +240,6 @@ public class MainActivity extends AppCompatActivity {
         stopSaving.setOnClickListener(view -> {
             Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
             stopService(serviceIntent);
-            Toast.makeText(MainActivity.this, "Service Stopped", Toast.LENGTH_SHORT).show();
             stopSaving.setVisibility(View.GONE);
             startSaving.setVisibility(View.VISIBLE);
             vibrate();
@@ -252,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CODE_APP_UPDATE) {
             if (resultCode != RESULT_OK) {
-                // If the update is not completed, you can handle it here
             }
         }
     }
@@ -394,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
                     startSaving.setVisibility(View.GONE);
                     vibrate();
                     stopSaving.setVisibility(View.VISIBLE);
-                    Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -416,7 +414,6 @@ public class MainActivity extends AppCompatActivity {
             startSaving.setVisibility(View.GONE);
             vibrate();
             stopSaving.setVisibility(View.VISIBLE);
-            Toast.makeText(MainActivity.this, "Service Enabled", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
