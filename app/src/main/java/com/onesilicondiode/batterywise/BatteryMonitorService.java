@@ -25,6 +25,9 @@ public class BatteryMonitorService extends Service {
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
     private static final int STOP_ACTION_NOTIFICATION_ID = 103;
     private static final String STOP_ACTION_CHANNEL_ID = "StopAction";
+    private static final String USER_STARTED_KEY = "userStarted";
+    private static final boolean DEFAULT_USER_STARTED = true;
+    SharedPreferences prefs;
     private MediaPlayer mediaPlayer;
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
@@ -42,7 +45,6 @@ public class BatteryMonitorService extends Service {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
         }
-
         BroadcastReceiver stopActionReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -64,34 +66,33 @@ public class BatteryMonitorService extends Service {
                 BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
                 int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
                 // Retrieve the selected battery level from SharedPreferences
-                SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+                prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
                 int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
-
+                boolean userStarted = prefs.getBoolean(USER_STARTED_KEY, DEFAULT_USER_STARTED);
                 if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
                     Notification stopActionNotification = createStopActionNotification();
-
-                    // Get the notification manager and show the notification
                     NotificationManager notificationManager = getSystemService(NotificationManager.class);
                     notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, stopActionNotification);
-                    Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
-                    // Increase volume to 85 before playing the alert tone
-                    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                    previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                    AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                    int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                    float percent = 0.8f;
-                    int seventyVolume = (int) (maxVolume * percent);
-                    audio.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
-
-                    // Play the alert tone only if it hasn't been played yet
-                    mediaPlayer.start();
-                    mediaPlayer.setLooping(true);
-                    mediaPlayer.setOnCompletionListener(mp -> {
-                        // Revert the volume to the previous level
-                        AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        audioManager1.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
-                    });
-
+                    if(!userStarted){
+                        Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
+                        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                        float percent = 0.8f;
+                        int seventyVolume = (int) (maxVolume * percent);
+                        audio.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
+                        mediaPlayer.start();
+                        mediaPlayer.setLooping(true);
+                        mediaPlayer.setOnCompletionListener(mp -> {
+                            // Revert the volume to the previous level
+                            AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                            audioManager1.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
+                        });
+                    }
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean(USER_STARTED_KEY, false);
+                    editor.apply();
                     alertPlayed = true;
                 } else if (batteryPercent <= selectedBatteryLevel) {
                     alertPlayed = false;

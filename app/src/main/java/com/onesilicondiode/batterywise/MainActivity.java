@@ -32,7 +32,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
@@ -74,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private Vibrator vibrator;
     private String manufacturer;
     private AppUpdateManager appUpdateManager;
+    private static final String USER_STARTED_KEY = "userStarted";
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -232,6 +232,9 @@ public class MainActivity extends AppCompatActivity {
         startSaving.setOnClickListener(view -> {
             try {
                 //TODO ADD EXTRA INTENT TO KEEP SILENCE
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean(USER_STARTED_KEY, true);
+                editor.apply();
                 enableAutoStart();
             } catch (Exception e) {
                 showIntentErrorDialog();
