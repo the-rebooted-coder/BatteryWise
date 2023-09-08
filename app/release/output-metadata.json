@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 2,
-      "versionName": "Juice+",
+      "versionCode": 9,
+      "versionName": "Juice",
       "outputFile": "app-release.apk"
     }
   ],

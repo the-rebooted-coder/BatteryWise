@@ -153,11 +153,12 @@ public class BatteryMonitorService extends Service {
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true);
         } else {
+            Uri notifSound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle);
             // For Android versions prior to Oreo
             builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
                     .setContentText("Optimising Battery Use")
-                    .setContentText("You may tap-and-hold this notification then hide it.")
                     .setSmallIcon(R.drawable.ic_notification)
+                    .setSound(notifSound)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true);

@@ -12,11 +12,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -53,11 +55,11 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
-import xyz.kumaraswamy.autostart.Autostart;
-import xyz.kumaraswamy.autostart.Utils;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_APP_UPDATE = 123;
+    private static final String PREF_SEEK_TOUCH = "seekTouch";
+    private static final String USER_STARTED_KEY = "userStarted";
     private final ActivityResultLauncher<String> requestNotificationPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
@@ -73,12 +75,10 @@ public class MainActivity extends AppCompatActivity {
     private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
     private float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private static final String PREF_SEEK_TOUCH = "seekTouch";
     private boolean seekTouch = false;
     private Vibrator vibrator;
     private String manufacturer;
     private AppUpdateManager appUpdateManager;
-    private static final String USER_STARTED_KEY = "userStarted";
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -263,24 +263,26 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void showSnackbar() {
-        CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinatorLayout); // Change to your layout ID
+        CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinatorLayout);
 
         Snackbar snackbar = Snackbar.make(coordinatorLayout, "You can also use the volume buttons to control slider", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction("OK", view -> {
-            // User clicked OK, save the state to not show it again
+        snackbar.setAction("Okay", view -> {
             seekTouch = true;
             saveSeekTouchState();
             snackbar.dismiss();
         });
         snackbar.show();
     }
+
     private void saveSeekTouchState() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(PREF_SEEK_TOUCH, seekTouch);
         editor.apply();
     }
+
     private void scaleSeekBar(SeekBar seekBar, float scaleFactor) {
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(seekBar, "scaleX", scaleFactor);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(seekBar, "scaleY", scaleFactor);
@@ -408,19 +410,37 @@ public class MainActivity extends AppCompatActivity {
         String brand = Build.BRAND;
         String manufacturer = Build.MANUFACTURER;
         if (brand.equalsIgnoreCase("xiaomi")) {
-            if (Utils.INSTANCE.isOnMiui()) {
-                boolean enabled = Autostart.INSTANCE.isAutoStartEnabled(this);
-                if (!enabled) {
-                    showAlertDialog("Xiaomi", "com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
-                } else {
-                    Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
-                    startService(serviceIntent);
-                    startSaving.setVisibility(View.GONE);
-                    vibrate();
-                    stopSaving.setVisibility(View.VISIBLE);
-                    finish();
-                }
-            }
+            View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
+            startService();
+            vibrateTouch();
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Enable AutoStart")
+                    .setMessage("You're using a Xiaomi Phone, enable Autostart to use SafeCharge on your device.")
+                    .setCancelable(false)
+                    .setView(customView)
+                    .setPositiveButton("Continue", (dialog, which) -> {
+                        Intent[] AUTO_START_XIAOMI = {
+                                new Intent().setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
+                                new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())),
+                        };
+                        boolean intentLaunched = false;
+                        for (Intent intent : AUTO_START_XIAOMI) {
+                            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                                try {
+                                    startActivity(intent);
+                                    intentLaunched = true;
+                                    break;
+                                } catch (Exception e) {
+                                    Log.e("Xiaomi ki mkb", "Crash Bach Gaya");
+                                }
+                            }
+                        }
+                        if (!intentLaunched) {
+                            // Show the error dialog here because none of the Intents were successfully launched
+                            showIntentErrorDialog();
+                        }
+                    })
+                    .show();
         } else if (brand.equalsIgnoreCase("Letv")) {
             showAlertDialog("Letv", "com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity");
         } else if (brand.equalsIgnoreCase("Honor")) {
@@ -489,7 +509,7 @@ public class MainActivity extends AppCompatActivity {
                             new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
                             new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
                             new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
-                           };
+                    };
                     boolean intentLaunched = false;
                     for (Intent intent : AUTO_START_HONOR) {
                         if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
@@ -498,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                                 intentLaunched = true;
                                 break;
                             } catch (Exception e) {
-                                Log.e("Honor ki mkb","Crash Bach Gaya");
+                                Log.e("Honor ki mkb", "Crash Bach Gaya");
                             }
                         }
                     }
@@ -535,7 +555,7 @@ public class MainActivity extends AppCompatActivity {
                                 intentLaunched = true;
                                 break;
                             } catch (Exception e) {
-                                Log.e("Oppo ki mkb","Crash Bach Gaya");
+                                Log.e("Oppo ki mkb", "Crash Bach Gaya");
                             }
                         }
                     }
@@ -570,7 +590,7 @@ public class MainActivity extends AppCompatActivity {
                                 intentLaunched = true;
                                 break;
                             } catch (Exception e) {
-                                Log.e("Vivo ki mkb","Crash Bach Gaya");
+                                Log.e("Vivo ki mkb", "Crash Bach Gaya");
                             }
                         }
                     }
