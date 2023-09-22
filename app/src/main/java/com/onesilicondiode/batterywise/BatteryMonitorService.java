@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.AlarmClock;
 import android.provider.Settings;
 import android.widget.Toast;
 
@@ -43,7 +44,7 @@ public class BatteryMonitorService extends Service {
         Toast.makeText(getApplicationContext(), "Service Enabled", Toast.LENGTH_SHORT).show();
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
         }
@@ -72,10 +73,20 @@ public class BatteryMonitorService extends Service {
                 int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
                 boolean userStarted = prefs.getBoolean(USER_STARTED_KEY, DEFAULT_USER_STARTED);
                 if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
-                    Notification stopActionNotification = createStopActionNotification();
-                    NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                    notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, stopActionNotification);
                     if (!userStarted) {
+                        /*
+                        //TODO Create Alarm
+                        Toast.makeText(getApplicationContext(), "Restart", Toast.LENGTH_SHORT).show();
+                        Intent setTimerIntent = new Intent(AlarmClock.ACTION_SET_TIMER);
+                        setTimerIntent.putExtra(AlarmClock.EXTRA_LENGTH, 10);
+                        setTimerIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "SafeCharge");
+                        setTimerIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                        setTimerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        context.startActivity(setTimerIntent);
+                         */
+                        Notification stopActionNotification = createStopActionNotification();
+                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                        notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, stopActionNotification);
                         Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
                         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -182,11 +193,11 @@ public class BatteryMonitorService extends Service {
                         stopPendingIntent
                 ).build();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, STOP_ACTION_CHANNEL_ID)
-                .setContentTitle("Alert is Ringing...")
+                .setContentTitle("Alert is Playing...")
                 .setContentText("Disconnect the charger")
                 .setSmallIcon(R.drawable.ringing)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .addAction(stopAction);
 
