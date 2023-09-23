@@ -97,4 +97,26 @@ public class StopAlert extends AppCompatActivity {
             vibrator.vibrate(pattern, -1);
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+        mediaPlayer.reset();
+        mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+        mediaPlayer.reset();
+        mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+    }
 }
