@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.TypedValue;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -20,12 +21,12 @@ import com.google.android.material.color.DynamicColors;
 import com.google.android.material.textview.MaterialTextView;
 
 public class StopAlert extends AppCompatActivity {
+    private static final int STOP_ACTION_NOTIFICATION_ID = 5101;
     MaterialButton stopAlert;
+    MaterialTextView battPercentage;
     private MediaPlayer mediaPlayer;
     private int previousVolume;
-    private static final int STOP_ACTION_NOTIFICATION_ID = 5101;
     private Vibrator vibrator;
-    MaterialTextView battPercentage;
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -41,6 +42,10 @@ public class StopAlert extends AppCompatActivity {
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true);
             setTurnScreenOn(true);
@@ -52,7 +57,7 @@ public class StopAlert extends AppCompatActivity {
         setupButton();
         BatteryManager bm = (BatteryManager) this.getSystemService(BATTERY_SERVICE);
         int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        battPercentage.setText("Battery is at "+batLevel+"%\nUnplug the charger");
+        battPercentage.setText("Battery is at " + batLevel + "%\nUnplug the charger");
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     }
 
@@ -68,7 +73,20 @@ public class StopAlert extends AppCompatActivity {
             mediaPlayer.reset();
             mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
             finish();
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
+    }
+
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (!hasFocus) {
+            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer.reset();
+            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+        }
     }
 
     private void setupMusic() {
@@ -96,17 +114,6 @@ public class StopAlert extends AppCompatActivity {
         } else {
             vibrator.vibrate(pattern, -1);
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-        }
-        mediaPlayer.reset();
-        mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
     }
 
     @Override

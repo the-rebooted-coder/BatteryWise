@@ -68,7 +68,6 @@ public class BatteryMonitorService extends Service {
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, STOP_ACTION_CHANNEL_ID)
                                 .setSmallIcon(R.drawable.ringing)
                                 .setContentTitle("Battery Charged")
-                                .setContentText("Unplug the charger")
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                                 .setAutoCancel(true)
