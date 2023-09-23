@@ -21,7 +21,7 @@ import com.google.android.material.color.DynamicColors;
 import com.google.android.material.textview.MaterialTextView;
 
 public class StopAlert extends AppCompatActivity {
-    private static final int STOP_ACTION_NOTIFICATION_ID = 5101;
+    private static final int STOP_ACTION_NOTIFICATION_ID = 198;
     MaterialButton stopAlert;
     MaterialTextView battPercentage;
     private MediaPlayer mediaPlayer;

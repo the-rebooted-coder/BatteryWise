@@ -24,8 +24,8 @@ import androidx.core.app.NotificationManagerCompat;
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
-    private static final int STOP_ACTION_NOTIFICATION_ID = 5101;
-    private static final String STOP_ACTION_CHANNEL_ID = "StopAction";
+    private static final int STOP_ACTION_NOTIFICATION_ID = 198;
+    private static final String STOP_ACTION_CHANNEL_ID = "StopAlert";
     private static final String USER_STARTED_KEY = "userStarted";
     private static final boolean DEFAULT_USER_STARTED = true;
     SharedPreferences prefs;
@@ -39,7 +39,7 @@ public class BatteryMonitorService extends Service {
         super.onCreate();
         Toast.makeText(getApplicationContext(), "Service Enabled", Toast.LENGTH_SHORT).show();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Alerts", NotificationManager.IMPORTANCE_HIGH);
             stopActionChannel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.silence), null);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
