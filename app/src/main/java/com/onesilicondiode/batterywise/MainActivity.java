@@ -282,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
         });
         snackbar.show();
     }
+
     private void requestAppReview() {
         // Create a ReviewInfo instance to request a review
         Task<ReviewInfo> requestReviewTask = reviewManager.requestReviewFlow();
@@ -298,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private void saveSeekTouchState() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -441,24 +443,12 @@ public class MainActivity extends AppCompatActivity {
                     .setCancelable(false)
                     .setView(customView)
                     .setPositiveButton("Continue", (dialog, which) -> {
-                        Intent[] AUTO_START_XIAOMI = {
-                                new Intent().setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
-                                new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())),
-                        };
-                        boolean intentLaunched = false;
-                        for (Intent intent : AUTO_START_XIAOMI) {
-                            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
-                                try {
-                                    startActivity(intent);
-                                    intentLaunched = true;
-                                    break;
-                                } catch (Exception e) {
-                                    Log.e("Xiaomi ki mkb", "Crash Bach Gaya");
-                                }
-                            }
+                        try{
+                            Intent intent1 = new Intent();
+                            intent1.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"));
+                            startActivity(intent1);
                         }
-                        if (!intentLaunched) {
-                            // Show the error dialog here because none of the Intents were successfully launched
+                        catch (Exception e){
                             showIntentErrorDialog();
                         }
                     })
