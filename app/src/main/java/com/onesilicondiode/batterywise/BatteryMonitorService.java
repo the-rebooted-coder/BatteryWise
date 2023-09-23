@@ -11,22 +11,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.AlarmClock;
 import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
-    private static final int STOP_ACTION_NOTIFICATION_ID = 103;
+    private static final int STOP_ACTION_NOTIFICATION_ID = 5101;
     private static final String STOP_ACTION_CHANNEL_ID = "StopAction";
     private static final String USER_STARTED_KEY = "userStarted";
     private static final boolean DEFAULT_USER_STARTED = true;
@@ -34,7 +33,6 @@ public class BatteryMonitorService extends Service {
     private MediaPlayer mediaPlayer;
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
-    private int previousVolume;
     private PendingIntent pendingIntent;
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -64,6 +62,7 @@ public class BatteryMonitorService extends Service {
         IntentFilter stopActionIntentFilter = new IntentFilter("com.onesilicondiode.batterywise.STOP_ACTION");
         registerReceiver(stopActionReceiver, stopActionIntentFilter);
         batteryReceiver = new BroadcastReceiver() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onReceive(Context context, Intent intent) {
                 BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
@@ -74,34 +73,26 @@ public class BatteryMonitorService extends Service {
                 boolean userStarted = prefs.getBoolean(USER_STARTED_KEY, DEFAULT_USER_STARTED);
                 if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
                     if (!userStarted) {
-                        /*
-                        //TODO Create Alarm
-                        Toast.makeText(getApplicationContext(), "Restart", Toast.LENGTH_SHORT).show();
-                        Intent setTimerIntent = new Intent(AlarmClock.ACTION_SET_TIMER);
-                        setTimerIntent.putExtra(AlarmClock.EXTRA_LENGTH, 10);
-                        setTimerIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "SafeCharge");
-                        setTimerIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-                        setTimerIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        context.startActivity(setTimerIntent);
-                         */
-                        Notification stopActionNotification = createStopActionNotification();
-                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                        notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, stopActionNotification);
-                        Toast.makeText(context, "Battery Levels More Than " + selectedBatteryLevel + "%", Toast.LENGTH_SHORT).show();
-                        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                        float percent = 0.8f;
-                        int seventyVolume = (int) (maxVolume * percent);
-                        audio.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
-                        mediaPlayer.start();
-                        mediaPlayer.setLooping(true);
-                        mediaPlayer.setOnCompletionListener(mp -> {
-                            // Revert the volume to the previous level
-                            AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                            audioManager1.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
-                        });
+                        // Create a PendingIntent for the full-screen intent
+                        Intent fullScreenIntent = new Intent(context, StopAlert.class);
+                        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, 0,
+                                fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                        // Create a notification channel (if not already created)
+                        createStopActionNotification();
+
+                        // Build the notification with a full-screen intent
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, STOP_ACTION_CHANNEL_ID)
+                                .setSmallIcon(R.drawable.ringing)
+                                .setContentTitle("Battery Charged")
+                                .setContentText("Unplug the charger")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                                .setAutoCancel(true)
+                                .setFullScreenIntent(fullScreenPendingIntent, true);
+                        // Issue the notification
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                        notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, builder.build());
                     }
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putBoolean(USER_STARTED_KEY, false);
@@ -197,6 +188,7 @@ public class BatteryMonitorService extends Service {
                 .setContentText("Disconnect the charger")
                 .setSmallIcon(R.drawable.ringing)
                 .setOngoing(true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .addAction(stopAction);
