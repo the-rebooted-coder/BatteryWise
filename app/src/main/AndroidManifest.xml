@@ -25,7 +25,8 @@
         <activity
             android:name=".StopAlert"
             android:exported="false"
-            android:showOnLockScreen="true"/>
+            android:showOnLockScreen="true"
+            android:theme="@style/Theme.Transparents"/>
         <activity
             android:name=".About"
             android:exported="false" />
