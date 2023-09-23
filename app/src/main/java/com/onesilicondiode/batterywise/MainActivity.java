@@ -52,6 +52,9 @@ import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
                     // Permission granted, perform your action
-                    Toast.makeText(this, "Permission denied, cannot post notification to keep SafeCharge working 😔", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "SafeCharge will not work, restart app to grant permission", Toast.LENGTH_LONG).show();
 
                 }
             });
@@ -79,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
     private Vibrator vibrator;
     private String manufacturer;
     private AppUpdateManager appUpdateManager;
+    private ReviewManager reviewManager;
+
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -96,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        waveLoadingView = findViewById(R.id.waveLoadingView); // Initialize the WaveLoadingView
+        reviewManager = ReviewManagerFactory.create(this);
+        waveLoadingView = findViewById(R.id.waveLoadingView);
         appUpdateManager = AppUpdateManagerFactory.create(this);
         InstallStateUpdatedListener installStateUpdatedListener = state -> {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
@@ -123,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        requestAppReview();
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
@@ -275,7 +282,22 @@ public class MainActivity extends AppCompatActivity {
         });
         snackbar.show();
     }
+    private void requestAppReview() {
+        // Create a ReviewInfo instance to request a review
+        Task<ReviewInfo> requestReviewTask = reviewManager.requestReviewFlow();
 
+        requestReviewTask.addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ReviewInfo reviewInfo = task.getResult();
+                Task<Void> launchReviewTask = reviewManager.launchReviewFlow(this, reviewInfo);
+
+                launchReviewTask.addOnCompleteListener(reviewTask -> {
+                });
+            } else {
+                //DO NOT REMOVE THIS
+            }
+        });
+    }
     private void saveSeekTouchState() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

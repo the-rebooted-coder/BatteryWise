@@ -11,8 +11,8 @@ android {
         applicationId "com.onesilicondiode.batterywise"
         minSdk 25
         targetSdk 33
-        versionCode 11
-        versionName "Juice"
+        versionCode 12
+        versionName "Juice+"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,4 +44,5 @@ dependencies {
     implementation 'com.github.tangqi92:WaveLoadingView:v0.3.5'
     implementation 'com.gauravbhola.ripplepulsebackground:library:1.0.0'
     implementation 'com.github.mhdmoh:swipe-button:1.0.3'
+    implementation 'com.google.android.play:review:2.0.1'
 }
