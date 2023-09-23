@@ -40,6 +40,7 @@ public class BatteryMonitorService extends Service {
         Toast.makeText(getApplicationContext(), "Service Enabled", Toast.LENGTH_SHORT).show();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_HIGH);
+            stopActionChannel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.silence), null);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
         }
@@ -125,7 +126,6 @@ public class BatteryMonitorService extends Service {
     // Create a custom notification
     private Notification createNotification() {
         NotificationCompat.Builder builder;
-
         // Check Android version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // For Android Oreo (API 26) and above
