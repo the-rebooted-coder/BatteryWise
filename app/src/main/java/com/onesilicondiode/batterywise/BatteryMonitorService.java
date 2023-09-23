@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -30,7 +29,6 @@ public class BatteryMonitorService extends Service {
     private static final String USER_STARTED_KEY = "userStarted";
     private static final boolean DEFAULT_USER_STARTED = true;
     SharedPreferences prefs;
-    private MediaPlayer mediaPlayer;
     private BroadcastReceiver batteryReceiver;
     private boolean alertPlayed = false;
     private PendingIntent pendingIntent;
@@ -40,27 +38,11 @@ public class BatteryMonitorService extends Service {
     public void onCreate() {
         super.onCreate();
         Toast.makeText(getApplicationContext(), "Service Enabled", Toast.LENGTH_SHORT).show();
-        mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Action", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
         }
-        BroadcastReceiver stopActionReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // Stop the media player when the stop action notification is tapped
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.stop();
-                }
-                mediaPlayer.reset();
-                mediaPlayer = MediaPlayer.create(context, R.raw.notification);
-                NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                notificationManager.cancel(STOP_ACTION_NOTIFICATION_ID);
-            }
-        };
-        IntentFilter stopActionIntentFilter = new IntentFilter("com.onesilicondiode.batterywise.STOP_ACTION");
-        registerReceiver(stopActionReceiver, stopActionIntentFilter);
         batteryReceiver = new BroadcastReceiver() {
             @SuppressLint("MissingPermission")
             @Override
@@ -148,8 +130,8 @@ public class BatteryMonitorService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // For Android Oreo (API 26) and above
             builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                    .setContentText("Optimising Battery Use")
-                    .setContentText("You may tap on this notification to hide it")
+                    .setContentTitle("Optimising Battery Use")
+                    .setContentText("You may tap on this notification and then disable it")
                     .setSmallIcon(R.drawable.ic_notification)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
                     .setContentIntent(pendingIntent)
@@ -194,16 +176,6 @@ public class BatteryMonitorService extends Service {
                 .addAction(stopAction);
 
         return builder.build();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-        }
-        unregisterReceiver(batteryReceiver);
-        Toast.makeText(getApplicationContext(), "Service Stopped", Toast.LENGTH_SHORT).show();
     }
 
     @Override
