@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
     private ReviewManager reviewManager;
 
 
-
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
         TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
@@ -145,10 +144,9 @@ public class MainActivity extends AppCompatActivity {
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
         String productInfoText;
-        if(selectedBatteryLevel>98){
+        if (selectedBatteryLevel > 98) {
             productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
-        }
-        else {
+        } else {
             productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
         }
         productInfo.setText(productInfoText);
@@ -171,10 +169,9 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
                 // Update the TextView to display the selected battery level
                 String productInfoText;
-                if(selectedBatteryLevel>98){
+                if (selectedBatteryLevel > 98) {
                     productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
-                }
-                else {
+                } else {
                     productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
                 }
                 productInfo.setText(productInfoText);
@@ -197,6 +194,20 @@ public class MainActivity extends AppCompatActivity {
                 seekBarValueOverlay.setVisibility(View.GONE);
             }
         });
+        final String PREF_SHARE_DIALOG_SHOWN = "share_dialog_shown";
+        if (counter > 9) {
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            boolean isShareDialogShown = sharedPreferences.getBoolean(PREF_SHARE_DIALOG_SHOWN, false);
+
+            if (!isShareDialogShown) {
+                showShareDialog();
+
+                // Mark the dialog as shown in SharedPreferences to avoid showing it again
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(PREF_SHARE_DIALOG_SHOWN, true);
+                editor.apply();
+            }
+        }
         productInfo.setText(productInfoText);
         boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
         if (isServiceRunning) {
@@ -440,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                 // Increase the progress (increase battery level) if within bounds
                 newSeekBarProgress = seekBarProgress + 1;
-                newSeekBarProgress = Math.min(10, newSeekBarProgress); // Limit to 10
+                newSeekBarProgress = Math.min(20, newSeekBarProgress); // Limit to 10
             } else {
                 // Decrease the progress (decrease battery level) if within bounds
                 newSeekBarProgress = seekBarProgress - 1;
@@ -457,7 +468,12 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
 
             // Update the TextView to display the selected battery level
-            String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+            String productInfoText;
+            if (selectedBatteryLevel > 98) {
+                productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
+            } else {
+                productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+            }
             productInfo.setText(productInfoText);
             vibrateKeys();
             return true; // Consume the volume key press event
@@ -529,6 +545,25 @@ public class MainActivity extends AppCompatActivity {
                         showIntentErrorDialog();
                     }
                 })
+                .show();
+    }
+
+    private void showShareDialog() {
+        View customView = getLayoutInflater().inflate(R.layout.share_app_dial, null);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Hey 👋")
+                .setMessage("Feel SafeCharge has contributed to a safer and more reliable charging experience for you?\n\nConsider sharing it with friends and family and make them SafeCharge too!")
+                .setCancelable(false)
+                .setView(customView)
+                .setPositiveButton("Share", (dialog, which) -> {
+                    String shareMessage = "Hey there! I've been using SafeCharge to ensure safe charging for my phone. It's been a game-changer!\n\nCheck it out: https://play.google.com/store/apps/details?id=com.onesilicondiode.batterywise";
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+
+                    startActivity(Intent.createChooser(shareIntent, "Share SafeCharge via"));
+                })
+                .setNegativeButton("No thanks", null)
                 .show();
     }
 
