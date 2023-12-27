@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/coordinatorLayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -12,10 +11,11 @@
         android:id="@+id/waveLoadingView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:wlv_waveColor="#B7EFBA"
         app:wlv_borderColor="@color/md_theme_light_primaryContainer"
+        app:wlv_shapeType="rectangle"
         app:wlv_waveAmplitude="15"
-        app:wlv_shapeType="rectangle"/>
+        app:wlv_waveColor="#B7EFBA" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_contacts"
         android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
         app:layout_anchor="@id/layoutHolder"
         app:layout_anchorGravity="center|top"
         app:maxImageSize="40dp"
-        app:tint="@color/green"/>
+        app:tint="@color/green" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/layoutHolder"
@@ -55,6 +55,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="250dp"
                 android:layout_height="match_parent"
@@ -62,22 +63,24 @@
                 android:layout_marginTop="10dp"
                 android:backgroundTint="#1B1B1B"
                 app:cardCornerRadius="8dp">
+
                 <TextView
                     android:id="@+id/seekBarValueOverlay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:fontFamily="@font/psb"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="50dp"
-                    android:visibility="gone"/>
+                    android:fontFamily="@font/psb"
+                    android:text="0%"
+                    android:visibility="gone" />
+
                 <androidx.appcompat.widget.AppCompatSeekBar
                     android:id="@+id/batteryLevelSeekBar"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:max="10"
-                    android:progress="5"/>
+                    android:progress="5" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
@@ -100,16 +103,28 @@
                 android:fontFamily="@font/productsans"
                 android:text="@string/disable"
                 android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/usedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/productsansbold"
+                android:text="Used"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:visibility="gone"/>
+
             <TextView
                 android:id="@+id/batterySaveText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:drawablePadding="5dp"
                 android:fontFamily="@font/productsans"
                 android:text="@string/learn_more"
-                android:layout_marginBottom="10dp"
                 android:textAlignment="center"
                 android:textColor="#89E4AA"
                 android:textSize="16sp"

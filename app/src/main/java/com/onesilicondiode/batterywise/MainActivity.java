@@ -12,13 +12,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.provider.Settings;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -85,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private ReviewManager reviewManager;
 
 
+
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
         TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
@@ -130,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         requestAppReview();
+        int counter = getCounterFromSharedPreferences();
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
         productInfo = findViewById(R.id.productInfo);
@@ -258,6 +258,16 @@ public class MainActivity extends AppCompatActivity {
             startSaving.setVisibility(View.VISIBLE);
             vibrate();
         });
+        if (counter > 0) {
+            TextView usedTime;
+            usedTime = findViewById(R.id.usedTime);
+            usedTime.setVisibility(View.VISIBLE);
+            if (counter == 1) {
+                usedTime.setText("SafeCharged " + counter + " time");
+            } else {
+                usedTime.setText("SafeCharged " + counter + " times");
+            }
+        }
     }
 
     @Override
@@ -281,6 +291,11 @@ public class MainActivity extends AppCompatActivity {
             snackbar.dismiss();
         });
         snackbar.show();
+    }
+
+    private int getCounterFromSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        return sharedPreferences.getInt("counter", 0);
     }
 
     private void requestAppReview() {
@@ -381,6 +396,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(R.string.notification_notify)
                 .setMessage(R.string.notify_desc)
                 .setView(customView)
+                .setCancelable(false)
                 .setPositiveButton("Continue", (dialog, which) -> {
                     vibrate();
                     requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
@@ -443,12 +459,11 @@ public class MainActivity extends AppCompatActivity {
                     .setCancelable(false)
                     .setView(customView)
                     .setPositiveButton("Continue", (dialog, which) -> {
-                        try{
+                        try {
                             Intent intent1 = new Intent();
                             intent1.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"));
                             startActivity(intent1);
-                        }
-                        catch (Exception e){
+                        } catch (Exception e) {
                             showIntentErrorDialog();
                         }
                     })

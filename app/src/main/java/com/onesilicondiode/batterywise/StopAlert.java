@@ -1,6 +1,7 @@
 package com.onesilicondiode.batterywise;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -27,6 +28,8 @@ public class StopAlert extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private int previousVolume;
     private Vibrator vibrator;
+    int currentValue;
+    SharedPreferences sharedPreferences;
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -50,6 +53,8 @@ public class StopAlert extends AppCompatActivity {
             setShowWhenLocked(true);
             setTurnScreenOn(true);
         }
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        currentValue = sharedPreferences.getInt("counter", 0);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_alert);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
@@ -72,6 +77,10 @@ public class StopAlert extends AppCompatActivity {
             }
             mediaPlayer.reset();
             mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+            int newValue = currentValue + 1;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("counter", newValue);
+            editor.apply();
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
@@ -86,6 +95,11 @@ public class StopAlert extends AppCompatActivity {
             }
             mediaPlayer.reset();
             mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+            int newValue = currentValue + 1;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("counter", newValue);
+            editor.apply();
+            finish();
         }
     }
 
@@ -125,5 +139,9 @@ public class StopAlert extends AppCompatActivity {
         }
         mediaPlayer.reset();
         mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+        int newValue = currentValue + 1;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("counter", newValue);
+        editor.apply();
     }
 }

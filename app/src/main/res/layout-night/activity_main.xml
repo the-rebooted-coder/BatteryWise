@@ -110,6 +110,17 @@
                 android:visibility="gone" />
 
             <TextView
+                android:id="@+id/usedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/productsansbold"
+                android:text="Used"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:visibility="gone"/>
+
+            <TextView
                 android:id="@+id/batterySaveText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

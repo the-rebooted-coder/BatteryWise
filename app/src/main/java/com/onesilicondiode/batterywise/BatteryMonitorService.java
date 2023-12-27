@@ -66,7 +66,7 @@ public class BatteryMonitorService extends Service {
 
                         // Build the notification with a full-screen intent
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, STOP_ACTION_CHANNEL_ID)
-                                .setSmallIcon(R.drawable.ringing)
+                                .setSmallIcon(R.drawable.ic_notification)
                                 .setContentTitle("Battery Charged")
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setCategory(NotificationCompat.CATEGORY_ALARM)
@@ -167,7 +167,7 @@ public class BatteryMonitorService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, STOP_ACTION_CHANNEL_ID)
                 .setContentTitle("Alert is Playing...")
                 .setContentText("Disconnect the charger")
-                .setSmallIcon(R.drawable.ringing)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
