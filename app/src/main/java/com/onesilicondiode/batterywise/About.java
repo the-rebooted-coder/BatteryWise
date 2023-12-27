@@ -52,7 +52,7 @@ public class About extends AppCompatActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             String version = pInfo.versionName;
-            String productInfoText = version + "\n5.0";
+            String productInfoText = version + "\n6.0";
             versionInfo.setText(productInfoText);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -100,7 +100,7 @@ public class About extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5, 5, 5, 6, 5, 6, 5, 7, 5, 8, 5, 8, 5, 9, 5, 10, 5, 10, 5, 11};
+        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
@@ -110,7 +110,7 @@ public class About extends AppCompatActivity {
         }
     }
     private void vibrateOSD() {
-        long[] pattern = {17,4,14,17,0,22,21,8,22,0,18,0,16,13,16,16,0,9,16,12,15};
+        long[] pattern = {17,4,14,17,0,22,21,8,22,0,18,0,16};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
@@ -120,7 +120,7 @@ public class About extends AppCompatActivity {
         }
     }
     private void vibrateOtherButton() {
-        long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3, 10, 5, 0, 6, 0, 7, 11, 9, 14, 10, 13, 10, 11, 11, 0, 11, 11, 11, 11, 11};
+        long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3};
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);

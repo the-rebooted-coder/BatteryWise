@@ -121,7 +121,7 @@ public class StopAlert extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5, 5, 5, 6};
+        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);

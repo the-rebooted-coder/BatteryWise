@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] pattern = {11, 0, 11, 0, 20, 2, 23, 6, 10, 9, 0, 12, 11, 14, 0, 16, 12, 17, 0, 16, 10, 15, 0, 13};
+        long[] pattern = {11, 0, 11, 0, 20, 2, 23, 6, 10, 9, 0, 12, 11};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrateKeys() {
-        long[] customPattern = {14, 0, 10, 9, 10, 15, 0, 11, 9, 5, 12, 2, 12, 4, 10, 7, 0, 11, 11, 14, 14, 25, 11, 25, 9};
+        long[] customPattern = {14, 0, 10, 9, 10, 15, 0, 11, 9, 5, 12, 2};
         // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
@@ -403,7 +403,15 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("No Thanks", (dialog, which) -> {
                     // Handle if the user cancels the request
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                    View rootView = findViewById(android.R.id.content); // Get the root view
+
+                    Snackbar snackbar = Snackbar.make(rootView, "SafeCharge needs this permission to work.", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Allow", v -> {
+                        vibrate();
+                        requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+                        snackbar.dismiss();
+                    });
+                    snackbar.show();
                 })
                 .show();
     }
