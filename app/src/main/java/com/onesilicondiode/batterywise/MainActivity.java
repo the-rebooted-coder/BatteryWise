@@ -144,11 +144,17 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
-        String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+        String productInfoText;
+        if(selectedBatteryLevel>98){
+            productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
+        }
+        else {
+            productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+        }
         productInfo.setText(productInfoText);
         int seekBarProgress = selectedBatteryLevel - 80;
         batteryLevelSeekBar.setProgress(seekBarProgress);
-        batteryLevelSeekBar.setMax(10);
+        batteryLevelSeekBar.setMax(19);
         batteryLevelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -164,7 +170,13 @@ public class MainActivity extends AppCompatActivity {
                 editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
                 editor.apply();
                 // Update the TextView to display the selected battery level
-                String productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+                String productInfoText;
+                if(selectedBatteryLevel>98){
+                    productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
+                }
+                else {
+                    productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+                }
                 productInfo.setText(productInfoText);
             }
 
