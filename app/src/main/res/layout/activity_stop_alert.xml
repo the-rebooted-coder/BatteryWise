@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:keepScreenOn="true"
     tools:context=".StopAlert">
 
@@ -28,11 +29,20 @@
         android:textAlignment="center"
         android:textSize="18sp" />
 
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/dividerLine"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_below="@id/appNamedBelow"
+        app:dividerColor="@color/white"/>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/stopMusic"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/appNamedBelow"
+        android:layout_below="@id/dividerLine"
         android:layout_centerInParent="true"
         android:layout_marginTop="20dp"
         android:text="@string/stop_ringing" />
