@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.TypedValue;
@@ -27,9 +28,10 @@ public class StopAlert extends AppCompatActivity {
     MaterialTextView battPercentage;
     private MediaPlayer mediaPlayer;
     private int previousVolume;
+    private SharedPreferences sharedPreferences, sharedMyPrefs;
+    private boolean shouldAutoStop;
     private Vibrator vibrator;
     int currentValue;
-    SharedPreferences sharedPreferences;
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -55,11 +57,29 @@ public class StopAlert extends AppCompatActivity {
         }
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         currentValue = sharedPreferences.getInt("counter", 0);
+        sharedMyPrefs = getSharedPreferences("MyPrefsFile",MODE_PRIVATE);
+        shouldAutoStop = sharedMyPrefs.getBoolean("switchState", false);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_alert);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         setupMusic();
         setupButton();
+        if (shouldAutoStop) {
+            // Start a handler to stop the media player after 60 seconds
+            new Handler().postDelayed(() -> {
+                NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.reset();
+                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                int newValue = currentValue + 1;
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("counter", newValue);
+                editor.apply();
+                finish();
+            }, 60000); // Stop after 60 seconds (60000 milliseconds)
+        }
         BatteryManager bm = (BatteryManager) this.getSystemService(BATTERY_SERVICE);
         int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
         battPercentage.setText("Battery is at " + batLevel + "%\nUnplug the charger");
