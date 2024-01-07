@@ -1,8 +1,8 @@
 package com.onesilicondiode.batterywise;
 
-import static com.onesilicondiode.batterywise.Constants.PREFS_NAME;
-
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
@@ -24,8 +24,10 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
@@ -79,8 +82,12 @@ public class MainActivity extends AppCompatActivity {
     private boolean seekTouch = false;
     private Vibrator vibrator;
     private String manufacturer;
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String SWITCH_STATE = "switchState";
     private AppUpdateManager appUpdateManager;
     private ReviewManager reviewManager;
+    private MaterialSwitch switchToggle;
+    private SharedPreferences sharedPreferences;
 
 
     public static int getThemeColor(Context context, int colorResId) {
@@ -109,7 +116,20 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         appUpdateManager.registerListener(installStateUpdatedListener);
+        switchToggle = findViewById(R.id.switchToggle);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
+        // Load the previous state of the switch toggle from SharedPreferences
+        switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
+
+        // Set a listener to save the state of the switch toggle in SharedPreferences when changed
+        switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Save the state of the switch toggle in SharedPreferences
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(SWITCH_STATE, isChecked);
+            editor.apply();
+            vibrateTouch();
+        });
         // Check for app updates
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
@@ -213,9 +233,11 @@ public class MainActivity extends AppCompatActivity {
         if (isServiceRunning) {
             startSaving.setVisibility(View.GONE);
             stopSaving.setVisibility(View.VISIBLE);
+            animateSwitchToggle();
         } else {
             startSaving.setVisibility(View.VISIBLE);
             stopSaving.setVisibility(View.GONE);
+            hideSwitchToggle();
         }
         TextView batterySaveText = findViewById(R.id.batterySaveText);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -279,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
             stopService(serviceIntent);
             stopSaving.setVisibility(View.GONE);
             startSaving.setVisibility(View.VISIBLE);
+            hideSwitchToggle();
             vibrate();
         });
         if (counter > 0) {
@@ -390,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrateTouch() {
-        long[] pattern = {7, 0, 8, 1, 6, 6, 6, 11, 5, 15, 0, 17, 5};
+        long[] pattern = {7, 0, 8, 1, 6, 6, 6, 11, 5};
         // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
@@ -522,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
             startSaving.setVisibility(View.GONE);
             vibrate();
             stopSaving.setVisibility(View.VISIBLE);
-            finish();
+            animateSwitchToggle();
         }
     }
 
@@ -689,5 +712,32 @@ public class MainActivity extends AppCompatActivity {
         startSaving.setVisibility(View.GONE);
         vibrate();
         stopSaving.setVisibility(View.VISIBLE);
+        animateSwitchToggle();
+    }
+    private void animateSwitchToggle() {
+        switchToggle.setVisibility(View.VISIBLE);
+
+        float startY = -100f; // Adjust this value based on your desired starting position
+
+        // Define the animation - falling from a lower position
+        ObjectAnimator animator = ObjectAnimator.ofFloat(switchToggle, "translationY", startY, 0);
+        animator.setDuration(200); // Duration in milliseconds
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.start();
+    }
+    private void hideSwitchToggle() {
+        float endY = -100f; // Adjust this value based on your desired ending position
+        // Define the animation - moving upwards before disappearing
+        ObjectAnimator animator = ObjectAnimator.ofFloat(switchToggle, "translationY", 0, endY);
+        animator.setDuration(110); // Duration in milliseconds
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                switchToggle.setVisibility(View.GONE);
+            }
+        });
+        animator.start();
     }
 }

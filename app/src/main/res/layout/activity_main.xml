@@ -88,7 +88,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:visibility="gone"
                 android:layout_gravity="center"
+                android:textColor="@color/white"
                 android:fontFamily="@font/productsans"
                 android:text="@string/dismiss_alert_after_1_minute"/>
 
@@ -107,7 +109,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/productsans"
                 android:text="@string/disable"
