@@ -42,7 +42,9 @@
         android:id="@+id/stopMusic"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/productsansbold"
         android:layout_below="@id/dividerLine"
+        app:cornerRadius="8dp"
         android:layout_centerInParent="true"
         android:layout_marginTop="20dp"
         android:text="@string/stop_ringing" />
