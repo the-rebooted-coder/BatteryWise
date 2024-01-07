@@ -83,12 +83,21 @@
                     android:progress="5" />
             </com.google.android.material.card.MaterialCardView>
 
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:fontFamily="@font/productsans"
+                android:text="@string/dismiss_alert_after_1_minute"/>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBatteryBtn"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/productsans"
                 android:text="@string/enable" />
