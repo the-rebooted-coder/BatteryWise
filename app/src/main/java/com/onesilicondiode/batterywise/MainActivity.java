@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -164,7 +165,22 @@ public class MainActivity extends AppCompatActivity {
         manufacturer = Build.MANUFACTURER;
         BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
         int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        waveLoadingView.setProgressValue(batteryPercent);
+        if(batteryPercent>55){
+            waveLoadingView.setWaveColor(Color.parseColor("#006C49"));
+            waveLoadingView.setProgressValue(batteryPercent);
+        }
+        else if (batteryPercent>40 && batteryPercent<55){
+            waveLoadingView.setWaveColor(Color.parseColor("#F6D3A1"));
+            waveLoadingView.setProgressValue(batteryPercent);
+        }
+        else if (batteryPercent>20 && batteryPercent<40){
+            waveLoadingView.setWaveColor(Color.parseColor("#E4B284"));
+            waveLoadingView.setProgressValue(batteryPercent);
+        }
+        else if (batteryPercent>1 && batteryPercent<20){
+            waveLoadingView.setWaveColor(Color.parseColor("#FFB4AB"));
+            waveLoadingView.setProgressValue(batteryPercent);
+        }
         SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
