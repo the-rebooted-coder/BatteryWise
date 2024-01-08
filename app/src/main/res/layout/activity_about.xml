@@ -81,7 +81,7 @@
                     android:layout_marginEnd="40dp"
                     android:layout_marginTop="30dp"
                     ripple:button_background_padding="3dp"
-                    ripple:button_background_src="@drawable/baseline_start_24"
+                    ripple:button_background_src="@drawable/about_me"
                     ripple:button_background_tint="@color/tint_trail"
                     ripple:has_active_status="false"
                     ripple:has_finish_animation="true"
