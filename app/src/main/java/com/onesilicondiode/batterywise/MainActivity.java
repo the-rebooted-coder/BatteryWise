@@ -184,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // Calculate the selected battery level based on the progress
                 selectedBatteryLevel = 80 + progress;
+                waveLoadingView.setProgressValue(81+ progress);
                 String progressText = selectedBatteryLevel + "%";
                 seekBarValueOverlay.setText(progressText);
                 vibrateTouch();
@@ -211,9 +212,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (!seekTouch) {
-                    showSnackbar();
                     seekTouch = true;
                 }
+                waveLoadingView.setProgressValue(batteryPercent);
                 vibrateTouch();
                 scaleSeekBar(seekBar, 1.0f);
                 seekBarValueOverlay.startAnimation(hideAnimation);
@@ -248,44 +249,15 @@ public class MainActivity extends AppCompatActivity {
         TextView batterySaveText = findViewById(R.id.batterySaveText);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         batterySaveText.setOnClickListener(view -> {
-            // Create a LayoutInflater
-            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-            View popupView = inflater.inflate(R.layout.popup_info, null);
-
-            // Create a PopupWindow
-            int width = LayoutParams.MATCH_PARENT;
-            int height = LayoutParams.WRAP_CONTENT;
-            boolean focusable = true;
-            PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
-            // Set a custom background for the popup
-            popupWindow.setBackgroundDrawable(getDrawable(R.drawable.popup_background));
-
-            // Show the popup with custom animations
-            popupWindow.setAnimationStyle(0); // Disable the default animation
-            Animation enterAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_enter_animation);
-            popupView.startAnimation(enterAnimation);
-            popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-            // Get the ImageView inside the popup
-            MaterialButton popupButton = popupView.findViewById(R.id.popupButton);
-
-            // Add an OnClickListener to the ImageView
-            popupButton.setOnClickListener(v -> {
-                // Create an Intent to open the NewActivity
-                Intent intent = new Intent(MainActivity.this, About.class);
-                startActivity(intent);
-                vibrate();
-                // Dismiss the popup
-                popupWindow.dismiss();
-            });
-
-            // Dismiss the popup with exit animation when needed
-            popupView.setOnClickListener(v -> {
-                Animation exitAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_exit_animation);
-                popupView.startAnimation(exitAnimation);
-                popupWindow.dismiss();
-            });
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Important information about your battery")
+                    .setMessage(R.string.disclaimer)
+                    .setPositiveButton("About & Licenses", (dialog, which) -> {
+                        vibrate();
+                        Intent intent = new Intent(MainActivity.this, About.class);
+                        startActivity(intent);
+                    })
+                    .show();
         });
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -358,17 +330,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private void showSnackbar() {
-        CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinatorLayout);
-
-        Snackbar snackbar = Snackbar.make(coordinatorLayout, "You can also use the volume buttons to control slider", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction("Okay", view -> {
-            seekTouch = true;
-            saveSeekTouchState();
-            snackbar.dismiss();
-        });
-        snackbar.show();
-    }
 
     private int getCounterFromSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -421,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrate() {
-        long[] pattern = {11, 0, 11, 0, 20, 2, 23, 6, 10, 9, 0, 12, 11};
+        long[] pattern = {11, 0, 11, 0, 20, 2, 23};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
@@ -491,49 +452,6 @@ public class MainActivity extends AppCompatActivity {
                     snackbar.show();
                 })
                 .show();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
-
-            // Calculate the selected battery level based on the current seek bar progress
-            int seekBarProgress = batteryLevelSeekBar.getProgress();
-            int newSeekBarProgress;
-
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                // Increase the progress (increase battery level) if within bounds
-                newSeekBarProgress = seekBarProgress + 1;
-                newSeekBarProgress = Math.min(20, newSeekBarProgress); // Limit to 10
-            } else {
-                // Decrease the progress (decrease battery level) if within bounds
-                newSeekBarProgress = seekBarProgress - 1;
-                newSeekBarProgress = Math.max(0, newSeekBarProgress); // Limit to 0
-            }
-
-            // Update the seek bar progress
-            batteryLevelSeekBar.setProgress(newSeekBarProgress);
-
-            // Update the selectedBatteryLevel and save it to SharedPreferences
-            selectedBatteryLevel = 80 + newSeekBarProgress;
-            SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-            editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
-            editor.apply();
-
-            // Update the TextView to display the selected battery level
-            String productInfoText;
-            if (selectedBatteryLevel > 98) {
-                productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
-            } else {
-                productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
-            }
-            productInfo.setText(productInfoText);
-            vibrateKeys();
-            return true; // Consume the volume key press event
-        }
-
-        return super.onKeyDown(keyCode, event);
     }
 
     private void enableAutoStart() {
