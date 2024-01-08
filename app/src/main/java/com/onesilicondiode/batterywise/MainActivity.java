@@ -20,16 +20,11 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CompoundButton;
-import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,13 +32,13 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -262,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
             stopSaving.setVisibility(View.GONE);
             hideSwitchToggle();
         }
-        TextView batterySaveText = findViewById(R.id.batterySaveText);
+        Chip batterySaveText = findViewById(R.id.batterySaveText);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         batterySaveText.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(this)

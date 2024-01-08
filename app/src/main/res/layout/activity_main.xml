@@ -127,21 +127,20 @@
                 android:textColor="@color/white"
                 android:visibility="gone"/>
 
-            <TextView
+            <com.google.android.material.chip.Chip
                 android:id="@+id/batterySaveText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Chip.Assist"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
-                android:drawablePadding="5dp"
                 android:fontFamily="@font/productsans"
+                app:chipIcon="@drawable/baseline_info_24"
                 android:text="@string/learn_more"
                 android:textAlignment="center"
-                android:textColor="#89E4AA"
-                android:textSize="16sp"
-                app:drawableLeftCompat="@drawable/baseline_info_24_white"
-                app:drawableTint="#89E4AA" />
+                android:textColor="@color/green_dark"
+                android:textSize="16sp"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
