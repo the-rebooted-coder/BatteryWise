@@ -58,7 +58,7 @@ public class StopAlert extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         currentValue = sharedPreferences.getInt("counter", 0);
         sharedMyPrefs = getSharedPreferences("MyPrefsFile",MODE_PRIVATE);
-        shouldAutoStop = sharedMyPrefs.getBoolean("switchState", false);
+        shouldAutoStop = sharedMyPrefs.getBoolean("switchState", true);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_alert);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);

@@ -41,6 +41,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Load the previous state of the switch toggle from SharedPreferences
-        switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
+        switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, true));
 
         // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -130,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             vibrateTouch();
         });
+
+        //Bottom Sheet What's New
+        if (!sharedPreferences.getBoolean("isConfirmed", false)) {
+            showBottomSheet();
+        }
         // Check for app updates
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
@@ -316,6 +322,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showBottomSheet() {
+        // Inflate the layout for the Bottom Sheet Dialog
+        View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_new, null);
+
+        // Create BottomSheetDialog
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.setCancelable(false);
+        // Get views from the Bottom Sheet layout
+        final TextView textWhatsNew = bottomSheetView.findViewById(R.id.textWhatsNew);
+        final MaterialButton btnConfirm = bottomSheetView.findViewById(R.id.btnConfirm);
+
+        // Set button click listener
+        btnConfirm.setOnClickListener(v -> {
+            // Save user confirmation
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isConfirmed", true);
+            editor.apply();
+
+            // Dismiss the Bottom Sheet Dialog
+            bottomSheetDialog.dismiss();
+        });
+
+        // Show the Bottom Sheet Dialog
+        bottomSheetDialog.show();
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -326,7 +358,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
     private void showSnackbar() {
         CoordinatorLayout coordinatorLayout = findViewById(R.id.coordinatorLayout);
 
@@ -401,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void vibrateKeys() {
-        long[] customPattern = {14, 0, 10, 9, 10, 15, 0, 11, 9, 5, 12, 2};
+        long[] customPattern = {14, 0, 10, 9, 10, 15, 0, 11};
         // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
