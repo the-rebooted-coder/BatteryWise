@@ -56,6 +56,26 @@
         android:fontFamily="@font/productsans"
         android:paddingEnd="10dp"
         android:text="When your device has charged, you will now be shown a graceful slider to dismiss the ringing alert."/>
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:textSize="18sp"
+        android:drawablePadding="5dp"
+        app:drawableTint="@color/green_dark"
+        android:paddingStart="10dp"
+        android:fontFamily="@font/productsansbold"
+        android:text="Dynamic Battery Levels"
+        app:drawableStartCompat="@drawable/sparkle" />
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textSize="18sp"
+        android:paddingStart="18dp"
+        android:fontFamily="@font/productsans"
+        android:paddingEnd="10dp"
+        android:text="SafeCharge now shows colour representing your current battery levels inside it and change dynamically."/>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
