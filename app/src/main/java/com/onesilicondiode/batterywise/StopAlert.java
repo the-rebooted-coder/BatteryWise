@@ -18,13 +18,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.splashscreen.SplashScreen;
 
-import com.google.android.material.button.MaterialButton;
+import com.example.swipebutton_library.OnActiveListener;
+import com.example.swipebutton_library.SwipeButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.textview.MaterialTextView;
 
 public class StopAlert extends AppCompatActivity {
     private static final int STOP_ACTION_NOTIFICATION_ID = 198;
-    MaterialButton stopAlert;
+    SwipeButton stopAlert;
     MaterialTextView battPercentage;
     private MediaPlayer mediaPlayer;
     private int previousVolume;
@@ -89,8 +90,8 @@ public class StopAlert extends AppCompatActivity {
     private void setupButton() {
         battPercentage = findViewById(R.id.appNamedBelow);
         stopAlert = findViewById(R.id.stopMusic);
-        stopAlert.setOnClickListener(view -> {
-            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+        stopAlert.setOnActiveListener(() -> {
+            NotificationManagerCompat.from(getApplicationContext()).cancel(STOP_ACTION_NOTIFICATION_ID);
             vibrate();
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.stop();

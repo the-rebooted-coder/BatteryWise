@@ -5,6 +5,7 @@
     <color name="green">#4CAF50</color>
     <color name="seed">#4CAF50</color>
     <color name="red">#93000A</color>
+    <color name="tint_trail">#032207</color>
     <color name="light_red">#FFB4AB</color>
     <color name="safeGreen">#006C49</color>
     <color name="safeGreenBg">#94F990</color>
@@ -69,4 +70,8 @@
     <color name="md_theme_dark_outlineVariant">#424940</color>
     <color name="md_theme_dark_scrim">#000000</color>
     <color name="slider">#3D9C41</color>
+    <color name="tint_dismiss_outer">#8133FD</color>
+    <color name="tint_dismiss_inner">#7C2AFF</color>
+    <color name="know_more_trail">#2E5929</color>
+    <color name="swipe_background_tint">#985BF8</color>
 </resources>

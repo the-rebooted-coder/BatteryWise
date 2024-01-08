@@ -73,18 +73,16 @@
 
                 <com.example.swipebutton_library.SwipeButton
                     android:id="@+id/moreAboutSS"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="300dp"
+                    android:layout_height="50dp"
                     android:layout_below="@+id/developedBy"
                     android:layout_centerHorizontal="true"
                     android:layout_marginStart="40dp"
-                    android:layout_marginEnd="40dp"
                     android:layout_marginTop="30dp"
+                    android:layout_marginEnd="40dp"
                     ripple:button_background_padding="3dp"
                     ripple:button_background_src="@drawable/baseline_start_24"
-                    ripple:button_background_tint="@color/green"
-                    ripple:button_height="35dp"
-                    ripple:button_width="35dp"
+                    ripple:button_background_tint="@color/green_dark"
                     ripple:has_active_status="false"
                     ripple:has_finish_animation="true"
                     ripple:inner_text="Swipe to know me"
@@ -93,7 +91,7 @@
                     ripple:inner_text_padding="8dp"
                     ripple:inner_text_size="14sp"
                     ripple:outer_background_tint="@color/green"
-                    ripple:trail_background_tint="#2E5929"
+                    ripple:trail_background_tint="@color/slider"
                     ripple:trail_enabled="true" />
                 <TextView
                     android:id="@+id/versionName"

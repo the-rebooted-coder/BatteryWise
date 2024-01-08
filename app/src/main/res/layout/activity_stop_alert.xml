@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:ripple="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:keepScreenOn="true"
     tools:context=".StopAlert">
@@ -38,15 +39,23 @@
         android:layout_below="@id/appNamedBelow"
         app:dividerColor="@color/white"/>
 
-    <com.google.android.material.button.MaterialButton
+    <com.example.swipebutton_library.SwipeButton
         android:id="@+id/stopMusic"
-        android:layout_width="240dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/productsansbold"
-        android:layout_below="@id/dividerLine"
-        app:cornerRadius="8dp"
-        android:layout_centerInParent="true"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/dividerLine"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:text="@string/stop_ringing" />
+        ripple:button_background_padding="3dp"
+        ripple:button_background_src="@drawable/stop_ringing"
+        ripple:button_background_tint="@color/swipe_background_tint"
+        ripple:has_active_status="false"
+        ripple:has_finish_animation="true"
+        ripple:inner_text="Swipe to Dismiss"
+        ripple:inner_text_color="@color/white"
+        ripple:inner_text_size="14sp"
+        ripple:outer_background_tint="@color/tint_dismiss_outer"
+        ripple:trail_background_tint="@color/swipe_background_tint"
+        ripple:trail_enabled="true" />
 
 </RelativeLayout>
