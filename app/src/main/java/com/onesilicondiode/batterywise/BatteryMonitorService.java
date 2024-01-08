@@ -37,7 +37,7 @@ public class BatteryMonitorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(getApplicationContext(), "Service Enabled", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "SafeCharge Service Enabled", Toast.LENGTH_SHORT).show();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel stopActionChannel = new NotificationChannel(STOP_ACTION_CHANNEL_ID, "Stop Alerts", NotificationManager.IMPORTANCE_HIGH);
             stopActionChannel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.silence), null);
