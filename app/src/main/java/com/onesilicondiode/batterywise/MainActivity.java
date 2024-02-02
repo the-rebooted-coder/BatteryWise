@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        requestAppReview();
         int counter = getCounterFromSharedPreferences();
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
@@ -345,30 +344,6 @@ public class MainActivity extends AppCompatActivity {
     private int getCounterFromSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         return sharedPreferences.getInt("counter", 0);
-    }
-
-    private void requestAppReview() {
-        // Create a ReviewInfo instance to request a review
-        Task<ReviewInfo> requestReviewTask = reviewManager.requestReviewFlow();
-
-        requestReviewTask.addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ReviewInfo reviewInfo = task.getResult();
-                Task<Void> launchReviewTask = reviewManager.launchReviewFlow(this, reviewInfo);
-
-                launchReviewTask.addOnCompleteListener(reviewTask -> {
-                });
-            } else {
-                //DO NOT REMOVE THIS
-            }
-        });
-    }
-
-    private void saveSeekTouchState() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(PREF_SEEK_TOUCH, seekTouch);
-        editor.apply();
     }
 
     private void scaleSeekBar(SeekBar seekBar, float scaleFactor) {

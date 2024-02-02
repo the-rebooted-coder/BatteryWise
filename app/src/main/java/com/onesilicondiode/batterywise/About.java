@@ -52,7 +52,7 @@ public class About extends AppCompatActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             String version = pInfo.versionName;
-            String productInfoText = version + "\n20.0";
+            String productInfoText = version + "\n20.1";
             versionInfo.setText(productInfoText);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -63,18 +63,33 @@ public class About extends AppCompatActivity {
         });
         privacyPolicy.setOnClickListener(view -> {
             vibrateOtherButton();
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/BatteryWise/PrivacyPolicy.txt"));
-            startActivity(browserIntent);
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/BatteryWise/PrivacyPolicy.txt"));
+                startActivity(browserIntent);
+            }
+            catch (Exception e){
+                Toast.makeText(this,"Cannot Open Browser",Toast.LENGTH_LONG).show();
+            }
         });
         openSource.setOnClickListener(view -> {
             vibrateOtherButton();
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/the-rebooted-coder/BatteryWise/blob/main/LICENSE"));
-            startActivity(browserIntent);
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/the-rebooted-coder/BatteryWise/blob/main/LICENSE"));
+                startActivity(browserIntent);
+            }
+            catch (Exception e){
+                Toast.makeText(this,"Cannot Open Browser",Toast.LENGTH_LONG).show();
+            }
         });
         moreAbout.setOnActiveListener(() -> {
             vibrate();
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.linkedin.com/in/spandn/"));
-            startActivity(browserIntent);
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.linkedin.com/in/spandn/"));
+                startActivity(browserIntent);
+            }
+            catch (Exception e){
+                Toast.makeText(this,"Google me up ;)",Toast.LENGTH_LONG).show();
+            }
         });
 
         MaterialCardView cardView = findViewById(R.id.initialCard);
