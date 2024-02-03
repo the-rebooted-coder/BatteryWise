@@ -51,16 +51,16 @@
                 android:id="@+id/productInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
                 android:fontFamily="@font/productsansbold"
-                android:gravity="center"
-                android:layout_gravity="center"
+                android:padding="10dp"
                 android:text="@string/productInfo"
                 android:textAlignment="center"
-                android:textColor="#E3E3E3"/>
+                android:textColor="#E3E3E3"
+                android:textSize="18sp" />
+
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="300dp"
+                android:layout_width="250dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
@@ -79,67 +79,25 @@
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/batteryLevelSlider"
-                    android:layout_width="match_parent"
+                    android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     app:labelBehavior="gone"
                     android:valueFrom="80.0"
                     android:valueTo="99.0"
+                    app:thumbRadius="0dp"
                     android:value="85.0"/>
             </com.google.android.material.card.MaterialCardView>
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchToggle"
-                android:layout_width="250dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center"
                 android:visibility="gone"
                 app:thumbIcon="@drawable/thum_icons"
-                android:textColor="@color/white"
                 android:fontFamily="@font/productsans"
                 android:text="@string/dismiss_alert_after_1_minute"/>
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/toggleGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_gravity="center"
-                app:singleSelection="true">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_1_minute"
-                    style="@style/ToggleButtonGroupStyleDark"
-                    android:textColor="@color/white"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cornerRadius="16dp"
-                    android:textAllCaps="false"
-                    android:text="1m"
-                    app:rippleColor="?attr/colorControlHighlight" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_2_minutes"
-                    android:layout_width="wrap_content"
-                    android:textColor="@color/white"
-                    style="@style/ToggleButtonGroupStyleDark"
-                    android:layout_height="wrap_content"
-                    android:text="2m"
-                    android:textAllCaps="false"
-                    app:cornerRadius="16dp"
-                    app:rippleColor="?attr/colorControlHighlight" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_3_minutes"
-                    style="@style/ToggleButtonGroupStyleDark"
-                    android:layout_width="wrap_content"
-                    android:textColor="@color/white"
-                    android:layout_height="wrap_content"
-                    android:textAllCaps="false"
-                    android:text="3m"
-                    app:cornerRadius="16dp"
-                    app:rippleColor="?attr/colorControlHighlight" />
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBatteryBtn"
                 android:layout_width="200dp"

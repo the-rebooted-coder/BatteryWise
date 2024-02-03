@@ -37,7 +37,6 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -83,9 +82,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String SWITCH_STATE = "switchState";
     private AppUpdateManager appUpdateManager;
+    private ReviewManager reviewManager;
     private MaterialSwitch switchToggle;
     private SharedPreferences sharedPreferences;
-    private MaterialButtonToggleGroup timeSelector;
+
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        reviewManager = ReviewManagerFactory.create(this);
         waveLoadingView = findViewById(R.id.waveLoadingView);
         appUpdateManager = AppUpdateManagerFactory.create(this);
         InstallStateUpdatedListener installStateUpdatedListener = state -> {
@@ -111,25 +112,15 @@ public class MainActivity extends AppCompatActivity {
                 appUpdateManager.completeUpdate();
             }
         };
-        timeSelector = findViewById(R.id.toggleGroup);
         appUpdateManager.registerListener(installStateUpdatedListener);
         switchToggle = findViewById(R.id.switchToggle);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Load the previous state of the switch toggle from SharedPreferences
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, true));
-        if (switchToggle.isChecked()) {
-            timeSelector.setVisibility(View.VISIBLE);
-        } else {
-            timeSelector.setVisibility(View.GONE);
-        }
+
         // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                timeSelector.setVisibility(View.VISIBLE);
-            } else {
-                timeSelector.setVisibility(View.GONE);
-            }
             // Save the state of the switch toggle in SharedPreferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(SWITCH_STATE, isChecked);
@@ -283,9 +274,6 @@ public class MainActivity extends AppCompatActivity {
             checkNotificationPermission();
         }
         startSaving.setOnClickListener(view -> {
-            if(switchToggle.getVisibility()==View.VISIBLE){
-                timeSelector.setVisibility(View.VISIBLE);
-            }
             try {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putBoolean(USER_STARTED_KEY, true);
@@ -652,6 +640,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void animateSwitchToggle() {
         switchToggle.setVisibility(View.VISIBLE);
+
         float startY = -100f; // Adjust this value based on your desired starting position
 
         // Define the animation - falling from a lower position
@@ -673,7 +662,6 @@ public class MainActivity extends AppCompatActivity {
                 switchToggle.setVisibility(View.GONE);
             }
         });
-        timeSelector.setVisibility(View.GONE);
         animator.start();
     }
 }

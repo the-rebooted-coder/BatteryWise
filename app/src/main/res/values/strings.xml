@@ -18,6 +18,6 @@
     <string name="notify_desc">As subtle as a ninja in the shadows!\nTo monitor your battery charge levels, we need notification access.\n\nNotifications are required to run SafeCharge</string>
     <string name="unplug_the_charger">Unplug the Charger</string>
     <string name="stop_ringing">STOP RINGING</string>
-    <string name="dismiss_alert_after_1_minute">Auto Dismiss Alert</string>
+    <string name="dismiss_alert_after_1_minute">Dismiss alert after 1 minute</string>
     <string name="what_new">What\'s new in SafeCharge!</string>
 </resources>
