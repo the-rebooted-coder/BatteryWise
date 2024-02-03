@@ -129,7 +129,7 @@ public class BatteryMonitorService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // For Android Oreo (API 26) and above
             builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                    .setContentTitle("Optimising Battery Use")
+                    .setContentTitle("Monitoring Charge Levels")
                     .setContentText("You may tap on this notification and then disable it")
                     .setSmallIcon(R.drawable.ic_notification)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -139,7 +139,7 @@ public class BatteryMonitorService extends Service {
             Uri notifSound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle);
             // For Android versions prior to Oreo
             builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                    .setContentText("Optimising Battery Use")
+                    .setContentText("Monitoring Charge Levels")
                     .setSmallIcon(R.drawable.ic_notification)
                     .setSound(notifSound)
                     .setPriority(NotificationCompat.PRIORITY_LOW)

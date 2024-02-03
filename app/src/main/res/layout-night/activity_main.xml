@@ -77,13 +77,15 @@
                     android:text="0%"
                     android:visibility="gone" />
 
-                <androidx.appcompat.widget.AppCompatSeekBar
-                    android:id="@+id/batteryLevelSeekBar"
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/batteryLevelSlider"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:max="19"
-                    android:progress="5" />
+                    app:labelBehavior="gone"
+                    android:valueFrom="80.0"
+                    android:valueTo="99.0"
+                    android:value="85.0"/>
             </com.google.android.material.card.MaterialCardView>
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchToggle"

@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +41,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.slider.Slider;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             waveLoadingView.setWaveColor(Color.parseColor("#FFB4AB"));
             waveLoadingView.setProgressValue(batteryPercent);
         }
-        SeekBar batteryLevelSeekBar = findViewById(R.id.batteryLevelSeekBar);
+        Slider batteryLevelSlider = findViewById(R.id.batteryLevelSlider);
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
@@ -186,25 +186,22 @@ public class MainActivity extends AppCompatActivity {
             productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
         }
         productInfo.setText(productInfoText);
-        int seekBarProgress = selectedBatteryLevel - 80;
-        batteryLevelSeekBar.setProgress(seekBarProgress);
-        batteryLevelSeekBar.setMax(19);
-        batteryLevelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+        batteryLevelSlider.setValue(selectedBatteryLevel);
+        batteryLevelSlider.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Calculate the selected battery level based on the progress
-                selectedBatteryLevel = 80 + progress;
-                waveLoadingView.setProgressValue(81+ progress);
+            public void onValueChange(Slider slider, float value, boolean fromUser) {
+                selectedBatteryLevel = (int) value;
+                waveLoadingView.setProgressValue(selectedBatteryLevel + 1);
                 String progressText = selectedBatteryLevel + "%";
                 seekBarValueOverlay.setText(progressText);
                 vibrateTouch();
-                // Display the overlay
                 seekBarValueOverlay.startAnimation(showAnimation);
                 seekBarValueOverlay.setVisibility(View.VISIBLE);
                 SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
                 editor.apply();
-                // Update the TextView to display the selected battery level
+
                 String productInfoText;
                 if (selectedBatteryLevel > 98) {
                     productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
@@ -213,20 +210,22 @@ public class MainActivity extends AppCompatActivity {
                 }
                 productInfo.setText(productInfoText);
             }
+        });
 
+        batteryLevelSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                scaleSeekBar(seekBar, 1.2f);
+            public void onStartTrackingTouch(Slider slider) {
+                scaleSeekBar(slider, 1.2f);
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(Slider slider) {
                 if (!seekTouch) {
                     seekTouch = true;
                 }
                 waveLoadingView.setProgressValue(batteryPercent);
                 vibrateTouch();
-                scaleSeekBar(seekBar, 1.0f);
+                scaleSeekBar(slider, 1.0f);
                 seekBarValueOverlay.startAnimation(hideAnimation);
                 seekBarValueOverlay.setVisibility(View.GONE);
             }
@@ -311,7 +310,6 @@ public class MainActivity extends AppCompatActivity {
         // Create BottomSheetDialog
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.setCancelable(false);
         // Get views from the Bottom Sheet layout
         final TextView textWhatsNew = bottomSheetView.findViewById(R.id.textWhatsNew);
         final MaterialButton btnConfirm = bottomSheetView.findViewById(R.id.btnConfirm);
@@ -326,7 +324,12 @@ public class MainActivity extends AppCompatActivity {
             // Dismiss the Bottom Sheet Dialog
             bottomSheetDialog.dismiss();
         });
-
+        //On Dismiss
+        bottomSheetDialog.setOnDismissListener(dialog -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isConfirmed", true);
+            editor.apply();
+                });
         // Show the Bottom Sheet Dialog
         bottomSheetDialog.show();
     }
@@ -346,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
         return sharedPreferences.getInt("counter", 0);
     }
 
-    private void scaleSeekBar(SeekBar seekBar, float scaleFactor) {
+    private void scaleSeekBar(Slider seekBar, float scaleFactor) {
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(seekBar, "scaleX", scaleFactor);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(seekBar, "scaleY", scaleFactor);
 
@@ -415,27 +418,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPermissionRationaleDialog() {
-        View customView = getLayoutInflater().inflate(R.layout.custom_alert_dialog, null);
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.notification_notify)
                 .setMessage(R.string.notify_desc)
-                .setView(customView)
                 .setCancelable(false)
                 .setPositiveButton("Continue", (dialog, which) -> {
                     vibrate();
                     requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
-                })
-                .setNegativeButton("No Thanks", (dialog, which) -> {
-                    // Handle if the user cancels the request
-                    View rootView = findViewById(android.R.id.content); // Get the root view
-
-                    Snackbar snackbar = Snackbar.make(rootView, "SafeCharge needs this permission to work.", Snackbar.LENGTH_INDEFINITE);
-                    snackbar.setAction("Allow", v -> {
-                        vibrate();
-                        requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
-                        snackbar.dismiss();
-                    });
-                    snackbar.show();
                 })
                 .show();
     }
