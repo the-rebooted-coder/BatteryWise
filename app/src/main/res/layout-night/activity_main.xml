@@ -85,6 +85,7 @@
                     app:labelBehavior="gone"
                     android:valueFrom="80.0"
                     android:valueTo="99.0"
+                    app:thumbRadius="0dp"
                     android:value="85.0"/>
             </com.google.android.material.card.MaterialCardView>
             <com.google.android.material.materialswitch.MaterialSwitch
