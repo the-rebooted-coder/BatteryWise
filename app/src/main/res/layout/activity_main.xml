@@ -88,12 +88,12 @@
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchToggle"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:layout_gravity="center"
                 android:visibility="gone"
                 app:thumbIcon="@drawable/thum_icons"
-                android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:fontFamily="@font/productsans"
                 android:text="@string/dismiss_alert_after_1_minute"/>
