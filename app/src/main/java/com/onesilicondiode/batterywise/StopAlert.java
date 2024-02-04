@@ -3,6 +3,7 @@ package com.onesilicondiode.batterywise;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.BatteryManager;
@@ -15,13 +16,11 @@ import android.os.Vibrator;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.splashscreen.SplashScreen;
 
-import com.example.swipebutton_library.OnActiveListener;
 import com.example.swipebutton_library.SwipeButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.textview.MaterialTextView;
@@ -31,7 +30,7 @@ import me.itangqi.waveloadingview.WaveLoadingView;
 public class StopAlert extends AppCompatActivity {
     private static final int STOP_ACTION_NOTIFICATION_ID = 198;
     SwipeButton stopAlert;
-    MaterialTextView battPercentage;
+    MaterialTextView battPercentage, appName, belowAppName;
     private MediaPlayer mediaPlayer;
     private int previousVolume;
     private SharedPreferences sharedPreferences, sharedMyPrefs;
@@ -79,79 +78,139 @@ public class StopAlert extends AppCompatActivity {
                 switch (selectedTime) {
                     case 1:
                         // Start a handler to stop the media player after 60 seconds
-                            stopLoadingView = findViewById(R.id.stopLoadingView);
-                            stopLoadingView.setVisibility(View.VISIBLE);
-                            countDownTimer = new CountDownTimer(60000, 1000) {
-                                public void onTick(long millisUntilFinished) {
-                                    // Calculate the progress value based on time remaining
-                                    int progress = (int) (millisUntilFinished / 600);
-                                    // Update your wave progress
-                                    stopLoadingView.setProgressValue(progress);
+                        stopLoadingView = findViewById(R.id.stopLoadingView);
+                        stopLoadingView.setVisibility(View.VISIBLE);
+                        countDownTimer = new CountDownTimer(60000, 1000) {
+                            public void onTick(long millisUntilFinished) {
+                                // Calculate the progress value based on time remaining
+                                int progress = (int) (millisUntilFinished / 600);
+                                // Update your wave progress
+                                stopLoadingView.setProgressValue(progress);
+                                new Handler().postDelayed(() -> {
+                                    appName = findViewById(R.id.appNamed);
+                                    belowAppName = findViewById(R.id.appNamedBelow);
+                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
+                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                                }, 26000); // 30 seconds delay (30000 milliseconds)
+                            }
+                            @Override
+                            public void onFinish() {
+                                // This part executes when the countdown finishes
+                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                                if (mediaPlayer.isPlaying()) {
+                                    mediaPlayer.stop();
                                 }
-                                @Override
-                                public void onFinish() {
-                                    // This part executes when the countdown finishes
-                                    NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                                    if (mediaPlayer.isPlaying()) {
-                                        mediaPlayer.stop();
-                                    }
-                                    mediaPlayer.reset();
-                                    mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                                    int newValue = currentValue + 1;
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putInt("counter", newValue);
-                                    editor.apply();
-                                    finish();
-                                }
-                            }.start();
+                                mediaPlayer.reset();
+                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                                int newValue = currentValue + 1;
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putInt("counter", newValue);
+                                editor.apply();
+                                finish();
+                            }
+                        }.start();
                         break;
                     case 2:
-                        new Handler().postDelayed(() -> {
-                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                            if (mediaPlayer.isPlaying()) {
-                                mediaPlayer.stop();
+                        stopLoadingView = findViewById(R.id.stopLoadingView);
+                        stopLoadingView.setVisibility(View.VISIBLE);
+                        countDownTimer = new CountDownTimer(120000, 1000) { // 2 minutes = 120,000 milliseconds
+                            public void onTick(long millisUntilFinished) {
+                                // Calculate the progress value based on time remaining
+                                int progress = (int) (millisUntilFinished / 1200); // Assuming you want to scale it to 100
+                                // Update your wave progress
+                                stopLoadingView.setProgressValue(progress);
+                                new Handler().postDelayed(() -> {
+                                    appName = findViewById(R.id.appNamed);
+                                    belowAppName = findViewById(R.id.appNamedBelow);
+                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
+                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                                }, 56000); // 30 seconds delay (60000 milliseconds)
                             }
-                            mediaPlayer.reset();
-                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                            int newValue = currentValue + 1;
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putInt("counter", newValue);
-                            editor.apply();
-                            finish();
-                        }, 120000); // Stop after 120 seconds (60000 milliseconds)
+
+                            public void onFinish() {
+                                // This part executes when the countdown finishes
+                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                                if (mediaPlayer.isPlaying()) {
+                                    mediaPlayer.stop();
+                                }
+                                mediaPlayer.reset();
+                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                                int newValue = currentValue + 1;
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putInt("counter", newValue);
+                                editor.apply();
+                                finish();
+                            }
+                        }.start();
                         break;
                     case 3:
-                        new Handler().postDelayed(() -> {
-                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                            if (mediaPlayer.isPlaying()) {
-                                mediaPlayer.stop();
+                        stopLoadingView = findViewById(R.id.stopLoadingView);
+                        stopLoadingView.setVisibility(View.VISIBLE);
+                        countDownTimer = new CountDownTimer(180000, 1000) { // 3 minutes = 180,000 milliseconds
+                            public void onTick(long millisUntilFinished) {
+                                // Calculate the progress value based on time remaining
+                                int progress = (int) (millisUntilFinished / 1800); // Assuming you want to scale it to 100
+                                // Update your wave progress
+                                stopLoadingView.setProgressValue(progress);
+                                new Handler().postDelayed(() -> {
+                                    appName = findViewById(R.id.appNamed);
+                                    belowAppName = findViewById(R.id.appNamedBelow);
+                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
+                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                                }, 89600); // 30 seconds delay (30000 milliseconds)
                             }
-                            mediaPlayer.reset();
-                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                            int newValue = currentValue + 1;
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putInt("counter", newValue);
-                            editor.apply();
-                            finish();
-                        }, 180000); // Stop after 180 seconds (60000 milliseconds)
+
+                            public void onFinish() {
+                                // This part executes when the countdown finishes
+                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                                if (mediaPlayer.isPlaying()) {
+                                    mediaPlayer.stop();
+                                }
+                                mediaPlayer.reset();
+                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                                int newValue = currentValue + 1;
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putInt("counter", newValue);
+                                editor.apply();
+                                finish();
+                            }
+                        }.start();
                         break;
                     default:
-                        new Handler().postDelayed(() -> {
-                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                            if (mediaPlayer.isPlaying()) {
-                                mediaPlayer.stop();
+                        stopLoadingView = findViewById(R.id.stopLoadingView);
+                        stopLoadingView.setVisibility(View.VISIBLE);
+                        countDownTimer = new CountDownTimer(60000, 1000) {
+                            public void onTick(long millisUntilFinished) {
+                                // Calculate the progress value based on time remaining
+                                int progress = (int) (millisUntilFinished / 600);
+                                // Update your wave progress
+                                stopLoadingView.setProgressValue(progress);
                             }
-                            mediaPlayer.reset();
-                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                            int newValue = currentValue + 1;
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putInt("counter", newValue);
-                            editor.apply();
-                            finish();
-                        }, 60000); // Stop after 60 seconds (60000 milliseconds)
+                            @Override
+                            public void onFinish() {
+                                // This part executes when the countdown finishes
+                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                                if (mediaPlayer.isPlaying()) {
+                                    mediaPlayer.stop();
+                                }
+                                mediaPlayer.reset();
+                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                                int newValue = currentValue + 1;
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putInt("counter", newValue);
+                                editor.apply();
+                                finish();
+                            }
+                        }.start();
                         break;
                 }
             }
+        }
+        else {
+            appName = findViewById(R.id.appNamed);
+            belowAppName = findViewById(R.id.appNamedBelow);
+            appName.setTextColor(Color.parseColor("#FFFFFF"));
+            belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
         }
         BatteryManager bm = (BatteryManager) this.getSystemService(BATTERY_SERVICE);
         int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
