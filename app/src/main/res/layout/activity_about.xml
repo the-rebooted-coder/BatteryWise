@@ -74,7 +74,7 @@
                 <com.example.swipebutton_library.SwipeButton
                     android:id="@+id/moreAboutSS"
                     android:layout_width="300dp"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/developedBy"
                     android:layout_centerHorizontal="true"
                     android:layout_marginStart="40dp"
@@ -89,7 +89,7 @@
                     ripple:inner_text_color="@color/green_dark"
                     ripple:inner_text_gravity="center"
                     ripple:inner_text_padding="8dp"
-                    ripple:inner_text_size="14sp"
+                    ripple:inner_text_size="15sp"
                     ripple:outer_background_tint="@color/green"
                     ripple:trail_background_tint="@color/know_more_trail"
                     ripple:trail_enabled="true" />

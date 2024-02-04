@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
     TextView productInfo;
     int selectedBatteryLevel = 85;
     private WaveLoadingView waveLoadingView;
-    private float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
-    private float scaleFactorOriginal = 1.0f;
+    private final float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
+    private final float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
     private boolean seekTouch = false;
     private Vibrator vibrator;

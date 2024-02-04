@@ -44,5 +44,6 @@
     </style>
     <color name="transparent">#00000000</color>
     <color name="green_dark">#013220</color>
+    <color name="swipe_dark">#1E654B</color>
     <color name="button_dark">#5EB387</color>
 </resources>
