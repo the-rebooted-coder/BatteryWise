@@ -88,7 +88,6 @@ public class StopAlert extends AppCompatActivity {
                         }, 60000); // Stop after 60 seconds (60000 milliseconds)
                         break;
                     case 2:
-                        Toast.makeText(this,"Two",Toast.LENGTH_SHORT).show();
                         new Handler().postDelayed(() -> {
                             NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
                             if (mediaPlayer.isPlaying()) {
@@ -101,7 +100,7 @@ public class StopAlert extends AppCompatActivity {
                             editor.putInt("counter", newValue);
                             editor.apply();
                             finish();
-                        }, 120000); // Stop after 60 seconds (60000 milliseconds)
+                        }, 120000); // Stop after 120 seconds (60000 milliseconds)
                         break;
                     case 3:
                         Toast.makeText(this,"Three",Toast.LENGTH_SHORT).show();
@@ -117,7 +116,7 @@ public class StopAlert extends AppCompatActivity {
                             editor.putInt("counter", newValue);
                             editor.apply();
                             finish();
-                        }, 180000); // Stop after 60 seconds (60000 milliseconds)
+                        }, 180000); // Stop after 180 seconds (60000 milliseconds)
                         break;
                     default:
                         new Handler().postDelayed(() -> {
