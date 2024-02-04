@@ -11,8 +11,8 @@ android {
         applicationId "com.onesilicondiode.batterywise"
         minSdk 25
         targetSdk 33
-        versionCode 21
-        versionName "Spark Cell"
+        versionCode 22
+        versionName "Power Flow"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -52,7 +52,7 @@ public class About extends AppCompatActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             String version = pInfo.versionName;
-            String productInfoText = version + "\n20.1";
+            String productInfoText = version + "\n25.0";
             versionInfo.setText(productInfoText);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -84,7 +84,7 @@ public class About extends AppCompatActivity {
         moreAbout.setOnActiveListener(() -> {
             vibrate();
             try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.linkedin.com/in/spandn/"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/Digital-TeesShirt/"));
                 startActivity(browserIntent);
             }
             catch (Exception e){
