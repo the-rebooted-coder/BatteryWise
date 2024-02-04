@@ -50,14 +50,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/productsansbold"
-                android:padding="10dp"
+                android:layout_gravity="center"
                 android:text="@string/productInfo"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="250dp"
+                android:layout_width="280dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
@@ -91,12 +91,43 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:thumbIcon="@drawable/thum_icons"
                 android:layout_gravity="center"
                 android:textColor="@color/white"
                 android:fontFamily="@font/productsans"
                 android:text="@string/dismiss_alert_after_1_minute"/>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/buttonToggleGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_1m"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1m"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_2m"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2m"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_3m"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3m" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBatteryBtn"
