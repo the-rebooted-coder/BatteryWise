@@ -123,9 +123,8 @@ public class MainActivity extends AppCompatActivity {
         switchToggle = findViewById(R.id.switchToggle);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         // Load the previous state of the switch toggle from SharedPreferences
-        switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, true));
+        switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
         boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
-        //Reading state of Dismiss Time
         int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 1);
         if (selectedTime != -1) {
             switch (selectedTime) {
@@ -165,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Bottom Sheet What's New
-        if (sharedPreferences.getBoolean("isConfirmed", false)) {
+        if (sharedPreferences.getBoolean("isConfirmed", true)) {
             showBottomSheet();
         }
         // Check for app updates
@@ -386,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
         //On Dismiss
         bottomSheetDialog.setOnDismissListener(dialog -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isConfirmed", true);
+            editor.putBoolean("isConfirmed", false);
             editor.apply();
                 });
         // Show the Bottom Sheet Dialog

@@ -7,7 +7,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:keepScreenOn="true"
     tools:context=".StopAlert">
-
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/stopLoadingView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:wlv_borderColor="@color/bright_orange"
+        app:wlv_shapeType="rectangle"
+        app:wlv_waveAmplitude="15"
+        android:visibility="gone"
+        app:wlv_waveColor="#EF9B00" />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/appNamed"
         android:layout_width="wrap_content"
@@ -16,6 +24,7 @@
         android:layout_marginTop="300dp"
         android:fontFamily="@font/productsansbold"
         android:text="@string/app_name"
+        android:textColor="@color/black"
         android:textSize="20sp" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -28,21 +37,22 @@
         android:fontFamily="@font/productsans"
         android:text="@string/unplug_the_charger"
         android:textAlignment="center"
+        android:textColor="@color/black"
         android:textSize="18sp" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/dividerLine"
         android:layout_width="250dp"
-        android:layout_height="wrap_content"
+        android:layout_height="2.5dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:layout_below="@id/appNamedBelow"
-        app:dividerColor="@color/white"/>
+        app:dividerColor="@color/black"/>
 
     <com.example.swipebutton_library.SwipeButton
         android:id="@+id/stopMusic"
         android:layout_width="300dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/dividerLine"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
@@ -53,7 +63,7 @@
         ripple:has_finish_animation="true"
         ripple:inner_text="Swipe to Dismiss"
         ripple:inner_text_color="@color/white"
-        ripple:inner_text_size="14sp"
+        ripple:inner_text_size="15sp"
         ripple:outer_background_tint="@color/tint_dismiss_outer"
         ripple:trail_background_tint="@color/swipe_background_tint"
         ripple:trail_enabled="true" />

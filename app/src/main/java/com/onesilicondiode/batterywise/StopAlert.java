@@ -8,10 +8,12 @@ import android.media.MediaPlayer;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -24,6 +26,8 @@ import com.example.swipebutton_library.SwipeButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.textview.MaterialTextView;
 
+import me.itangqi.waveloadingview.WaveLoadingView;
+
 public class StopAlert extends AppCompatActivity {
     private static final int STOP_ACTION_NOTIFICATION_ID = 198;
     SwipeButton stopAlert;
@@ -34,6 +38,9 @@ public class StopAlert extends AppCompatActivity {
     private boolean shouldAutoStop;
     private Vibrator vibrator;
     int currentValue;
+    private WaveLoadingView stopLoadingView;
+    private CountDownTimer countDownTimer;
+
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -61,7 +68,7 @@ public class StopAlert extends AppCompatActivity {
         currentValue = sharedPreferences.getInt("counter", 0);
         sharedMyPrefs = getSharedPreferences("MyPrefsFile",MODE_PRIVATE);
         shouldAutoStop = sharedMyPrefs.getBoolean("switchState", true);
-        int selectedTime = sharedMyPrefs.getInt("selected_time", -1);
+        int selectedTime = sharedMyPrefs.getInt("selected_time", 1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_alert);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
@@ -72,19 +79,31 @@ public class StopAlert extends AppCompatActivity {
                 switch (selectedTime) {
                     case 1:
                         // Start a handler to stop the media player after 60 seconds
-                        new Handler().postDelayed(() -> {
-                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                            if (mediaPlayer.isPlaying()) {
-                                mediaPlayer.stop();
-                            }
-                            mediaPlayer.reset();
-                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                            int newValue = currentValue + 1;
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putInt("counter", newValue);
-                            editor.apply();
-                            finish();
-                        }, 60000); // Stop after 60 seconds (60000 milliseconds)
+                            stopLoadingView = findViewById(R.id.stopLoadingView);
+                            stopLoadingView.setVisibility(View.VISIBLE);
+                            countDownTimer = new CountDownTimer(60000, 1000) {
+                                public void onTick(long millisUntilFinished) {
+                                    // Calculate the progress value based on time remaining
+                                    int progress = (int) (millisUntilFinished / 600);
+                                    // Update your wave progress
+                                    stopLoadingView.setProgressValue(progress);
+                                }
+                                @Override
+                                public void onFinish() {
+                                    // This part executes when the countdown finishes
+                                    NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                                    if (mediaPlayer.isPlaying()) {
+                                        mediaPlayer.stop();
+                                    }
+                                    mediaPlayer.reset();
+                                    mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                                    int newValue = currentValue + 1;
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putInt("counter", newValue);
+                                    editor.apply();
+                                    finish();
+                                }
+                            }.start();
                         break;
                     case 2:
                         new Handler().postDelayed(() -> {
