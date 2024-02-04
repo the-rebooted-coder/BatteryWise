@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_APP_UPDATE = 123;
     private static final String PREF_SEEK_TOUCH = "seekTouch";
     private static final String USER_STARTED_KEY = "userStarted";
+    private static final String SELECTED_TIME_KEY = "selected_time";
     private final ActivityResultLauncher<String> requestNotificationPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-    MaterialButton startSaving, stopSaving;
+    MaterialButton startSaving, stopSaving, oneMin, twoMin, threeMin;
     TextView productInfo;
     int selectedBatteryLevel = 85;
     private WaveLoadingView waveLoadingView;
@@ -109,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
         waveLoadingView = findViewById(R.id.waveLoadingView);
         segmentedButtonGroup = findViewById(R.id.buttonToggleGroup);
         appUpdateManager = AppUpdateManagerFactory.create(this);
+        oneMin = findViewById(R.id.button_1m);
+        twoMin = findViewById(R.id.button_2m);
+        threeMin = findViewById(R.id.button_3m);
         InstallStateUpdatedListener installStateUpdatedListener = state -> {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
                 // The update has been downloaded, trigger the installation
@@ -121,7 +125,29 @@ public class MainActivity extends AppCompatActivity {
         // Load the previous state of the switch toggle from SharedPreferences
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, true));
         boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
+        //Reading state of Dismiss Time
+        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, -1);
+        if (selectedTime != -1) {
+            switch (selectedTime) {
+                case 1:
+                    // Button for 1 minute
+                    oneMin.setChecked(true); // Assuming you are using a ToggleButton or similar
+                    break;
+                case 2:
+                    // Button for 2 minutes
+                    twoMin.setChecked(true); // Assuming you are using a ToggleButton or similar
+                    break;
+                case 3:
+                    // Button for 3 minutes
+                    threeMin.setChecked(true); // Assuming you are using a ToggleButton or similar
+                    break;
+            }
+        }
         updateSegmentedButtonVisibility(switchState);
+        oneMin.setOnClickListener(v -> handleMaterialButtonClick(1));
+        twoMin.setOnClickListener(v -> handleMaterialButtonClick(2));
+        threeMin.setOnClickListener(v -> handleMaterialButtonClick(3));
+
         // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -688,6 +714,28 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Switch is OFF, hide the segmented buttons
             segmentedButtonGroup.setVisibility(View.GONE);
+        }
+    }
+    private void handleMaterialButtonClick(int selectedTime) {
+        // Save the selected time to SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(SELECTED_TIME_KEY, selectedTime);
+        editor.apply();
+
+        // Perform any other necessary actions based on the selected time
+        switch (selectedTime) {
+            case 1:
+                Toast.makeText(this,"Alert will dismiss after 1 minute",Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                Toast.makeText(this,"Alert will dismiss after 2 minutes",Toast.LENGTH_SHORT).show();
+                break;
+            case 3:
+                Toast.makeText(this,"Alert will dismiss after 3 minutes",Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                // Handle default case
+                break;
         }
     }
 }
