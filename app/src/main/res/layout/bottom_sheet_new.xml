@@ -39,6 +39,26 @@
             android:fontFamily="@font/productsans"
             android:paddingEnd="10dp"
             android:text="You may now choose from three different time settings to auto dismiss the alert, or leave it off to keep it ringing."/>
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:textSize="18sp"
+            android:drawablePadding="5dp"
+            app:drawableTint="@color/green_dark"
+            android:paddingStart="10dp"
+            android:fontFamily="@font/productsansbold"
+            android:text="Dynamic Timer When Ringing"
+            app:drawableStartCompat="@drawable/water_loader" />
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:paddingStart="18dp"
+            android:fontFamily="@font/productsans"
+            android:paddingEnd="10dp"
+            android:text="When SafeCharge alert is ringing, and auto dismiss is turned on, you will see waves dropping down showing the time left to auto-dismiss"/>
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
