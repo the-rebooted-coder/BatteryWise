@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, true));
         boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
         //Reading state of Dismiss Time
-        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, -1);
+        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 1);
         if (selectedTime != -1) {
             switch (selectedTime) {
                 case 1:
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Bottom Sheet What's New
-        if (!sharedPreferences.getBoolean("isConfirmed", false)) {
+        if (sharedPreferences.getBoolean("isConfirmed", false)) {
             showBottomSheet();
         }
         // Check for app updates
@@ -318,6 +318,22 @@ public class MainActivity extends AppCompatActivity {
                 boolean switchedState = sharedPreferences.getBoolean(SWITCH_STATE, false);
                 if (switchedState){
                     segmentedButtonGroup.setVisibility(View.VISIBLE);
+                    if (selectedTime != 1) {
+                        switch (selectedTime) {
+                            case 1:
+                                // Button for 1 minute
+                                oneMin.setChecked(true);
+                                break;
+                            case 2:
+                                // Button for 2 minutes
+                                twoMin.setChecked(true);
+                                break;
+                            case 3:
+                                // Button for 3 minutes
+                                threeMin.setChecked(true);
+                                break;
+                        }
+                    }
                 }
                 else {
                     segmentedButtonGroup.setVisibility(View.GONE);
@@ -361,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(v -> {
             // Save user confirmation
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isConfirmed", true);
+            editor.putBoolean("isConfirmed", false);
             editor.apply();
 
             // Dismiss the Bottom Sheet Dialog
