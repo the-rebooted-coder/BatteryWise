@@ -107,16 +107,26 @@
                 android:visibility="gone"
                 android:layout_marginTop="5dp"
                 app:singleSelection="true">
-
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_45s"
+                    style="@style/ToggleButtonGroupStyleDark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textAllCaps="false"
+                    android:fontFamily="@font/productsans"
+                    app:cornerRadius="18dp"
+                    android:text="30 secs" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_1m"
                     style="@style/ToggleButtonGroupStyleDark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAllCaps="false"
                     android:fontFamily="@font/productsans"
                     app:cornerRadius="18dp"
                     android:textColor="@color/white"
-                    android:text="1m"/>
+                    android:text="1 min"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_2m"
@@ -124,9 +134,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/productsans"
+                    android:textAllCaps="false"
                     app:cornerRadius="18dp"
                     android:textColor="@color/white"
-                    android:text="2m"/>
+                    android:text="2 min"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_3m"
@@ -134,9 +145,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/productsans"
+                    android:textAllCaps="false"
                     app:cornerRadius="18dp"
                     android:textColor="@color/white"
-                    android:text="3m" />
+                    android:text="3 min" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
 

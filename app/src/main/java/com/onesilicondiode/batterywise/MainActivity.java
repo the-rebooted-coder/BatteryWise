@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-    MaterialButton startSaving, stopSaving, oneMin, twoMin, threeMin;
+    MaterialButton startSaving, stopSaving, oneMin, twoMin, threeMin, thirtySec;
     TextView productInfo;
     int selectedBatteryLevel = 85;
     private WaveLoadingView waveLoadingView;
@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         oneMin = findViewById(R.id.button_1m);
         twoMin = findViewById(R.id.button_2m);
         threeMin = findViewById(R.id.button_3m);
+        thirtySec = findViewById(R.id.button_45s);
         InstallStateUpdatedListener installStateUpdatedListener = state -> {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
                 // The update has been downloaded, trigger the installation
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         // Load the previous state of the switch toggle from SharedPreferences
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
         boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
-        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 1);
+        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
         if (selectedTime != -1) {
             switch (selectedTime) {
                 case 1:
@@ -140,13 +141,17 @@ public class MainActivity extends AppCompatActivity {
                     // Button for 3 minutes
                     threeMin.setChecked(true);
                     break;
+                case 4:
+                    // Button for 30 seconds
+                    thirtySec.setChecked(true);
+                    break;
             }
         }
         updateSegmentedButtonVisibility(switchState);
         oneMin.setOnClickListener(v -> handleMaterialButtonClick(1));
         twoMin.setOnClickListener(v -> handleMaterialButtonClick(2));
         threeMin.setOnClickListener(v -> handleMaterialButtonClick(3));
-
+        thirtySec.setOnClickListener(v -> handleMaterialButtonClick(4));
         // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -736,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(SELECTED_TIME_KEY, selectedTime);
         editor.apply();
-
+        vibrateTouch();
         // Perform any other necessary actions based on the selected time
         switch (selectedTime) {
             case 1:
@@ -747,6 +752,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 3:
                 Toast.makeText(this,"Alert will dismiss after 3 minutes",Toast.LENGTH_SHORT).show();
+                break;
+            case 4:
+                Toast.makeText(this,"Alert will dismiss after 30 seconds",Toast.LENGTH_SHORT).show();
                 break;
             default:
                 // Handle default case

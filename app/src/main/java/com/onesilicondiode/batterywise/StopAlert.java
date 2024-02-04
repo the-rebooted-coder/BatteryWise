@@ -176,6 +176,39 @@ public class StopAlert extends AppCompatActivity {
                             }
                         }.start();
                         break;
+                    case 4:
+                        stopLoadingView = findViewById(R.id.stopLoadingView);
+                        stopLoadingView.setVisibility(View.VISIBLE);
+                        countDownTimer = new CountDownTimer(30000, 1000) { // 30 seconds = 30,000 milliseconds
+                            public void onTick(long millisUntilFinished) {
+                                // Calculate the progress value based on time remaining
+                                int progress = (int) (millisUntilFinished / 300); // Assuming you want to scale it to 100
+                                // Update your wave progress
+                                stopLoadingView.setProgressValue(progress);
+                                new Handler().postDelayed(() -> {
+                                    appName = findViewById(R.id.appNamed);
+                                    belowAppName = findViewById(R.id.appNamedBelow);
+                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
+                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                                }, 13000); // 13 seconds delay (13000 milliseconds)
+                            }
+
+                            public void onFinish() {
+                                // This part executes when the countdown finishes
+                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                                if (mediaPlayer.isPlaying()) {
+                                    mediaPlayer.stop();
+                                }
+                                mediaPlayer.reset();
+                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                                int newValue = currentValue + 1;
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putInt("counter", newValue);
+                                editor.apply();
+                                finish();
+                            }
+                        }.start();
+                        break;
                     default:
                         stopLoadingView = findViewById(R.id.stopLoadingView);
                         stopLoadingView.setVisibility(View.VISIBLE);
