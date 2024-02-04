@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:thumbIcon="@drawable/thum_icons"
                 android:fontFamily="@font/productsans"
                 android:text="@string/dismiss_alert_after_1_minute"/>
@@ -103,6 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:visibility="gone"
                 android:layout_marginTop="5dp"
                 app:singleSelection="true">
 

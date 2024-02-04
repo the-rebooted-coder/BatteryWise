@@ -37,6 +37,7 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private ReviewManager reviewManager;
     private MaterialSwitch switchToggle;
     private SharedPreferences sharedPreferences;
+    private MaterialButtonToggleGroup segmentedButtonGroup;
 
 
     public static int getThemeColor(Context context, int colorResId) {
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         reviewManager = ReviewManagerFactory.create(this);
         waveLoadingView = findViewById(R.id.waveLoadingView);
+        segmentedButtonGroup = findViewById(R.id.buttonToggleGroup);
         appUpdateManager = AppUpdateManagerFactory.create(this);
         InstallStateUpdatedListener installStateUpdatedListener = state -> {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
@@ -115,12 +118,19 @@ public class MainActivity extends AppCompatActivity {
         appUpdateManager.registerListener(installStateUpdatedListener);
         switchToggle = findViewById(R.id.switchToggle);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-
         // Load the previous state of the switch toggle from SharedPreferences
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, true));
-
+        boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
+        updateSegmentedButtonVisibility(switchState);
         // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Switch is ON, show the segmented buttons
+                segmentedButtonGroup.setVisibility(View.VISIBLE);
+            } else {
+                // Switch is OFF, hide the segmented buttons
+                segmentedButtonGroup.setVisibility(View.GONE);
+            }
             // Save the state of the switch toggle in SharedPreferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(SWITCH_STATE, isChecked);
@@ -279,6 +289,13 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean(USER_STARTED_KEY, true);
                 editor.apply();
                 enableAutoStart();
+                boolean switchedState = sharedPreferences.getBoolean(SWITCH_STATE, false);
+                if (switchedState){
+                    segmentedButtonGroup.setVisibility(View.VISIBLE);
+                }
+                else {
+                    segmentedButtonGroup.setVisibility(View.GONE);
+                }
             } catch (Exception e) {
                 showIntentErrorDialog();
             }
@@ -640,7 +657,6 @@ public class MainActivity extends AppCompatActivity {
     }
     private void animateSwitchToggle() {
         switchToggle.setVisibility(View.VISIBLE);
-
         float startY = -100f; // Adjust this value based on your desired starting position
 
         // Define the animation - falling from a lower position
@@ -660,8 +676,18 @@ public class MainActivity extends AppCompatActivity {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 switchToggle.setVisibility(View.GONE);
+                segmentedButtonGroup.setVisibility(View.GONE);
             }
         });
         animator.start();
+    }
+    private void updateSegmentedButtonVisibility(boolean switchState) {
+        if (switchState) {
+            // Switch is ON, show the segmented buttons
+            segmentedButtonGroup.setVisibility(View.VISIBLE);
+        } else {
+            // Switch is OFF, hide the segmented buttons
+            segmentedButtonGroup.setVisibility(View.GONE);
+        }
     }
 }
