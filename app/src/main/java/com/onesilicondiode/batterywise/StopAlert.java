@@ -71,7 +71,6 @@ public class StopAlert extends AppCompatActivity {
             if (selectedTime != -1) {
                 switch (selectedTime) {
                     case 1:
-                        Toast.makeText(this,"One",Toast.LENGTH_SHORT).show();
                         // Start a handler to stop the media player after 60 seconds
                         new Handler().postDelayed(() -> {
                             NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
@@ -103,7 +102,6 @@ public class StopAlert extends AppCompatActivity {
                         }, 120000); // Stop after 120 seconds (60000 milliseconds)
                         break;
                     case 3:
-                        Toast.makeText(this,"Three",Toast.LENGTH_SHORT).show();
                         new Handler().postDelayed(() -> {
                             NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
                             if (mediaPlayer.isPlaying()) {
