@@ -131,15 +131,15 @@ public class MainActivity extends AppCompatActivity {
             switch (selectedTime) {
                 case 1:
                     // Button for 1 minute
-                    oneMin.setChecked(true); // Assuming you are using a ToggleButton or similar
+                    oneMin.setChecked(true);
                     break;
                 case 2:
                     // Button for 2 minutes
-                    twoMin.setChecked(true); // Assuming you are using a ToggleButton or similar
+                    twoMin.setChecked(true);
                     break;
                 case 3:
                     // Button for 3 minutes
-                    threeMin.setChecked(true); // Assuming you are using a ToggleButton or similar
+                    threeMin.setChecked(true);
                     break;
             }
         }

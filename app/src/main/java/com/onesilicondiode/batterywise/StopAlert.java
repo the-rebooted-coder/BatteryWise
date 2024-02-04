@@ -13,6 +13,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.TypedValue;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -60,26 +61,81 @@ public class StopAlert extends AppCompatActivity {
         currentValue = sharedPreferences.getInt("counter", 0);
         sharedMyPrefs = getSharedPreferences("MyPrefsFile",MODE_PRIVATE);
         shouldAutoStop = sharedMyPrefs.getBoolean("switchState", true);
+        int selectedTime = sharedMyPrefs.getInt("selected_time", -1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_alert);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         setupMusic();
         setupButton();
         if (shouldAutoStop) {
-            // Start a handler to stop the media player after 60 seconds
-            new Handler().postDelayed(() -> {
-                NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.stop();
+            if (selectedTime != -1) {
+                switch (selectedTime) {
+                    case 1:
+                        Toast.makeText(this,"One",Toast.LENGTH_SHORT).show();
+                        // Start a handler to stop the media player after 60 seconds
+                        new Handler().postDelayed(() -> {
+                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                            if (mediaPlayer.isPlaying()) {
+                                mediaPlayer.stop();
+                            }
+                            mediaPlayer.reset();
+                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                            int newValue = currentValue + 1;
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt("counter", newValue);
+                            editor.apply();
+                            finish();
+                        }, 60000); // Stop after 60 seconds (60000 milliseconds)
+                        break;
+                    case 2:
+                        Toast.makeText(this,"Two",Toast.LENGTH_SHORT).show();
+                        new Handler().postDelayed(() -> {
+                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                            if (mediaPlayer.isPlaying()) {
+                                mediaPlayer.stop();
+                            }
+                            mediaPlayer.reset();
+                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                            int newValue = currentValue + 1;
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt("counter", newValue);
+                            editor.apply();
+                            finish();
+                        }, 120000); // Stop after 60 seconds (60000 milliseconds)
+                        break;
+                    case 3:
+                        Toast.makeText(this,"Three",Toast.LENGTH_SHORT).show();
+                        new Handler().postDelayed(() -> {
+                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                            if (mediaPlayer.isPlaying()) {
+                                mediaPlayer.stop();
+                            }
+                            mediaPlayer.reset();
+                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                            int newValue = currentValue + 1;
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt("counter", newValue);
+                            editor.apply();
+                            finish();
+                        }, 180000); // Stop after 60 seconds (60000 milliseconds)
+                        break;
+                    default:
+                        new Handler().postDelayed(() -> {
+                            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+                            if (mediaPlayer.isPlaying()) {
+                                mediaPlayer.stop();
+                            }
+                            mediaPlayer.reset();
+                            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
+                            int newValue = currentValue + 1;
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt("counter", newValue);
+                            editor.apply();
+                            finish();
+                        }, 60000); // Stop after 60 seconds (60000 milliseconds)
+                        break;
                 }
-                mediaPlayer.reset();
-                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                int newValue = currentValue + 1;
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("counter", newValue);
-                editor.apply();
-                finish();
-            }, 60000); // Stop after 60 seconds (60000 milliseconds)
+            }
         }
         BatteryManager bm = (BatteryManager) this.getSystemService(BATTERY_SERVICE);
         int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
