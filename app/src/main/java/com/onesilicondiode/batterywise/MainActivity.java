@@ -51,7 +51,6 @@ import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
-import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -199,19 +198,16 @@ public class MainActivity extends AppCompatActivity {
         manufacturer = Build.MANUFACTURER;
         BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
         int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        if(batteryPercent>55){
+        if (batteryPercent > 55) {
             waveLoadingView.setWaveColor(Color.parseColor("#006C49"));
             waveLoadingView.setProgressValue(batteryPercent);
-        }
-        else if (batteryPercent>40 && batteryPercent<55){
+        } else if (batteryPercent > 40 && batteryPercent < 55) {
             waveLoadingView.setWaveColor(Color.parseColor("#F6D3A1"));
             waveLoadingView.setProgressValue(batteryPercent);
-        }
-        else if (batteryPercent>20 && batteryPercent<40){
+        } else if (batteryPercent > 20 && batteryPercent < 40) {
             waveLoadingView.setWaveColor(Color.parseColor("#E4B284"));
             waveLoadingView.setProgressValue(batteryPercent);
-        }
-        else if (batteryPercent>1 && batteryPercent<20){
+        } else if (batteryPercent > 1 && batteryPercent < 20) {
             waveLoadingView.setWaveColor(Color.parseColor("#FFB4AB"));
             waveLoadingView.setProgressValue(batteryPercent);
         }
@@ -320,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
                 enableAutoStart();
                 boolean switchedState = sharedPreferences.getBoolean(SWITCH_STATE, false);
-                if (switchedState){
+                if (switchedState) {
                     segmentedButtonGroup.setVisibility(View.VISIBLE);
                     if (selectedTime != 1) {
                         switch (selectedTime) {
@@ -338,8 +334,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                         }
                     }
-                }
-                else {
+                } else {
                     segmentedButtonGroup.setVisibility(View.GONE);
                 }
             } catch (Exception e) {
@@ -392,10 +387,11 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isConfirmed", false);
             editor.apply();
-                });
+        });
         // Show the Bottom Sheet Dialog
         bottomSheetDialog.show();
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -525,8 +521,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (manufacturer.contains("asus")) {
             showAlertDialog("Asus", "com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity");
         } else if (manufacturer.contains("samsung")) {
-            Toast.makeText(this,"Samsung Detected",Toast.LENGTH_SHORT).show();
-            showAlertDialog("Samsung", "com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity");
+            showSamsungAlertDialog();
         } else {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
             startService(serviceIntent);
@@ -535,6 +530,46 @@ public class MainActivity extends AppCompatActivity {
             stopSaving.setVisibility(View.VISIBLE);
             animateSwitchToggle();
         }
+    }
+
+    private void showSamsungAlertDialog() {
+        View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
+        startService();
+        vibrateTouch();
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Enable Background Running")
+                .setMessage("You're using a Samsung Phone which stops SafeCharge from running in the background.\n\nFollow the steps next to make SafeCharge run efficiently")
+                .setCancelable(false)
+                .setView(customView)
+                .setPositiveButton("Next", (dialog, which) -> {
+                    View customSamsungView = getLayoutInflater().inflate(R.layout.custom_samsung_view, null);
+                    new MaterialAlertDialogBuilder(this)
+                            .setTitle("Here are the steps")
+                            .setMessage("On the next page\n\nTap on Background usage Limits ->\nNever sleeping apps ->\nTap on +\nAdd SafeCharge to the list")
+                            .setCancelable(false)
+                            .setView(customSamsungView)
+                            .setPositiveButton("Enable", (dialog2, which2) -> {
+                                boolean intentLaunched = false;
+                                Intent[] AUTO_START_HONOR = {
+                                        new Intent().setComponent(new ComponentName("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity"))
+                                };
+                                for (Intent intent : AUTO_START_HONOR) {
+                                    if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                                        try {
+                                            startActivity(intent);
+                                            break;
+                                        } catch (Exception e) {
+                                            Log.e("Samsung ki mkb", "Crash Bach Gaya");
+                                        }
+                                        if (!intentLaunched) {
+                                            // Show the error dialog here because none of the Intents were successfully launched
+                                            showIntentErrorDialog();
+                                        }
+                                    }
+                                }
+                            }).show();
+                })
+                .show();
     }
 
     private void showAlertDialog(String brandName, String componentNamePackage, String componentNameClass) {
@@ -702,6 +737,7 @@ public class MainActivity extends AppCompatActivity {
         stopSaving.setVisibility(View.VISIBLE);
         animateSwitchToggle();
     }
+
     private void animateSwitchToggle() {
         switchToggle.setVisibility(View.VISIBLE);
         float startY = -100f; // Adjust this value based on your desired starting position
@@ -712,6 +748,7 @@ public class MainActivity extends AppCompatActivity {
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.start();
     }
+
     private void hideSwitchToggle() {
         float endY = -100f; // Adjust this value based on your desired ending position
         // Define the animation - moving upwards before disappearing
@@ -728,6 +765,7 @@ public class MainActivity extends AppCompatActivity {
         });
         animator.start();
     }
+
     private void updateSegmentedButtonVisibility(boolean switchState) {
         if (switchState) {
             // Switch is ON, show the segmented buttons
@@ -737,29 +775,34 @@ public class MainActivity extends AppCompatActivity {
             segmentedButtonGroup.setVisibility(View.GONE);
         }
     }
+
     private void handleMaterialButtonClick(int selectedTime) {
         // Save the selected time to SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(SELECTED_TIME_KEY, selectedTime);
         editor.apply();
         vibrateTouch();
-        // Perform any other necessary actions based on the selected time
+
+        String message = "";
         switch (selectedTime) {
             case 1:
-                Toast.makeText(this,"Alert will dismiss after 1 minute",Toast.LENGTH_SHORT).show();
+                message = "Alert will dismiss after a minute";
                 break;
             case 2:
-                Toast.makeText(this,"Alert will dismiss after 2 minutes",Toast.LENGTH_SHORT).show();
+                message = "Alert will dismiss after 2 minutes";
                 break;
             case 3:
-                Toast.makeText(this,"Alert will dismiss after 3 minutes",Toast.LENGTH_SHORT).show();
+                message = "Alert will dismiss after 3 minutes";
                 break;
             case 4:
-                Toast.makeText(this,"Alert will dismiss after 30 seconds",Toast.LENGTH_SHORT).show();
+                message = "Alert will dismiss after 30 seconds";
                 break;
             default:
                 // Handle default case
                 break;
         }
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT);
+        snackbar.show();
+
     }
 }
