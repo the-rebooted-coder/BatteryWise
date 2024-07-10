@@ -525,6 +525,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (manufacturer.contains("asus")) {
             showAlertDialog("Asus", "com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity");
         } else if (manufacturer.contains("samsung")) {
+            Toast.makeText(this,"Samsung Detected",Toast.LENGTH_SHORT).show();
             showAlertDialog("Samsung", "com.samsung.android.lool", "com.samsung.android.sm.ui.battery.BatteryActivity");
         } else {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
