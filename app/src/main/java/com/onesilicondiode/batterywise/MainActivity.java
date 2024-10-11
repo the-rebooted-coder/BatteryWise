@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity {
     private void enableAutoStart() {
         String brand = Build.BRAND;
         String manufacturer = Build.MANUFACTURER;
-        if (brand.equalsIgnoreCase("xiaomi")) {
+        if (brand.equalsIgnoreCase("xiaomi") || brand.equalsIgnoreCase("redmi"))  {
             View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
             startService();
             vibrateTouch();
