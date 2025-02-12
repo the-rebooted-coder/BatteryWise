@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">SafeCharge</string>
-    <string name="enable">ENABLE</string>
+    <string name="enable">Enable SafeCharge</string>
     <string name="enabled">ENABLED</string>
-    <string name="disable">DISABLE</string>
+    <string name="disable">Disable SafeCharge</string>
     <string name="shortcutInfo">QuickStart</string>
     <string name="shortcutDetail">You can use this as to straight enable the SafeCharge Service.</string>
     <string name="productInfo">Goodbye to battery drain.\nHello to longer life</string>
