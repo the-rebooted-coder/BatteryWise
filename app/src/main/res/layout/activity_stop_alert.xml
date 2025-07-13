@@ -13,10 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        app:wlv_borderColor="@color/bright_orange"
+        app:wlv_borderColor="#3C611C"
         app:wlv_shapeType="rectangle"
         app:wlv_waveAmplitude="15"
-        app:wlv_waveColor="#EF9B00" />
+        app:wlv_waveColor="#33B864" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/appNamed"
