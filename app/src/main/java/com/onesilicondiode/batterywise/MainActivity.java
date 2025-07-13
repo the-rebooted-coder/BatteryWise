@@ -828,34 +828,4 @@ public class MainActivity extends AppCompatActivity {
             buttonToggleGroup.setVisibility(View.GONE);
         }
     }
-
-    private void handleMaterialButtonClick(int selectedTime) {
-        // Save the selected time to SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(SELECTED_TIME_KEY, selectedTime);
-        editor.apply();
-        vibrateTouch();
-
-        String message = "";
-        switch (selectedTime) {
-            case 1:
-                message = "Alert will dismiss after a minute";
-                break;
-            case 2:
-                message = "Alert will dismiss after 2 minutes";
-                break;
-            case 3:
-                message = "Alert will dismiss after 3 minutes";
-                break;
-            case 4:
-                message = "Alert will dismiss after 30 seconds";
-                break;
-            default:
-                // Handle default case
-                break;
-        }
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT);
-        snackbar.show();
-
-    }
 }
