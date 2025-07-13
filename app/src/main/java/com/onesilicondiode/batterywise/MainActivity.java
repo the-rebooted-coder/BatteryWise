@@ -217,9 +217,9 @@ public class MainActivity extends AppCompatActivity {
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
         String productInfoText;
         if (selectedBatteryLevel > 98) {
-            productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
+            productInfoText = "Your " + manufacturer + " " + getString(R.string.productInfo_partThree);
         } else {
-            productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
+            productInfoText = "Your " + manufacturer + " " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
         }
         productInfo.setText(productInfoText);
 
@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity {
     private void enableAutoStart() {
         String brand = Build.BRAND;
         String manufacturer = Build.MANUFACTURER;
-        if (brand.equalsIgnoreCase("xiaomi") || brand.equalsIgnoreCase("redmi"))  {
+        if (brand.equalsIgnoreCase("xiaomi") || brand.equalsIgnoreCase("redmi")) {
             View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
             startService();
             vibrateTouch();

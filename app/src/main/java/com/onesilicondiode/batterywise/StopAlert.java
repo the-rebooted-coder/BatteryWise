@@ -73,6 +73,11 @@ public class StopAlert extends AppCompatActivity {
         int selectedTime = sharedMyPrefs.getInt("selected_time", 1);
 
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        );
         setContentView(R.layout.activity_stop_alert);
 
         // Initialize views

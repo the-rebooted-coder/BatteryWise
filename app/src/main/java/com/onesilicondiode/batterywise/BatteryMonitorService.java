@@ -1,5 +1,6 @@
 package com.onesilicondiode.batterywise;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -11,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -20,6 +23,7 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
@@ -28,6 +32,8 @@ public class BatteryMonitorService extends Service {
     private static final String STOP_ACTION_CHANNEL_ID = "StopAlert";
     private static final String USER_STARTED_KEY = "userStarted";
     private static final String ALERT_PLAYED_KEY = "alertPlayed";
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
+
     private static final boolean DEFAULT_USER_STARTED = false;
     private static final String TAG = "BatteryMonitorService";
     private SharedPreferences prefs;
@@ -52,6 +58,8 @@ public class BatteryMonitorService extends Service {
             NotificationChannel stopActionChannel = new NotificationChannel(
                     STOP_ACTION_CHANNEL_ID, "Stop Alerts", NotificationManager.IMPORTANCE_HIGH);
             stopActionChannel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.silence), null);
+            stopActionChannel.setBypassDnd(true);
+            stopActionChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
         }
@@ -77,9 +85,22 @@ public class BatteryMonitorService extends Service {
                         ", alertPlayed=" + alertPlayed);
 
                 if (isPlugged && batteryPercent >= selectedBatteryLevel && !alertPlayed && !userStarted) {
+                    // Check notification permission first
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                                    != PackageManager.PERMISSION_GRANTED) {
+
+                        Log.w(TAG, "Missing notification permission");
+                        return;
+                    }
                     Intent fullScreenIntent = new Intent(context, StopAlert.class);
+                    fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                     PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
-                            context, 0, fullScreenIntent,
+                            context,
+                            STOP_ACTION_NOTIFICATION_ID,
+                            fullScreenIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, STOP_ACTION_CHANNEL_ID)
@@ -89,10 +110,18 @@ public class BatteryMonitorService extends Service {
                             .setPriority(NotificationCompat.PRIORITY_MAX)
                             .setCategory(NotificationCompat.CATEGORY_ALARM)
                             .setAutoCancel(true)
-                            .setFullScreenIntent(fullScreenPendingIntent, true);
+                            .setFullScreenIntent(fullScreenPendingIntent, true)
+                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
                     Log.d(TAG, "onReceive: Posting full-screen notification");
-                    NotificationManagerCompat.from(context).notify(STOP_ACTION_NOTIFICATION_ID, builder.build());
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                    try {
+                        notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, builder.build());
+                        Log.d(TAG, "Notification posted successfully");
+                    } catch (SecurityException e) {
+                        Log.e(TAG, "Failed to post notification", e);
+                    }
 
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putBoolean(ALERT_PLAYED_KEY, true);
