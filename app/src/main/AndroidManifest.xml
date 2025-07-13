@@ -28,7 +28,8 @@
             android:name=".StopAlert"
             android:exported="false"
             android:showOnLockScreen="true"
-            android:theme="@style/Theme.Transparents" />
+            android:theme="@style/Theme.Transparents"
+            android:turnScreenOn="true" />
         <activity
             android:name=".About"
             android:exported="false" />
