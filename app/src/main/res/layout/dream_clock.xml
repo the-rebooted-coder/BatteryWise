@@ -25,12 +25,8 @@
                 android:layout_gravity="bottom"
                 android:alpha="1"
                 android:fontFamily="@font/mb"
-                android:shadowColor="#99000000"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="8"
                 android:text="00"
-                android:textColor="#A9A9A9"
+                android:textColor="#454545"
                 android:textSize="64sp" />
 
             <TextView
@@ -40,12 +36,8 @@
                 android:layout_gravity="bottom"
                 android:alpha="1"
                 android:fontFamily="monospace"
-                android:shadowColor="#99000000"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="8"
                 android:text=":"
-                android:textColor="#818589"
+                android:textColor="#454545"
                 android:textSize="38sp" />
 
             <TextView
@@ -55,12 +47,8 @@
                 android:layout_gravity="bottom"
                 android:alpha="1"
                 android:fontFamily="@font/mb"
-                android:shadowColor="#99000000"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="8"
                 android:text="00"
-                android:textColor="#A9A9A9"
+                android:textColor="#454545"
                 android:textSize="56sp" />
         </LinearLayout>
 
@@ -70,12 +58,8 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:gravity="start"
-            android:shadowColor="#99000000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="8"
             android:text="Saturday, 13th July"
-            android:textColor="#818589"
+            android:textColor="#454545"
             android:textSize="20sp" />
     </LinearLayout>
 
