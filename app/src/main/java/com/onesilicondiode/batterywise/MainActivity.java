@@ -289,15 +289,37 @@ public class MainActivity extends AppCompatActivity {
             hideSwitchToggle();
         }
         Chip batterySaveText = findViewById(R.id.batterySaveText);
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         batterySaveText.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Important information about your battery")
                     .setMessage(R.string.disclaimer)
-                    .setPositiveButton("About & Licenses", (dialog, which) -> {
+                    .setPositiveButton("About", (dialog, which) -> {
                         vibrate();
                         Intent intent = new Intent(MainActivity.this, About.class);
                         startActivity(intent);
+                    })
+                    .setNeutralButton("Start Screensaver", (dialog, which) -> {
+                        vibrate();
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.setClassName(getPackageName(), "com.onesilicondiode.batterywise.SafeChargeDreamService");
+                        try {
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            // Show popup instructing user to select "Day Dream" in screensaver settings
+                            new MaterialAlertDialogBuilder(this)
+                                    .setTitle("Hello DayDream ☁️")
+                                    .setMessage("DayDream brings a gentle, calming clock to your screen while charging. To enjoy this relaxing experience, please open your device’s screensaver settings, find 'Day Dream', and select as your screensaver.\n\nDayDream then begins automatically when your device charges.")
+                                    .setPositiveButton("Open Screensaver Settings", (d, w) -> {
+                                        try {
+                                            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
+                                            startActivity(settingsIntent);
+                                        } catch (Exception ex) {
+                                            Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
+                                        }
+                                    })
+                                    .setNegativeButton("OK", null)
+                                    .show();
+                        }
                     })
                     .show();
         });
