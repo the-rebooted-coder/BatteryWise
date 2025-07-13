@@ -339,13 +339,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         stopSaving.setOnClickListener(view -> {
-            Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
-            stopService(serviceIntent);
-            stopSaving.setVisibility(View.GONE);
-            startSaving.setVisibility(View.VISIBLE);
-            hideSwitchToggle();
-            vibrate();
-            stopSaving.setText("Disable SafeCharge");
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Disable SafeCharge?")
+                    .setMessage("Are you sure you want to turn off SafeCharge service?\n\nBattery monitoring and alerts will be turned off and your device might be prone to overcharging.")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
+                        stopService(serviceIntent);
+                        stopSaving.setVisibility(View.GONE);
+                        startSaving.setVisibility(View.VISIBLE);
+                        hideSwitchToggle();
+                        vibrate();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
         if (counter > 0) {
             TextView usedTime;
