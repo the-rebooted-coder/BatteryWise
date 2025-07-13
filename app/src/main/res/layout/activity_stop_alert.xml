@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ripple="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:ripple="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:keepScreenOn="true"
     tools:context=".StopAlert">
+
     <me.itangqi.waveloadingview.WaveLoadingView
         android:id="@+id/stopLoadingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:wlv_borderColor="@color/bright_orange"
         app:wlv_shapeType="rectangle"
         app:wlv_waveAmplitude="15"
-        android:visibility="gone"
         app:wlv_waveColor="#EF9B00" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/appNamed"
         android:layout_width="wrap_content"
@@ -44,10 +46,10 @@
         android:id="@+id/dividerLine"
         android:layout_width="250dp"
         android:layout_height="2.5dp"
+        android:layout_below="@id/appNamedBelow"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:layout_below="@id/appNamedBelow"
-        app:dividerColor="@color/black"/>
+        app:dividerColor="@color/black" />
 
     <com.example.swipebutton_library.SwipeButton
         android:id="@+id/stopMusic"
@@ -67,5 +69,6 @@
         ripple:outer_background_tint="@color/tint_dismiss_outer"
         ripple:trail_background_tint="@color/swipe_background_tint"
         ripple:trail_enabled="true" />
+
 
 </RelativeLayout>

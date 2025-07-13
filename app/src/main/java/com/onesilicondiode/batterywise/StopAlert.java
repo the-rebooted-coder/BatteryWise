@@ -1,7 +1,9 @@
 package com.onesilicondiode.batterywise;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -18,8 +20,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -138,7 +138,7 @@ public class StopAlert extends AppCompatActivity {
         BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
         int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
         if (battPercentage != null) {
-            battPercentage.setText("Battery is at " + batLevel + "%\nUnplug the charger");
+            battPercentage.setText("Battery is at " + batLevel + "%\nUnplug charger to dismiss alert");
         } else {
             Log.e(TAG, "updateBatteryLevel: battPercentage TextView is null");
         }
