@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,17 +30,17 @@ import me.itangqi.waveloadingview.WaveLoadingView;
 
 public class StopAlert extends AppCompatActivity {
     private static final int STOP_ACTION_NOTIFICATION_ID = 198;
-    SwipeButton stopAlert;
-    MaterialTextView battPercentage, appName, belowAppName;
+    private static final String TAG = "StopAlert";
+    private SwipeButton stopAlert;
+    private MaterialTextView battPercentage, appName, belowAppName;
     private MediaPlayer mediaPlayer;
     private int previousVolume;
     private SharedPreferences sharedPreferences, sharedMyPrefs;
     private boolean shouldAutoStop;
     private Vibrator vibrator;
-    int currentValue;
+    private int currentValue;
     private WaveLoadingView stopLoadingView;
     private CountDownTimer countDownTimer;
-
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -51,6 +52,7 @@ public class StopAlert extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: Starting StopAlert activity");
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
@@ -63,270 +65,191 @@ public class StopAlert extends AppCompatActivity {
             setShowWhenLocked(true);
             setTurnScreenOn(true);
         }
+
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         currentValue = sharedPreferences.getInt("counter", 0);
-        sharedMyPrefs = getSharedPreferences("MyPrefsFile",MODE_PRIVATE);
+        sharedMyPrefs = getSharedPreferences("MyPrefsFile", MODE_PRIVATE);
         shouldAutoStop = sharedMyPrefs.getBoolean("switchState", true);
         int selectedTime = sharedMyPrefs.getInt("selected_time", 1);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_alert);
+
+        // Initialize views
+        appName = findViewById(R.id.appNamed);
+        belowAppName = findViewById(R.id.appNamedBelow);
+        battPercentage = findViewById(R.id.appNamedBelow);
+        stopAlert = findViewById(R.id.stopMusic);
+        stopLoadingView = findViewById(R.id.stopLoadingView);
+
+        // Initialize media player
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
+        if (mediaPlayer == null) {
+            Log.e(TAG, "onCreate: Failed to create MediaPlayer");
+            finish();
+            return;
+        }
+
+        // Update battery level display
+        updateBatteryLevel();
+
+        // Setup components
         setupMusic();
         setupButton();
-        if (shouldAutoStop) {
-            if (selectedTime != -1) {
-                switch (selectedTime) {
-                    case 1:
-                        // Start a handler to stop the media player after 60 seconds
-                        stopLoadingView = findViewById(R.id.stopLoadingView);
-                        stopLoadingView.setVisibility(View.VISIBLE);
-                        countDownTimer = new CountDownTimer(60000, 1000) {
-                            public void onTick(long millisUntilFinished) {
-                                // Calculate the progress value based on time remaining
-                                int progress = (int) (millisUntilFinished / 600);
-                                // Update your wave progress
-                                stopLoadingView.setProgressValue(progress);
-                                new Handler().postDelayed(() -> {
-                                    appName = findViewById(R.id.appNamed);
-                                    belowAppName = findViewById(R.id.appNamedBelow);
-                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
-                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
-                                }, 26000); // 30 seconds delay (30000 milliseconds)
-                            }
-                            @Override
-                            public void onFinish() {
-                                // This part executes when the countdown finishes
-                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                                if (mediaPlayer.isPlaying()) {
-                                    mediaPlayer.stop();
-                                }
-                                mediaPlayer.reset();
-                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                                int newValue = currentValue + 1;
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putInt("counter", newValue);
-                                editor.apply();
-                                finish();
-                            }
-                        }.start();
-                        break;
-                    case 2:
-                        stopLoadingView = findViewById(R.id.stopLoadingView);
-                        stopLoadingView.setVisibility(View.VISIBLE);
-                        countDownTimer = new CountDownTimer(120000, 1000) { // 2 minutes = 120,000 milliseconds
-                            public void onTick(long millisUntilFinished) {
-                                // Calculate the progress value based on time remaining
-                                int progress = (int) (millisUntilFinished / 1200); // Assuming you want to scale it to 100
-                                // Update your wave progress
-                                stopLoadingView.setProgressValue(progress);
-                                new Handler().postDelayed(() -> {
-                                    appName = findViewById(R.id.appNamed);
-                                    belowAppName = findViewById(R.id.appNamedBelow);
-                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
-                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
-                                }, 56000); // 30 seconds delay (60000 milliseconds)
-                            }
 
-                            public void onFinish() {
-                                // This part executes when the countdown finishes
-                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                                if (mediaPlayer.isPlaying()) {
-                                    mediaPlayer.stop();
-                                }
-                                mediaPlayer.reset();
-                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                                int newValue = currentValue + 1;
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putInt("counter", newValue);
-                                editor.apply();
-                                finish();
-                            }
-                        }.start();
-                        break;
-                    case 3:
-                        stopLoadingView = findViewById(R.id.stopLoadingView);
-                        stopLoadingView.setVisibility(View.VISIBLE);
-                        countDownTimer = new CountDownTimer(180000, 1000) { // 3 minutes = 180,000 milliseconds
-                            public void onTick(long millisUntilFinished) {
-                                // Calculate the progress value based on time remaining
-                                int progress = (int) (millisUntilFinished / 1800); // Assuming you want to scale it to 100
-                                // Update your wave progress
-                                stopLoadingView.setProgressValue(progress);
-                                new Handler().postDelayed(() -> {
-                                    appName = findViewById(R.id.appNamed);
-                                    belowAppName = findViewById(R.id.appNamedBelow);
-                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
-                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
-                                }, 89600); // 30 seconds delay (30000 milliseconds)
-                            }
-
-                            public void onFinish() {
-                                // This part executes when the countdown finishes
-                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                                if (mediaPlayer.isPlaying()) {
-                                    mediaPlayer.stop();
-                                }
-                                mediaPlayer.reset();
-                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                                int newValue = currentValue + 1;
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putInt("counter", newValue);
-                                editor.apply();
-                                finish();
-                            }
-                        }.start();
-                        break;
-                    case 4:
-                        stopLoadingView = findViewById(R.id.stopLoadingView);
-                        stopLoadingView.setVisibility(View.VISIBLE);
-                        countDownTimer = new CountDownTimer(30000, 1000) { // 30 seconds = 30,000 milliseconds
-                            public void onTick(long millisUntilFinished) {
-                                // Calculate the progress value based on time remaining
-                                int progress = (int) (millisUntilFinished / 300); // Assuming you want to scale it to 100
-                                // Update your wave progress
-                                stopLoadingView.setProgressValue(progress);
-                                new Handler().postDelayed(() -> {
-                                    appName = findViewById(R.id.appNamed);
-                                    belowAppName = findViewById(R.id.appNamedBelow);
-                                    appName.setTextColor(Color.parseColor("#FFFFFF"));
-                                    belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
-                                }, 13000); // 13 seconds delay (13000 milliseconds)
-                            }
-
-                            public void onFinish() {
-                                // This part executes when the countdown finishes
-                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                                if (mediaPlayer.isPlaying()) {
-                                    mediaPlayer.stop();
-                                }
-                                mediaPlayer.reset();
-                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                                int newValue = currentValue + 1;
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putInt("counter", newValue);
-                                editor.apply();
-                                finish();
-                            }
-                        }.start();
-                        break;
-                    default:
-                        stopLoadingView = findViewById(R.id.stopLoadingView);
-                        stopLoadingView.setVisibility(View.VISIBLE);
-                        countDownTimer = new CountDownTimer(60000, 1000) {
-                            public void onTick(long millisUntilFinished) {
-                                // Calculate the progress value based on time remaining
-                                int progress = (int) (millisUntilFinished / 600);
-                                // Update your wave progress
-                                stopLoadingView.setProgressValue(progress);
-                            }
-                            @Override
-                            public void onFinish() {
-                                // This part executes when the countdown finishes
-                                NotificationManagerCompat.from(StopAlert.this).cancel(STOP_ACTION_NOTIFICATION_ID);
-                                if (mediaPlayer.isPlaying()) {
-                                    mediaPlayer.stop();
-                                }
-                                mediaPlayer.reset();
-                                mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-                                int newValue = currentValue + 1;
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putInt("counter", newValue);
-                                editor.apply();
-                                finish();
-                            }
-                        }.start();
-                        break;
-                }
-            }
-        }
-        else {
-            appName = findViewById(R.id.appNamed);
-            belowAppName = findViewById(R.id.appNamedBelow);
+        // Handle auto-stop
+        if (shouldAutoStop && selectedTime != -1) {
+            startAutoStopTimer(selectedTime);
+        } else {
             appName.setTextColor(Color.parseColor("#FFFFFF"));
             belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+            stopLoadingView.setVisibility(View.GONE);
         }
-        BatteryManager bm = (BatteryManager) this.getSystemService(BATTERY_SERVICE);
-        int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        battPercentage.setText("Battery is at " + batLevel + "%\nUnplug the charger");
+
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     }
 
-    private void setupButton() {
-        battPercentage = findViewById(R.id.appNamedBelow);
-        stopAlert = findViewById(R.id.stopMusic);
-        stopAlert.setOnActiveListener(() -> {
-            NotificationManagerCompat.from(getApplicationContext()).cancel(STOP_ACTION_NOTIFICATION_ID);
-            vibrate();
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
-            mediaPlayer.reset();
-            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-            int newValue = currentValue + 1;
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("counter", newValue);
-            editor.apply();
-            finish();
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        });
+    private void updateBatteryLevel() {
+        BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+        int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        if (battPercentage != null) {
+            battPercentage.setText("Battery is at " + batLevel + "%\nUnplug the charger");
+        } else {
+            Log.e(TAG, "updateBatteryLevel: battPercentage TextView is null");
+        }
     }
 
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (!hasFocus) {
-            NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
-            mediaPlayer.reset();
-            mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-            int newValue = currentValue + 1;
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("counter", newValue);
-            editor.apply();
-            finish();
+    private void setupButton() {
+        if (stopAlert != null) {
+            stopAlert.setOnActiveListener(() -> {
+                Log.d(TAG, "SwipeButton activated");
+                vibrate();
+                stopAlertAndCleanup();
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            });
+        } else {
+            Log.e(TAG, "setupButton: stopAlert SwipeButton is null");
         }
     }
 
     private void setupMusic() {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        float percent = 0.8f;
-        int seventyVolume = (int) (maxVolume * percent);
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
-        mediaPlayer.start();
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int seventyVolume = (int) (maxVolume * 0.8f);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
         mediaPlayer.setLooping(true);
+        try {
+            mediaPlayer.start();
+            Log.d(TAG, "setupMusic: MediaPlayer started");
+        } catch (Exception e) {
+            Log.e(TAG, "setupMusic: Error starting MediaPlayer", e);
+        }
         mediaPlayer.setOnCompletionListener(mp -> {
-            // Revert the volume to the previous level
-            AudioManager audioManager1 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            audioManager1.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
+            Log.d(TAG, "setupMusic: MediaPlayer completed, volume restored");
         });
     }
 
+    private void startAutoStopTimer(int selectedTime) {
+        stopLoadingView.setVisibility(View.VISIBLE);
+        long duration;
+        long textColorChangeDelay;
+        switch (selectedTime) {
+            case 1:
+                duration = 60000; // 60 seconds
+                textColorChangeDelay = 26000; // 26 seconds
+                break;
+            case 2:
+                duration = 120000; // 120 seconds
+                textColorChangeDelay = 56000; // 56 seconds
+                break;
+            case 3:
+                duration = 180000; // 180 seconds
+                textColorChangeDelay = 89600; // 89.6 seconds
+                break;
+            case 4:
+                duration = 30000; // 30 seconds
+                textColorChangeDelay = 13000; // 13 seconds
+                break;
+            default:
+                duration = 60000; // Default 60 seconds
+                textColorChangeDelay = 26000; // 26 seconds
+                break;
+        }
+
+        countDownTimer = new CountDownTimer(duration, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int progress = (int) (millisUntilFinished * 100 / duration);
+                stopLoadingView.setProgressValue(progress);
+                new Handler().postDelayed(() -> {
+                    if (appName != null && belowAppName != null) {
+                        appName.setTextColor(Color.parseColor("#FFFFFF"));
+                        belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                    }
+                }, textColorChangeDelay);
+            }
+
+            @Override
+            public void onFinish() {
+                Log.d(TAG, "Auto-stop timer finished");
+                stopAlertAndCleanup();
+            }
+        }.start();
+        Log.d(TAG, "startAutoStopTimer: Started timer for " + duration + "ms");
+    }
+
     private void vibrate() {
-        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3};
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-            vibrator.vibrate(vibrationEffect);
+        if (vibrator != null && vibrator.hasVibrator()) {
+            long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3};
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
+                vibrator.vibrate(vibrationEffect);
+            } else {
+                vibrator.vibrate(pattern, -1);
+            }
+            Log.d(TAG, "vibrate: Vibration triggered");
         } else {
-            vibrator.vibrate(pattern, -1);
+            Log.w(TAG, "vibrate: Vibrator not available");
+        }
+    }
+
+    private void stopAlertAndCleanup() {
+        Log.d(TAG, "stopAlertAndCleanup: Cleaning up resources");
+        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("counter", currentValue + 1);
+        editor.apply();
+        finish();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (!hasFocus) {
+            Log.d(TAG, "onWindowFocusChanged: Lost focus, stopping alert");
+            stopAlertAndCleanup();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-        }
-        mediaPlayer.reset();
-        mediaPlayer = MediaPlayer.create(StopAlert.this, R.raw.notification);
-        int newValue = currentValue + 1;
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("counter", newValue);
-        editor.apply();
+        Log.d(TAG, "onDestroy: Activity destroyed");
+        stopAlertAndCleanup();
     }
 }
