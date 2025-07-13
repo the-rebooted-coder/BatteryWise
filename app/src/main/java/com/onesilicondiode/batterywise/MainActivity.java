@@ -345,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
             startSaving.setVisibility(View.VISIBLE);
             hideSwitchToggle();
             vibrate();
+            stopSaving.setText("Disable SafeCharge");
         });
         if (counter > 0) {
             TextView usedTime;
