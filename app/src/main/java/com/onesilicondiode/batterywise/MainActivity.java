@@ -596,39 +596,73 @@ public class MainActivity extends AppCompatActivity {
         View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
         startService();
         vibrateTouch();
+
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Enable Background Running")
-                .setMessage("You're using a Samsung Phone which stops SafeCharge from running in the background.\n\nFollow the steps next to make SafeCharge run efficiently")
+                .setTitle("Allow SafeCharge to run in background")
+                .setMessage("To ensure SafeCharge works correctly on your Samsung device, please:\n\n" +
+                        "1. Disable battery optimization for SafeCharge\n" +
+                        "2. Allow background activity\n\n" +
+                        "You will be guided to the right settings screens. Please follow the steps!")
                 .setCancelable(false)
                 .setView(customView)
-                .setPositiveButton("Next", (dialog, which) -> {
-                    View customSamsungView = getLayoutInflater().inflate(R.layout.custom_samsung_view, null);
-                    new MaterialAlertDialogBuilder(this)
-                            .setTitle("Here are the steps")
-                            .setMessage("On the next page\n\nTap on Background usage Limits ->\nNever sleeping apps ->\nTap on +\nAdd SafeCharge to the list")
-                            .setCancelable(false)
-                            .setView(customSamsungView)
-                            .setPositiveButton("Enable", (dialog2, which2) -> {
-                                boolean intentLaunched = false;
-                                Intent[] AUTO_START_HONOR = {
-                                        new Intent().setComponent(new ComponentName("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity"))
-                                };
-                                for (Intent intent : AUTO_START_HONOR) {
-                                    if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
-                                        try {
-                                            startActivity(intent);
-                                            break;
-                                        } catch (Exception e) {
-                                            Log.e("Samsung ki mkb", "Crash Bach Gaya");
-                                        }
-                                        if (!intentLaunched) {
-                                            // Show the error dialog here because none of the Intents were successfully launched
-                                            showIntentErrorDialog();
-                                        }
-                                    }
-                                }
-                            }).show();
+                .setPositiveButton("Start", (dialog, which) -> {
+                    showSamsungStepDialog();
                 })
+                .show();
+    }
+
+    private void showSamsungStepDialog() {
+        // Step 1: Battery optimization
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Step 1: Disable Battery Optimization")
+                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                        "• Find SafeCharge in the list\n" +
+                        "• Select 'Unrestricted' or 'Allow'\n\n" +
+                        "After finishing, return to the app for step 2.")
+                .setCancelable(false)
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    try {
+                        Intent intent = new Intent();
+                        intent.setAction(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        showIntentErrorDialog();
+                    }
+                    showSamsungStepDialog2();
+                })
+                .show();
+    }
+
+    private void showSamsungStepDialog2() {
+        View customSamsungView = getLayoutInflater().inflate(R.layout.custom_samsung_view, null);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Step 2: Allow Background Activity")
+                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                        "• Find 'Background usage limits'\n" +
+                        "• Click 'Never sleeping apps'\n" +
+                        "• Add 'SafeCharge' to the list\n\n" +
+                        "This helps SafeCharge work reliably even when your screen is off.")
+                .setCancelable(false)
+                .setView(customSamsungView)
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    try {
+                        // This intent opens Samsung's battery management activity.
+                        Intent intent = new Intent();
+                        intent.setComponent(new ComponentName("com.samsung.android.lool", "com.samsung.android.sm.battery.ui.BatteryActivity"));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        // Fallback: open generic battery usage settings
+                        try {
+                            Intent intent = new Intent();
+                            intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+                        } catch (Exception ex) {
+                            showIntentErrorDialog();
+                        }
+                    }
+                })
+                .setNegativeButton("Done", null)
                 .show();
     }
 
@@ -722,70 +756,135 @@ public class MainActivity extends AppCompatActivity {
         View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
         startService();
         vibrateTouch();
+
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Enable AutoStart")
-                .setMessage("You're using an Oppo Phone, autostart is required to enable SafeCharge on your device.")
-                .setView(customView)
+                .setTitle("Allow SafeCharge to run in background")
+                .setMessage("To ensure SafeCharge works correctly on your Oppo device, please:\n\n" +
+                        "1. Enable autostart for SafeCharge\n" +
+                        "2. Allow background activity/unrestricted battery usage\n\n" +
+                        "Tap Start to be guided to the correct setting screens.")
                 .setCancelable(false)
-                .setPositiveButton("Continue", (dialog, which) -> {
-                    Intent[] AUTO_START_OPPO = {
-                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startup.StartupAppListActivity")),
-                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupapp.StartupAppListActivity")),
-                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")),
-                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startup.StartupAppListActivity")),
-                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.privacypermissionsentry.PermissionTopActivity"))
-                    };
-                    boolean intentLaunched = false;
-                    for (Intent intent : AUTO_START_OPPO) {
-                        if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
-                            try {
-                                startActivity(intent);
-                                intentLaunched = true;
-                                break;
-                            } catch (Exception e) {
-                                Log.e("Oppo ki mkb", "Crash Bach Gaya");
-                            }
-                        }
-                    }
-                    if (!intentLaunched) {
-                        // Show the error dialog here because none of the Intents were successfully launched
-                        showIntentErrorDialog();
-                    }
+                .setView(customView)
+                .setPositiveButton("Start", (dialog, which) -> {
+                    showOppoStepDialog();
                 })
                 .show();
     }
 
-    private void showVivoAlertDialog() {
-        View customView = getLayoutInflater().inflate(R.layout.request_autostart_dialog, null);
-        startService();
-        vibrateTouch();
+    private void showOppoStepDialog() {
+        // Step 1: Autostart management
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Enable AutoStart")
-                .setMessage("You're using a Vivo Phone, autostart is required to enable SafeCharge on your device.")
+                .setTitle("Step 1: Enable Autostart")
+                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                        "• Locate SafeCharge in the list\n" +
+                        "• Enable autostart for SafeCharge\n\n" +
+                        "After finishing, return for step 2.")
                 .setCancelable(false)
-                .setView(customView)
-                .setPositiveButton("Continue", (dialog, which) -> {
-                    Intent[] AUTO_START_VIVO = {
-                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")),
-                            new Intent().setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
-                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager")),
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    boolean launched = false;
+                    // Try common Oppo autostart activities
+                    Intent[] intents = new Intent[]{
+                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startup.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startup.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupapp.StartupAppListActivity"))
                     };
-                    boolean intentLaunched = false;
-                    for (Intent intent : AUTO_START_VIVO) {
+                    for (Intent intent : intents) {
                         if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                             try {
                                 startActivity(intent);
-                                intentLaunched = true;
+                                launched = true;
                                 break;
-                            } catch (Exception e) {
-                                Log.e("Vivo ki mkb", "Crash Bach Gaya");
-                            }
+                            } catch (Exception e) { /* Ignore and try next */ }
                         }
                     }
-                    if (!intentLaunched) {
+                    if (!launched) {
+                        showIntentErrorDialog();
+                    }
+                    showOppoStepDialog2();
+                })
+                .setNegativeButton("Skip", (dialog, which) -> showOppoStepDialog2())
+                .show();
+    }
+
+    private void showOppoStepDialog2() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Step 2: Allow Background Activity")
+                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                        "• Find SafeCharge\n" +
+                        "• Allow 'Background activity', 'Run in background', or set battery usage to 'Unrestricted'\n\n" +
+                        "This will help SafeCharge work reliably even when your screen is off.")
+                .setCancelable(false)
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    try {
+                        // Open app battery details
+                        Intent intent = new Intent();
+                        intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    } catch (Exception e) {
                         showIntentErrorDialog();
                     }
                 })
+                .setNegativeButton("Done", null)
+                .show();
+    }
+
+    private void showVivoStepDialog() {
+        // Step 1: Whitelist/autostart management
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Step 1: Add to Whitelist/Autostart")
+                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                        "• Find SafeCharge in the list\n" +
+                        "• Enable autostart/whitelist for SafeCharge\n\n" +
+                        "After finishing, return for step 2.")
+                .setCancelable(false)
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    boolean launched = false;
+                    // Try common Vivo autostart/whitelist activities
+                    Intent[] intents = new Intent[]{
+                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")),
+                            new Intent().setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
+                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager"))
+                    };
+                    for (Intent intent : intents) {
+                        if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                            try {
+                                startActivity(intent);
+                                launched = true;
+                                break;
+                            } catch (Exception e) { /* Ignore and try next */ }
+                        }
+                    }
+                    if (!launched) {
+                        showIntentErrorDialog();
+                    }
+                    showVivoStepDialog2();
+                })
+                .setNegativeButton("Skip", (dialog, which) -> showVivoStepDialog2())
+                .show();
+    }
+
+    private void showVivoStepDialog2() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Step 2: Allow Background Activity")
+                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                        "• Find SafeCharge\n" +
+                        "• Allow 'Background activity', 'Run in background', or set battery usage to 'Unrestricted'\n\n" +
+                        "This will help SafeCharge work reliably even when your screen is off.")
+                .setCancelable(false)
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    try {
+                        // Open app battery details
+                        Intent intent = new Intent();
+                        intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        showIntentErrorDialog();
+                    }
+                })
+                .setNegativeButton("Done", null)
                 .show();
     }
 
