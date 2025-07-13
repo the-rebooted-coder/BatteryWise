@@ -102,67 +102,92 @@
                 app:thumbTint="@color/md_theme_light_primary"
                 app:trackTint="@color/md_theme_light_surfaceVariant" />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/buttonToggleGroup"
-                android:layout_width="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                app:selectionRequired="true"
-                app:singleSelection="true">
+                app:cardBackgroundColor="@color/md_theme_light_surfaceVariant"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/md_theme_light_primary"
+                app:strokeWidth="1dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_45s"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/buttonToggleGroup"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/productsans"
-                    android:text="30 sec"
-                    android:textAllCaps="false"
-                    android:textColor="@color/md_theme_light_onSurface"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/md_theme_light_primary" />
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:visibility="gone">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_1m"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/productsans"
-                    android:text="1 min"
-                    android:textAllCaps="false"
-                    android:textColor="@color/md_theme_light_onSurface"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/md_theme_light_primary" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_2m"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/productsans"
-                    android:text="2 min"
-                    android:textAllCaps="false"
-                    android:textColor="@color/md_theme_light_onSurface"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/md_theme_light_primary" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_45s"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/productsans"
+                            android:text="30 secs"
+                            android:textAllCaps="false"
+                            android:textColor="@color/md_theme_light_onSurface"
+                            app:cornerRadius="8dp"
+                            app:strokeColor="@color/md_theme_light_primary" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_3m"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/productsans"
-                    android:text="3 min"
-                    android:textAllCaps="false"
-                    android:textColor="@color/md_theme_light_onSurface"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/md_theme_light_primary" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_1m"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/productsans"
+                            android:text="1 min"
+                            android:textAllCaps="false"
+                            android:textColor="@color/md_theme_light_onSurface"
+                            app:cornerRadius="8dp"
+                            app:strokeColor="@color/md_theme_light_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_2m"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/productsans"
+                            android:text="2 min"
+                            android:textAllCaps="false"
+                            android:textColor="@color/md_theme_light_onSurface"
+                            app:cornerRadius="8dp"
+                            app:strokeColor="@color/md_theme_light_primary" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_3m"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/productsans"
+                            android:text="3 min"
+                            android:textAllCaps="false"
+                            android:textColor="@color/md_theme_light_onSurface"
+                            app:cornerRadius="8dp"
+                            app:strokeColor="@color/md_theme_light_primary" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/saveBatteryBtn"

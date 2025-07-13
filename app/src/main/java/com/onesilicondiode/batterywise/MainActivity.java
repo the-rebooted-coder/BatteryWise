@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.BatteryManager;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +39,6 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -86,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
     private ReviewManager reviewManager;
     private MaterialSwitch switchToggle;
     private SharedPreferences sharedPreferences;
-    private MaterialButtonToggleGroup segmentedButtonGroup;
+    private LinearLayout buttonToggleGroup;
+    private MaterialButton currentSelectedButton;
 
 
     public static int getThemeColor(Context context, int colorResId) {
@@ -105,9 +107,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         reviewManager = ReviewManagerFactory.create(this);
         waveLoadingView = findViewById(R.id.waveLoadingView);
-        segmentedButtonGroup = findViewById(R.id.buttonToggleGroup);
+        buttonToggleGroup = findViewById(R.id.buttonToggleGroup);
         appUpdateManager = AppUpdateManagerFactory.create(this);
         oneMin = findViewById(R.id.button_1m);
         twoMin = findViewById(R.id.button_2m);
@@ -126,39 +129,33 @@ public class MainActivity extends AppCompatActivity {
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
         boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
         int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
-        if (selectedTime != -1) {
-            switch (selectedTime) {
-                case 1:
-                    // Button for 1 minute
-                    oneMin.setChecked(true);
-                    break;
-                case 2:
-                    // Button for 2 minutes
-                    twoMin.setChecked(true);
-                    break;
-                case 3:
-                    // Button for 3 minutes
-                    threeMin.setChecked(true);
-                    break;
-                case 4:
-                    // Button for 30 seconds
-                    thirtySec.setChecked(true);
-                    break;
-            }
+        switch (selectedTime) {
+            case 1:
+                handleButtonSelection(oneMin, 1);
+                break;
+            case 2:
+                handleButtonSelection(twoMin, 2);
+                break;
+            case 3:
+                handleButtonSelection(threeMin, 3);
+                break;
+            case 4:
+                handleButtonSelection(thirtySec, 4);
+                break;
         }
         updateSegmentedButtonVisibility(switchState);
-        oneMin.setOnClickListener(v -> handleMaterialButtonClick(1));
-        twoMin.setOnClickListener(v -> handleMaterialButtonClick(2));
-        threeMin.setOnClickListener(v -> handleMaterialButtonClick(3));
-        thirtySec.setOnClickListener(v -> handleMaterialButtonClick(4));
+        thirtySec.setOnClickListener(v -> handleButtonSelection(thirtySec, 4));
+        oneMin.setOnClickListener(v -> handleButtonSelection(oneMin, 1));
+        twoMin.setOnClickListener(v -> handleButtonSelection(twoMin, 2));
+        threeMin.setOnClickListener(v -> handleButtonSelection(threeMin, 3));
         // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // Switch is ON, show the segmented buttons
-                segmentedButtonGroup.setVisibility(View.VISIBLE);
+                buttonToggleGroup.setVisibility(View.VISIBLE);
             } else {
                 // Switch is OFF, hide the segmented buttons
-                segmentedButtonGroup.setVisibility(View.GONE);
+                buttonToggleGroup.setVisibility(View.GONE);
             }
             // Save the state of the switch toggle in SharedPreferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -317,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
                 enableAutoStart();
                 boolean switchedState = sharedPreferences.getBoolean(SWITCH_STATE, false);
                 if (switchedState) {
-                    segmentedButtonGroup.setVisibility(View.VISIBLE);
+                    buttonToggleGroup.setVisibility(View.VISIBLE);
                     if (selectedTime != 1) {
                         switch (selectedTime) {
                             case 1:
@@ -335,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    segmentedButtonGroup.setVisibility(View.GONE);
+                    buttonToggleGroup.setVisibility(View.GONE);
                 }
             } catch (Exception e) {
                 showIntentErrorDialog();
@@ -359,6 +356,62 @@ public class MainActivity extends AppCompatActivity {
                 usedTime.setText("SafeCharged " + counter + " times");
             }
         }
+    }
+
+    private void handleButtonSelection(MaterialButton selectedButton, int timeValue) {
+        resetAllButtons();
+        selectedButton.setBackgroundColor(ContextCompat.getColor(this, R.color.md_theme_light_primary));
+        selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white));
+        selectedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.md_theme_light_primary)));
+
+        currentSelectedButton = selectedButton;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(SELECTED_TIME_KEY, timeValue);
+        editor.apply();
+
+        vibrateTouch();
+
+        // Only show message if auto-dismiss is enabled
+        if (switchToggle.isChecked()) {
+            String message = getDismissMessage(timeValue);
+            Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getDismissMessage(int timeValue) {
+        switch (timeValue) {
+            case 1:
+                return "Alert will dismiss after 1 minute";
+            case 2:
+                return "Alert will dismiss after 2 minutes";
+            case 3:
+                return "Alert will dismiss after 3 minutes";
+            case 4:
+                return "Alert will dismiss after 30 seconds";
+            default:
+                return "Time selection updated";
+        }
+    }
+
+    private void resetAllButtons() {
+        int defaultTextColor = ContextCompat.getColor(this, R.color.md_theme_light_onSurface);
+        int strokeColor = ContextCompat.getColor(this, R.color.md_theme_light_primary);
+
+        thirtySec.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+        thirtySec.setTextColor(defaultTextColor);
+        thirtySec.setStrokeColor(ColorStateList.valueOf(strokeColor));
+
+        oneMin.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+        oneMin.setTextColor(defaultTextColor);
+        oneMin.setStrokeColor(ColorStateList.valueOf(strokeColor));
+
+        twoMin.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+        twoMin.setTextColor(defaultTextColor);
+        twoMin.setStrokeColor(ColorStateList.valueOf(strokeColor));
+
+        threeMin.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+        threeMin.setTextColor(defaultTextColor);
+        threeMin.setStrokeColor(ColorStateList.valueOf(strokeColor));
     }
 
     private void showBottomSheet() {
@@ -760,7 +813,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 switchToggle.setVisibility(View.GONE);
-                segmentedButtonGroup.setVisibility(View.GONE);
+                buttonToggleGroup.setVisibility(View.GONE);
             }
         });
         animator.start();
@@ -769,10 +822,10 @@ public class MainActivity extends AppCompatActivity {
     private void updateSegmentedButtonVisibility(boolean switchState) {
         if (switchState) {
             // Switch is ON, show the segmented buttons
-            segmentedButtonGroup.setVisibility(View.VISIBLE);
+            buttonToggleGroup.setVisibility(View.VISIBLE);
         } else {
             // Switch is OFF, hide the segmented buttons
-            segmentedButtonGroup.setVisibility(View.GONE);
+            buttonToggleGroup.setVisibility(View.GONE);
         }
     }
 
