@@ -1,6 +1,7 @@
 package com.onesilicondiode.batterywise;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -17,6 +18,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -41,6 +44,7 @@ public class StopAlert extends AppCompatActivity {
     private int currentValue;
     private WaveLoadingView stopLoadingView;
     private CountDownTimer countDownTimer;
+    private BroadcastReceiver unplugReceiver;
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -112,6 +116,22 @@ public class StopAlert extends AppCompatActivity {
         }
 
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
+        // Register receiver for unplug event (auto-dismiss if unplugged)
+        unplugReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                boolean isPlugged = plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                        plugged == BatteryManager.BATTERY_PLUGGED_USB ||
+                        plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+                if (!isPlugged) {
+                    Log.d(TAG, "Charger disconnected, auto-dismissing StopAlert");
+                    stopAlertAndCleanup();
+                }
+            }
+        };
+        registerReceiver(unplugReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     private void updateBatteryLevel() {
@@ -256,5 +276,9 @@ public class StopAlert extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "onDestroy: Activity destroyed");
         stopAlertAndCleanup();
+        if (unplugReceiver != null) {
+            unregisterReceiver(unplugReceiver);
+            unplugReceiver = null;
+        }
     }
 }

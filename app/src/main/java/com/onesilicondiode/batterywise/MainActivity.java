@@ -577,7 +577,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (manufacturer.equalsIgnoreCase("oppo")) {
             showOppoAlertDialog();
         } else if (manufacturer.contains("vivo")) {
-            showVivoAlertDialog();
+            showVivoStepDialog();
         } else if (manufacturer.contains("asus")) {
             showAlertDialog("Asus", "com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity");
         } else if (manufacturer.contains("samsung")) {
