@@ -54,7 +54,7 @@ public class BatteryMonitorService extends Service {
                 prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
                 int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
                 boolean userStarted = prefs.getBoolean(USER_STARTED_KEY, DEFAULT_USER_STARTED);
-                if (batteryPercent > selectedBatteryLevel && !alertPlayed) {
+                if (batteryPercent >= selectedBatteryLevel && !alertPlayed) {
                     if (!userStarted) {
                         // Create a PendingIntent for the full-screen intent
                         Intent fullScreenIntent = new Intent(context, StopAlert.class);
