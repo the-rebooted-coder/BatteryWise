@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -22,11 +23,18 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.shape.CornerFamily;
 
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
+
 public class About extends AppCompatActivity {
     SwipeButton moreAbout;
     TextView versionInfo, privacyPolicy, openSource;
     private Vibrator vibrator;
     ImageView osdLogo;
+
+    // Predictive back callback for Android 13+ (U+)
+    private OnBackInvokedCallback predictiveBackCallback;
+
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
         TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
@@ -66,9 +74,8 @@ public class About extends AppCompatActivity {
             try {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/BatteryWise/PrivacyPolicy.txt"));
                 startActivity(browserIntent);
-            }
-            catch (Exception e){
-                Toast.makeText(this,"Cannot Open Browser",Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Cannot Open Browser", Toast.LENGTH_LONG).show();
             }
         });
         openSource.setOnClickListener(view -> {
@@ -76,9 +83,8 @@ public class About extends AppCompatActivity {
             try {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/the-rebooted-coder/BatteryWise/blob/main/LICENSE"));
                 startActivity(browserIntent);
-            }
-            catch (Exception e){
-                Toast.makeText(this,"Cannot Open Browser",Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Cannot Open Browser", Toast.LENGTH_LONG).show();
             }
         });
         moreAbout.setOnActiveListener(() -> {
@@ -86,9 +92,8 @@ public class About extends AppCompatActivity {
             try {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/Digital-TeesShirt/"));
                 startActivity(browserIntent);
-            }
-            catch (Exception e){
-                Toast.makeText(this,"Google me up ;)",Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Google me up ;)", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -112,6 +117,24 @@ public class About extends AppCompatActivity {
                         .setBottomRightCornerSize(0)
                         .setBottomLeftCornerSize(0)
                         .build());
+
+        // Predictive Back Navigation (Android 15+/U+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+            predictiveBackCallback = () -> finish();
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    predictiveBackCallback
+            );
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister predictive back callback
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && predictiveBackCallback != null) {
+            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(predictiveBackCallback);
+        }
     }
 
     private void vibrate() {
@@ -120,28 +143,26 @@ public class About extends AppCompatActivity {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
         } else {
-            // For versions lower than Oreo
             vibrator.vibrate(pattern, -1);
         }
     }
+
     private void vibrateOSD() {
-        long[] pattern = {17,4,14,17,0,22,21,8,22,0,18,0,16};
+        long[] pattern = {17, 4, 14, 17, 0, 22, 21, 8, 22, 0, 18, 0, 16};
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
         } else {
-            // For versions lower than Oreo
             vibrator.vibrate(pattern, -1);
         }
     }
+
     private void vibrateOtherButton() {
         long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3};
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
         } else {
-            // For versions lower than Oreo
             vibrator.vibrate(pattern, -1);
         }
     }

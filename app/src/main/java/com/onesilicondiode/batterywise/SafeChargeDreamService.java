@@ -21,13 +21,14 @@ import java.util.Random;
 
 public class SafeChargeDreamService extends DreamService {
 
-    private TextView clockHourView, clockColonView, clockMinuteView, safeChargeLabel;
+    private TextView clockHourView, clockColonView, clockMinuteView, safeChargeLabel, clockDateView;
     private LinearLayout clockContainer;
     private static final int COLOR_DEFAULT = 0xFF818589;
     private static final int COLOR_ZEN = 0xFF2196F3;
     private Handler handler = new Handler();
     private final SimpleDateFormat hourFormat = new SimpleDateFormat("HH", Locale.getDefault());
     private final SimpleDateFormat minuteFormat = new SimpleDateFormat("mm", Locale.getDefault());
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, d'%s' MMMM", Locale.getDefault());
     private final Random random = new Random();
 
     private final int MOVE_INTERVAL_MS = 120000; // 2 mins for clock
@@ -42,15 +43,41 @@ public class SafeChargeDreamService extends DreamService {
     private int safeChargePrevOffset = 0;
     private final int SAFECHARGE_OFFSET_PX = 10; // max +/-10px movement
 
+    // Helper to get day suffix
+    private String getDaySuffix(int day) {
+        if (day >= 11 && day <= 13) return "th";
+        switch (day % 10) {
+            case 1:
+                return "st";
+            case 2:
+                return "nd";
+            case 3:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+
     private final Runnable updateClockRunnable = new Runnable() {
         @Override
         public void run() {
             if (clockHourView != null && clockMinuteView != null && clockColonView != null) {
-                String hour = hourFormat.format(new Date());
-                String minute = minuteFormat.format(new Date());
+                Date now = new Date();
+                String hour = hourFormat.format(now);
+                String minute = minuteFormat.format(now);
                 clockHourView.setText(hour);
                 clockMinuteView.setText(minute);
                 clockColonView.setText(":");
+
+                // Day and date
+                if (clockDateView != null) {
+                    // Get day of month for suffix
+                    SimpleDateFormat dayFormat = new SimpleDateFormat("d", Locale.getDefault());
+                    int dayOfMonth = Integer.parseInt(dayFormat.format(now));
+                    String suffix = getDaySuffix(dayOfMonth);
+                    String formattedDate = new SimpleDateFormat("EEEE, d'" + suffix + "' MMMM", Locale.getDefault()).format(now);
+                    clockDateView.setText(formattedDate);
+                }
             }
             handler.postDelayed(this, 1000);
         }
@@ -84,6 +111,7 @@ public class SafeChargeDreamService extends DreamService {
         clockHourView = findViewById(R.id.clockHourView);
         clockColonView = findViewById(R.id.clockColonView);
         clockMinuteView = findViewById(R.id.clockMinuteView);
+        clockDateView = findViewById(R.id.clockDateView);
         safeChargeLabel = findViewById(R.id.safeChargeLabel);
 
         getWindow().getDecorView().setSystemUiVisibility(
@@ -101,6 +129,9 @@ public class SafeChargeDreamService extends DreamService {
         clockHourView.setTextColor(color);
         clockColonView.setTextColor(color);
         clockMinuteView.setTextColor(color);
+        if (clockDateView != null) {
+            clockDateView.setTextColor(color);
+        }
 
         updateClockRunnable.run();
         moveClockRunnable.run();

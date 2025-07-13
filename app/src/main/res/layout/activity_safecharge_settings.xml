@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
@@ -11,33 +10,27 @@
         android:id="@+id/safecharge_settings_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/psb"
         android:paddingBottom="8dp"
-        android:text="SafeCharge Screensaver Settings"
+        android:text="SafeCharge Day Dream ☁️"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/safecharge_settings_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="24dp"
-        android:text="Configure your screensaver experience below."
-        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/zen_mode_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Enable Zen Mode (Blue Clock)"
+        android:fontFamily="@font/productsans"
+        android:paddingStart="10dp"
+        android:text="Enable Zen Mode"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/zen_mode_summary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:fontFamily="@font/productsans"
+        android:padding="10dp"
         android:text="Zen Mode makes your clock blue for a more peaceful screensaver experience."
         android:textAppearance="?android:attr/textAppearanceSmall" />
 

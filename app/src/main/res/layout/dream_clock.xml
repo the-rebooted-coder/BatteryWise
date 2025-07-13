@@ -10,52 +10,73 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/clockHourView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:alpha="1"
-            android:fontFamily="@font/mb"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/clockHourView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:alpha="1"
+                android:fontFamily="@font/mb"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="8"
+                android:text="00"
+                android:textColor="#A9A9A9"
+                android:textSize="64sp" />
+
+            <TextView
+                android:id="@+id/clockColonView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:alpha="1"
+                android:fontFamily="monospace"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="8"
+                android:text=":"
+                android:textColor="#818589"
+                android:textSize="38sp" />
+
+            <TextView
+                android:id="@+id/clockMinuteView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:alpha="1"
+                android:fontFamily="@font/mb"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="8"
+                android:text="00"
+                android:textColor="#A9A9A9"
+                android:textSize="56sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/clockDateView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="start"
             android:shadowColor="#99000000"
             android:shadowDx="0"
             android:shadowDy="0"
             android:shadowRadius="8"
-            android:text="00"
+            android:text="Saturday, 13th July"
             android:textColor="#818589"
-            android:textSize="96sp" />
-
-        <TextView
-            android:id="@+id/clockColonView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:alpha="1"
-            android:fontFamily="monospace"
-            android:shadowColor="#99000000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="8"
-            android:text=":"
-            android:textColor="#818589"
-            android:textSize="72sp" />
-
-        <TextView
-            android:id="@+id/clockMinuteView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:alpha="1"
-            android:fontFamily="@font/mb"
-            android:shadowColor="#99000000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="8"
-            android:text="00"
-            android:textColor="#818589"
-            android:textSize="56sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <TextView
@@ -71,5 +92,5 @@
         android:shadowDy="0"
         android:text="SafeCharge"
         android:textColor="#808080"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 </FrameLayout>
