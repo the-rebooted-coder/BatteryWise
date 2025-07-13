@@ -1,0 +1,75 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dreamRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <LinearLayout
+        android:id="@+id/clockContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/clockHourView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:alpha="1"
+            android:fontFamily="@font/mb"
+            android:shadowColor="#99000000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="8"
+            android:text="00"
+            android:textColor="#818589"
+            android:textSize="96sp" />
+
+        <TextView
+            android:id="@+id/clockColonView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:alpha="1"
+            android:fontFamily="monospace"
+            android:shadowColor="#99000000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="8"
+            android:text=":"
+            android:textColor="#818589"
+            android:textSize="72sp" />
+
+        <TextView
+            android:id="@+id/clockMinuteView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:alpha="1"
+            android:fontFamily="@font/mb"
+            android:shadowColor="#99000000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="8"
+            android:text="00"
+            android:textColor="#818589"
+            android:textSize="56sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/safeChargeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="32dp"
+        android:alpha="0.9"
+        android:fontFamily="@font/productsansitalic"
+        android:shadowColor="#55000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:text="SafeCharge"
+        android:textColor="#808080"
+        android:textSize="18sp" />
+</FrameLayout>

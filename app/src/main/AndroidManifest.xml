@@ -65,7 +65,24 @@
                 <action android:name="com.onesilicondiode.batterywise.STOP_ACTION" />
             </intent-filter>
         </service>
+        <service
+            android:name=".SafeChargeDreamService"
+            android:exported="true"
+            android:label="Day Dream"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.dream"
+                android:resource="@xml/dream_metadata" />
+        </service>
 
+        <activity
+            android:name=".SafeChargeSettingsActivity"
+            android:exported="true"
+            android:label="SafeCharge DayDream Settings"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"

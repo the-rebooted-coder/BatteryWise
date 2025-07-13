@@ -40,11 +40,15 @@ public class BatteryMonitorService extends Service {
     private BroadcastReceiver batteryReceiver;
     private PendingIntent pendingIntent;
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: SafeCharge Service started");
+
+        // Fix 1: Service killed by system - register receiver in onStartCommand and re-register if needed
+
+        // Fix 2: App updated - make service STICKY so it restarts after update
+        // This is handled in onStartCommand below
 
         // Initialize SharedPreferences
         prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
@@ -62,86 +66,6 @@ public class BatteryMonitorService extends Service {
             stopActionChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(stopActionChannel);
-        }
-
-        // Register BroadcastReceiver for battery changes
-        batteryReceiver = new BroadcastReceiver() {
-            @SuppressLint("MissingPermission")
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
-                int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                boolean isPlugged = plugged == BatteryManager.BATTERY_PLUGGED_AC ||
-                        plugged == BatteryManager.BATTERY_PLUGGED_USB ||
-                        plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
-
-                int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
-                boolean userStarted = prefs.getBoolean(USER_STARTED_KEY, DEFAULT_USER_STARTED);
-                boolean alertPlayed = prefs.getBoolean(ALERT_PLAYED_KEY, false);
-
-                Log.d(TAG, "onReceive: batteryPercent=" + batteryPercent + ", isPlugged=" + isPlugged +
-                        ", selectedBatteryLevel=" + selectedBatteryLevel + ", userStarted=" + userStarted +
-                        ", alertPlayed=" + alertPlayed);
-
-                if (isPlugged && batteryPercent >= selectedBatteryLevel && !alertPlayed && !userStarted) {
-                    // Check notification permission first
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-                                    != PackageManager.PERMISSION_GRANTED) {
-
-                        Log.w(TAG, "Missing notification permission");
-                        return;
-                    }
-                    Intent fullScreenIntent = new Intent(context, StopAlert.class);
-                    fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-                    PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
-                            context,
-                            STOP_ACTION_NOTIFICATION_ID,
-                            fullScreenIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, STOP_ACTION_CHANNEL_ID)
-                            .setSmallIcon(R.drawable.ic_notification)
-                            .setContentTitle("Battery Charged")
-                            .setContentText("Disconnect the charger")
-                            .setPriority(NotificationCompat.PRIORITY_MAX)
-                            .setCategory(NotificationCompat.CATEGORY_ALARM)
-                            .setAutoCancel(true)
-                            .setFullScreenIntent(fullScreenPendingIntent, true)
-                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-                    Log.d(TAG, "onReceive: Posting full-screen notification");
-                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-                    try {
-                        notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, builder.build());
-                        Log.d(TAG, "Notification posted successfully");
-                    } catch (SecurityException e) {
-                        Log.e(TAG, "Failed to post notification", e);
-                    }
-
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean(ALERT_PLAYED_KEY, true);
-                    editor.putBoolean(USER_STARTED_KEY, false);
-                    editor.apply();
-                } else if (!isPlugged) {
-                    Log.d(TAG, "onReceive: Charger disconnected, resetting alertPlayed");
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean(ALERT_PLAYED_KEY, false);
-                    editor.putBoolean(USER_STARTED_KEY, false);
-                    editor.apply();
-                }
-            }
-        };
-
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(batteryReceiver, intentFilter, RECEIVER_NOT_EXPORTED);
-        } else {
-            registerReceiver(batteryReceiver, intentFilter);
         }
 
         // Setup foreground service notification
@@ -166,6 +90,96 @@ public class BatteryMonitorService extends Service {
 
         Notification notification = createNotification();
         startForeground(FOREGROUND_SERVICE_ID, notification);
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // Fix 1: Service killed by system - re-register receiver if null
+        if (batteryReceiver == null) {
+            batteryReceiver = new BroadcastReceiver() {
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    BatteryManager batteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
+                    int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                    int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                    boolean isPlugged = plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                            plugged == BatteryManager.BATTERY_PLUGGED_USB ||
+                            plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+
+                    int selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
+                    boolean userStarted = prefs.getBoolean(USER_STARTED_KEY, DEFAULT_USER_STARTED);
+                    boolean alertPlayed = prefs.getBoolean(ALERT_PLAYED_KEY, false);
+
+                    Log.d(TAG, "onReceive: batteryPercent=" + batteryPercent + ", isPlugged=" + isPlugged +
+                            ", selectedBatteryLevel=" + selectedBatteryLevel + ", userStarted=" + userStarted +
+                            ", alertPlayed=" + alertPlayed);
+
+                    if (isPlugged && batteryPercent >= selectedBatteryLevel && !alertPlayed && !userStarted) {
+                        // Check notification permission first
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                                        != PackageManager.PERMISSION_GRANTED) {
+
+                            Log.w(TAG, "Missing notification permission");
+                            return;
+                        }
+                        Intent fullScreenIntent = new Intent(context, StopAlert.class);
+                        fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
+                                context,
+                                STOP_ACTION_NOTIFICATION_ID,
+                                fullScreenIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, STOP_ACTION_CHANNEL_ID)
+                                .setSmallIcon(R.drawable.ic_notification)
+                                .setContentTitle("Battery Charged")
+                                .setContentText("Disconnect the charger")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                                .setAutoCancel(true)
+                                .setFullScreenIntent(fullScreenPendingIntent, true)
+                                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+                        Log.d(TAG, "onReceive: Posting full-screen notification");
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+                        try {
+                            notificationManager.notify(STOP_ACTION_NOTIFICATION_ID, builder.build());
+                            Log.d(TAG, "Notification posted successfully");
+                        } catch (SecurityException e) {
+                            Log.e(TAG, "Failed to post notification", e);
+                        }
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean(ALERT_PLAYED_KEY, true);
+                        editor.putBoolean(USER_STARTED_KEY, false);
+                        editor.apply();
+                    } else if (!isPlugged) {
+                        Log.d(TAG, "onReceive: Charger disconnected, resetting alertPlayed");
+                        NotificationManagerCompat.from(context).cancel(STOP_ACTION_NOTIFICATION_ID); // Ensure notification is cancelled
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean(ALERT_PLAYED_KEY, false);
+                        editor.putBoolean(USER_STARTED_KEY, false);
+                        editor.apply();
+                    }
+                }
+            };
+
+            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(batteryReceiver, intentFilter, RECEIVER_NOT_EXPORTED);
+            } else {
+                registerReceiver(batteryReceiver, intentFilter);
+            }
+        }
+
+        // Fix 2: App update or service killed - restart service automatically
+        return START_STICKY;
     }
 
     private Notification createNotification() {
