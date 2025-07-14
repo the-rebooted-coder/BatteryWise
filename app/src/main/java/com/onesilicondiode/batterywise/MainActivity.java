@@ -695,6 +695,7 @@ public class MainActivity extends AppCompatActivity {
                         "• Find 'Background usage limits'\n" +
                         "• Click 'Never sleeping apps'\n" +
                         "• Add 'SafeCharge' to the list\n\n" +
+                        "• Ignore if 'SafeCharge' is not present in the list\n" +
                         "This helps SafeCharge work reliably even when your screen is off.")
                 .setCancelable(false)
                 .setView(customSamsungView)
