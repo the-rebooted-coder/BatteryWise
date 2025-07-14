@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -42,8 +43,10 @@ public class ScreenSaverActivity extends AppCompatActivity {
     private FrameLayout rootLayout;
     private int safeChargePrevOffset = 0;
     private final int SAFECHARGE_OFFSET_PX = 10; // max +/-10px movement
+    private LinearLayout safeChargeLabelContainer;
 
     private boolean zenModeEnabled;
+    private TextView batteryPercentLabel;
 
     private final Runnable updateClockRunnable = new Runnable() {
         @Override
@@ -98,12 +101,17 @@ public class ScreenSaverActivity extends AppCompatActivity {
         );
 
         rootLayout = findViewById(R.id.dreamRoot);
+        batteryPercentLabel = findViewById(R.id.batteryPercentLabel);
         clockContainer = findViewById(R.id.clockContainer);
         clockHourView = findViewById(R.id.clockHourView);
         clockColonView = findViewById(R.id.clockColonView);
         clockMinuteView = findViewById(R.id.clockMinuteView);
         clockDateView = findViewById(R.id.clockDateView);
-        safeChargeLabel = findViewById(R.id.safeChargeLabel);
+        safeChargeLabelContainer = findViewById(R.id.safeChargeLabelContainer);
+
+
+        int batteryPercent = getBatteryPercentage();
+        batteryPercentLabel.setText(batteryPercent + "%");
 
         // Read Zen Mode from SafeCharge Settings
         zenModeEnabled = getSharedPreferences(
@@ -191,29 +199,31 @@ public class ScreenSaverActivity extends AppCompatActivity {
     }
 
     private void animateSafeChargeMove() {
-        if (safeChargeLabel == null || rootLayout == null) return;
+        if (safeChargeLabelContainer == null || rootLayout == null) return;
 
-        int offset;
-        do {
-            offset = random.nextInt(SAFECHARGE_OFFSET_PX * 2 + 1) - SAFECHARGE_OFFSET_PX;
-        } while (offset == safeChargePrevOffset);
-        safeChargePrevOffset = offset;
-
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(safeChargeLabel, "alpha", 0.9f, 0f);
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(safeChargeLabelContainer, "alpha", 0.9f, 0f);
         fadeOut.setDuration(SAFECHARGE_FADE_OUT);
         fadeOut.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) safeChargeLabel.getLayoutParams();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) safeChargeLabelContainer.getLayoutParams();
                 params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
                 params.leftMargin = safeChargePrevOffset;
-                safeChargeLabel.setLayoutParams(params);
+                safeChargeLabelContainer.setLayoutParams(params);
 
-                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(safeChargeLabel, "alpha", 0f, 0.9f);
+                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(safeChargeLabelContainer, "alpha", 0f, 0.9f);
                 fadeIn.setDuration(SAFECHARGE_FADE_IN);
                 fadeIn.start();
             }
         });
         fadeOut.start();
+    }
+
+    private int getBatteryPercentage() {
+        BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+        if (bm != null) {
+            return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        }
+        return -1; // fallback
     }
 }

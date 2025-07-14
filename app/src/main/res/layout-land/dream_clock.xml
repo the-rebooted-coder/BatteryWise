@@ -27,7 +27,7 @@
                 android:fontFamily="@font/mb"
                 android:text="00"
                 android:textColor="#454545"
-                android:textSize="64sp" />
+                android:textSize="110sp" /> <!-- Bigger for landscape -->
 
             <TextView
                 android:id="@+id/clockColonView"
@@ -38,7 +38,7 @@
                 android:fontFamily="monospace"
                 android:text=":"
                 android:textColor="#454545"
-                android:textSize="38sp" />
+                android:textSize="40sp" /> <!-- Bigger for landscape -->
 
             <TextView
                 android:id="@+id/clockMinuteView"
@@ -49,7 +49,7 @@
                 android:fontFamily="@font/mb"
                 android:text="00"
                 android:textColor="#454545"
-                android:textSize="56sp" />
+                android:textSize="100sp" /> <!-- Bigger for landscape -->
         </LinearLayout>
 
         <TextView
@@ -60,7 +60,7 @@
             android:gravity="start"
             android:text="Saturday, 13th July"
             android:textColor="#454545"
-            android:textSize="20sp" />
+            android:textSize="28sp" /> <!-- Bigger for landscape -->
     </LinearLayout>
 
     <LinearLayout
@@ -68,7 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="42dp"
         android:orientation="horizontal">
 
         <TextView
@@ -78,7 +78,7 @@
             android:fontFamily="@font/productsansitalic"
             android:text="SafeCharge"
             android:textColor="#808080"
-            android:textSize="16sp" />
+            android:textSize="18sp" /> <!-- Bigger for landscape -->
 
         <TextView
             android:id="@+id/batteryPercentLabel"
@@ -88,6 +88,6 @@
             android:fontFamily="@font/productsansitalic"
             android:text="85%"
             android:textColor="#808080"
-            android:textSize="16sp" />
+            android:textSize="18sp" /> <!-- Bigger for landscape -->
     </LinearLayout>
 </FrameLayout>

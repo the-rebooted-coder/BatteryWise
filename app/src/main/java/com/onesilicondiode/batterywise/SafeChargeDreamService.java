@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.BatteryManager;
 import android.os.Handler;
 import android.service.dreams.DreamService;
 import android.view.Gravity;
@@ -21,8 +22,9 @@ import java.util.Random;
 
 public class SafeChargeDreamService extends DreamService {
 
-    private TextView clockHourView, clockColonView, clockMinuteView, safeChargeLabel, clockDateView;
+    private TextView clockHourView, clockColonView, clockMinuteView, safeChargeLabel, clockDateView, batteryPercentLabel;
     private LinearLayout clockContainer;
+    private LinearLayout safeChargeLabelContainer;
     private static final int COLOR_DEFAULT = 0xFF818589;
     private static final int COLOR_ZEN = 0xFF2196F3;
     private Handler handler = new Handler();
@@ -78,6 +80,10 @@ public class SafeChargeDreamService extends DreamService {
                     String formattedDate = new SimpleDateFormat("EEEE, d'" + suffix + "' MMMM", Locale.getDefault()).format(now);
                     clockDateView.setText(formattedDate);
                 }
+                if (batteryPercentLabel != null) {
+                    int batteryPercent = getBatteryPercentage();
+                    batteryPercentLabel.setText(batteryPercent + "%");
+                }
             }
             handler.postDelayed(this, 1000);
         }
@@ -105,14 +111,15 @@ public class SafeChargeDreamService extends DreamService {
         setInteractive(false);
         setFullscreen(true);
         setContentView(R.layout.dream_clock);
-
         rootLayout = findViewById(R.id.dreamRoot);
+        safeChargeLabelContainer = findViewById(R.id.safeChargeLabelContainer);
         clockContainer = findViewById(R.id.clockContainer);
         clockHourView = findViewById(R.id.clockHourView);
         clockColonView = findViewById(R.id.clockColonView);
         clockMinuteView = findViewById(R.id.clockMinuteView);
         clockDateView = findViewById(R.id.clockDateView);
         safeChargeLabel = findViewById(R.id.safeChargeLabel);
+        batteryPercentLabel = findViewById(R.id.batteryPercentLabel);
 
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
@@ -132,10 +139,26 @@ public class SafeChargeDreamService extends DreamService {
         if (clockDateView != null) {
             clockDateView.setTextColor(color);
         }
+        safeChargeLabel.setTextColor(color);
+        batteryPercentLabel.setTextColor(color);
+
+        // Initial battery percentage
+        if (batteryPercentLabel != null) {
+            int batteryPercent = getBatteryPercentage();
+            batteryPercentLabel.setText(batteryPercent + "%");
+        }
 
         updateClockRunnable.run();
         moveClockRunnable.run();
         moveSafeChargeRunnable.run();
+    }
+
+    private int getBatteryPercentage() {
+        BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+        if (bm != null) {
+            return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+        }
+        return -1;
     }
 
     @Override
@@ -207,7 +230,7 @@ public class SafeChargeDreamService extends DreamService {
     }
 
     private void animateSafeChargeMove() {
-        if (safeChargeLabel == null || rootLayout == null) return;
+        if (safeChargeLabelContainer == null || rootLayout == null) return;
 
         int offset;
         do {
@@ -215,17 +238,17 @@ public class SafeChargeDreamService extends DreamService {
         } while (offset == safeChargePrevOffset);
         safeChargePrevOffset = offset;
 
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(safeChargeLabel, "alpha", 0.9f, 0f);
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(safeChargeLabelContainer, "alpha", 0.9f, 0f);
         fadeOut.setDuration(SAFECHARGE_FADE_OUT);
         fadeOut.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) safeChargeLabel.getLayoutParams();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) safeChargeLabelContainer.getLayoutParams();
                 params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
                 params.leftMargin = safeChargePrevOffset;
-                safeChargeLabel.setLayoutParams(params);
+                safeChargeLabelContainer.setLayoutParams(params);
 
-                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(safeChargeLabel, "alpha", 0f, 0.9f);
+                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(safeChargeLabelContainer, "alpha", 0f, 0.9f);
                 fadeIn.setDuration(SAFECHARGE_FADE_IN);
                 fadeIn.start();
             }
