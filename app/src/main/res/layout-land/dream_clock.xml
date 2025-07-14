@@ -6,11 +6,11 @@
 
     <LinearLayout
         android:id="@+id/clockContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="32dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -22,34 +22,31 @@
                 android:id="@+id/clockHourView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:alpha="1"
                 android:fontFamily="@font/mb"
+                android:maxWidth="350dp"
                 android:text="00"
                 android:textColor="#454545"
-                android:textSize="110sp" /> <!-- Bigger for landscape -->
+                android:textSize="110sp" />
 
             <TextView
                 android:id="@+id/clockColonView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:alpha="1"
                 android:fontFamily="monospace"
+                android:maxWidth="120dp"
                 android:text=":"
                 android:textColor="#454545"
-                android:textSize="40sp" /> <!-- Bigger for landscape -->
+                android:textSize="60sp" />
 
             <TextView
                 android:id="@+id/clockMinuteView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:alpha="1"
                 android:fontFamily="@font/mb"
+                android:maxWidth="350dp"
                 android:text="00"
                 android:textColor="#454545"
-                android:textSize="100sp" /> <!-- Bigger for landscape -->
+                android:textSize="100sp" />
         </LinearLayout>
 
         <TextView
@@ -57,12 +54,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
-            android:gravity="start"
-            android:text="Saturday, 13th July"
+            android:gravity="center"
+            android:maxWidth="700dp"
+            android:text="Friday, 02nd March"
             android:textColor="#454545"
-            android:textSize="28sp" /> <!-- Bigger for landscape -->
+            android:textSize="32sp" />
     </LinearLayout>
 
+    <!-- SafeCharge Container remains unchanged -->
     <LinearLayout
         android:id="@+id/safeChargeLabelContainer"
         android:layout_width="wrap_content"
@@ -78,16 +77,16 @@
             android:fontFamily="@font/productsansitalic"
             android:text="SafeCharge"
             android:textColor="#808080"
-            android:textSize="18sp" /> <!-- Bigger for landscape -->
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/batteryPercentLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="8dp"
             android:fontFamily="@font/productsansitalic"
             android:text="85%"
             android:textColor="#808080"
-            android:textSize="18sp" /> <!-- Bigger for landscape -->
+            android:textSize="18sp" />
     </LinearLayout>
 </FrameLayout>
