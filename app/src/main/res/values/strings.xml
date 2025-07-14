@@ -20,4 +20,5 @@
     <string name="stop_ringing">STOP RINGING</string>
     <string name="dismiss_alert_after_1_minute">Auto Dismiss Alerts</string>
     <string name="what_new">What\'s new in SafeCharge!</string>
+    <string name="start_daydream">Start DayDream</string>
 </resources>

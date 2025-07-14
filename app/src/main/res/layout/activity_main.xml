@@ -228,20 +228,45 @@
                 android:textColor="@color/md_theme_light_onSurface"
                 android:visibility="gone" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/batterySaveText"
-                style="@style/Widget.Material3.Chip.Assist.Elevated"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
-                android:fontFamily="@font/productsans"
-                android:text="@string/learn_more"
-                android:textColor="@color/md_theme_light_primary"
-                android:textSize="14sp"
-                app:chipBackgroundColor="@color/md_theme_light_surfaceVariant"
-                app:chipStrokeColor="@color/md_theme_light_primary"
-                app:chipStrokeWidth="1dp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/enableDaydreamBtn"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/productsans"
+                    android:text="@string/start_daydream"
+                    android:textAllCaps="false"
+                    android:textColor="@color/md_theme_light_primary"
+                    app:backgroundTint="@color/md_theme_light_surfaceVariant"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/md_theme_light_primary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/batterySaveText"
+                    style="@style/ThemeOverlay.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/productsans"
+                    android:text="@string/learn_more"
+                    android:textColor="@color/md_theme_light_primary"
+                    android:textSize="14sp"
+                    app:backgroundTint="@color/md_theme_light_surfaceVariant"
+                    app:chipBackgroundColor="@color/md_theme_light_surfaceVariant"
+                    app:chipStrokeColor="@color/md_theme_light_primary"
+                    app:chipStrokeWidth="1dp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/md_theme_light_primary" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

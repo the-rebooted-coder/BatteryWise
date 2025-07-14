@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -12,7 +13,6 @@
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" /> <!-- For Oppo Phones -->
     <uses-permission android:name="oppo.permission.OPPO_COMPONENT_SAFE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App.Starting"
         tools:targetApi="31">
+        <activity
+            android:name=".ScreenSaverActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".StopAlert"
             android:excludeFromRecents="true"
@@ -73,6 +77,7 @@
             <intent-filter>
                 <action android:name="android.service.dreams.DreamService" />
             </intent-filter>
+
             <meta-data
                 android:name="android.service.dream"
                 android:resource="@xml/dream_metadata" />
@@ -83,6 +88,7 @@
             android:exported="true"
             android:label="SafeCharge DayDream Settings"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
+
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"

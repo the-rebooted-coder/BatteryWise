@@ -39,7 +39,6 @@ import androidx.core.splashscreen.SplashScreen;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -288,7 +287,63 @@ public class MainActivity extends AppCompatActivity {
             stopSaving.setVisibility(View.GONE);
             hideSwitchToggle();
         }
-        Chip batterySaveText = findViewById(R.id.batterySaveText);
+        MaterialButton enableDaydreamBtn = findViewById(R.id.enableDaydreamBtn);
+        enableDaydreamBtn.setOnClickListener(v -> {
+            vibrate();
+            boolean isFirstTime = prefs.getBoolean("first_time_enable_daydream", true);
+
+            // Show a popup with two options: start screensaver OR set as phone screensaver
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Welcome to DayDream ☁️")
+                    .setMessage("Would you like to preview DayDream or set it as your phone's system screensaver?\n\nP.S. After setting as screensaver, allow your phone to be locked automatically for DayDream to kick-in, don't force lock using power button ;)")
+                    .setPositiveButton("Preview Screensaver", (dialog, which) -> {
+                        // Preview: first time always show intro with image, else just start activity
+                        if (isFirstTime) {
+                            prefs.edit().putBoolean("first_time_enable_daydream", false).apply();
+                            View dialogView = getLayoutInflater().inflate(R.layout.dialog_daydream_intro, null);
+                            new MaterialAlertDialogBuilder(this)
+                                    .setTitle("Welcome to DayDream ☁️")
+                                    .setView(dialogView)
+                                    .setCancelable(false)
+                                    .setPositiveButton("Try DayDream", (d, w) -> {
+                                        Intent intent = new Intent(this, ScreenSaverActivity.class);
+                                        startActivity(intent);
+                                    })
+                                    .setNegativeButton("Nope", null)
+                                    .show();
+                        } else {
+                            Intent intent = new Intent(this, ScreenSaverActivity.class);
+                            try {
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                new MaterialAlertDialogBuilder(this)
+                                        .setTitle("Hello DayDream ☁️")
+                                        .setMessage("SafeCharge DayDream brings a gentle, calming clock to your screen while charging. To experience this, open your device’s screensaver settings, find 'Day Dream', and select SafeCharge as your screensaver.\n\nDayDream will then start automatically while charging.")
+                                        .setPositiveButton("Open Screensaver Settings", (d, w) -> {
+                                            try {
+                                                Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
+                                                startActivity(settingsIntent);
+                                            } catch (Exception ex) {
+                                                Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
+                                            }
+                                        })
+                                        .setNegativeButton("OK", null)
+                                        .show();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Set as Phone Screensaver", (dialog, which) -> {
+                        // Always open daydream settings for this option
+                        try {
+                            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
+                            startActivity(settingsIntent);
+                        } catch (Exception ex) {
+                            Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .show();
+        });
+        MaterialButton batterySaveText = findViewById(R.id.batterySaveText);
         batterySaveText.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Important information about your battery")
@@ -297,29 +352,6 @@ public class MainActivity extends AppCompatActivity {
                         vibrate();
                         Intent intent = new Intent(MainActivity.this, About.class);
                         startActivity(intent);
-                    })
-                    .setNeutralButton("Start Screensaver", (dialog, which) -> {
-                        vibrate();
-                        Intent intent = new Intent(Intent.ACTION_MAIN);
-                        intent.setClassName(getPackageName(), "com.onesilicondiode.batterywise.SafeChargeDreamService");
-                        try {
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            // Show popup instructing user to select "Day Dream" in screensaver settings
-                            new MaterialAlertDialogBuilder(this)
-                                    .setTitle("Hello DayDream ☁️")
-                                    .setMessage("DayDream brings a gentle, calming clock to your screen while charging. To enjoy this relaxing experience, please open your device’s screensaver settings, find 'Day Dream', and select as your screensaver.\n\nDayDream then begins automatically when your device charges.")
-                                    .setPositiveButton("Open Screensaver Settings", (d, w) -> {
-                                        try {
-                                            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
-                                            startActivity(settingsIntent);
-                                        } catch (Exception ex) {
-                                            Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
-                                        }
-                                    })
-                                    .setNegativeButton("OK", null)
-                                    .show();
-                        }
                     })
                     .show();
         });
