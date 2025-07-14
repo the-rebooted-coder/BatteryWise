@@ -47,9 +47,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
-import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
@@ -149,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             vibrateTouch();
         });
 
-        if (sharedPreferences.getBoolean("isConfirmed", true)) {
+        if (!sharedPreferences.getBoolean("isConfirmed", true)) {
             showBottomSheet();
         }
 
@@ -467,13 +465,13 @@ public class MainActivity extends AppCompatActivity {
         final MaterialButton btnConfirm = bottomSheetView.findViewById(R.id.btnConfirm);
         btnConfirm.setOnClickListener(v -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isConfirmed", false);
+            editor.putBoolean("isConfirmed", true);
             editor.apply();
             bottomSheetDialog.dismiss();
         });
         bottomSheetDialog.setOnDismissListener(dialog -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isConfirmed", false);
+            editor.putBoolean("isConfirmed", true);
             editor.apply();
         });
         bottomSheetDialog.show();

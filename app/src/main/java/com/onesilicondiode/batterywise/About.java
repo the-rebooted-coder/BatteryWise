@@ -14,6 +14,8 @@ import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
@@ -22,9 +24,6 @@ import com.example.swipebutton_library.SwipeButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.shape.CornerFamily;
-
-import android.window.OnBackInvokedCallback;
-import android.window.OnBackInvokedDispatcher;
 
 public class About extends AppCompatActivity {
     SwipeButton moreAbout;
@@ -60,7 +59,7 @@ public class About extends AppCompatActivity {
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             String version = pInfo.versionName;
-            String productInfoText = version + "\n25.0";
+            String productInfoText = version + "\n35.0";
             versionInfo.setText(productInfoText);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
