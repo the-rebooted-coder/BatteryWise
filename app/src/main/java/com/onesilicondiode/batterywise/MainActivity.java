@@ -65,16 +65,14 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> requestNotificationPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
-                    // Permission granted, perform your action
                     Toast.makeText(this, "SafeCharge will not work, restart app to grant permission", Toast.LENGTH_LONG).show();
-
                 }
             });
     MaterialButton startSaving, stopSaving, oneMin, twoMin, threeMin, thirtySec;
     TextView productInfo;
     int selectedBatteryLevel = 85;
     private WaveLoadingView waveLoadingView;
-    private final float scaleFactorStretched = 1.2f; // Adjust the scaling factor as needed
+    private final float scaleFactorStretched = 1.2f;
     private final float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
     private boolean seekTouch = false;
@@ -84,19 +82,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String SWITCH_STATE = "switchState";
     private AppUpdateManager appUpdateManager;
     private ReviewManager reviewManager;
+
+    private static final String WAVE_COLOR_GREY = "#B0B0B0";
+    private static final String WAVE_COLOR_GREEN = "#006C49";
+    private static final String WAVE_COLOR_YELLOW = "#F6D3A1";
+    private static final String WAVE_COLOR_ORANGE = "#E4B284";
+    private static final String WAVE_COLOR_RED = "#FFB4AB";
+
     private MaterialSwitch switchToggle;
     private SharedPreferences sharedPreferences;
     private LinearLayout buttonToggleGroup;
     private MaterialButton currentSelectedButton;
-
-
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         reviewManager = ReviewManagerFactory.create(this);
         waveLoadingView = findViewById(R.id.waveLoadingView);
@@ -115,16 +112,9 @@ public class MainActivity extends AppCompatActivity {
         twoMin = findViewById(R.id.button_2m);
         threeMin = findViewById(R.id.button_3m);
         thirtySec = findViewById(R.id.button_45s);
-        InstallStateUpdatedListener installStateUpdatedListener = state -> {
-            if (state.installStatus() == InstallStatus.DOWNLOADED) {
-                // The update has been downloaded, trigger the installation
-                appUpdateManager.completeUpdate();
-            }
-        };
-        appUpdateManager.registerListener(installStateUpdatedListener);
         switchToggle = findViewById(R.id.switchToggle);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        // Load the previous state of the switch toggle from SharedPreferences
+
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
         boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
         int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
@@ -147,32 +137,26 @@ public class MainActivity extends AppCompatActivity {
         oneMin.setOnClickListener(v -> handleButtonSelection(oneMin, 1));
         twoMin.setOnClickListener(v -> handleButtonSelection(twoMin, 2));
         threeMin.setOnClickListener(v -> handleButtonSelection(threeMin, 3));
-        // Set a listener to save the state of the switch toggle in SharedPreferences when changed
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                // Switch is ON, show the segmented buttons
                 buttonToggleGroup.setVisibility(View.VISIBLE);
             } else {
-                // Switch is OFF, hide the segmented buttons
                 buttonToggleGroup.setVisibility(View.GONE);
             }
-            // Save the state of the switch toggle in SharedPreferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(SWITCH_STATE, isChecked);
             editor.apply();
             vibrateTouch();
         });
 
-        //Bottom Sheet What's New
         if (sharedPreferences.getBoolean("isConfirmed", true)) {
             showBottomSheet();
         }
-        // Check for app updates
+
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                     && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                // An update is available, and it can be installed immediately
                 try {
                     appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
@@ -184,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         int counter = getCounterFromSharedPreferences();
         startSaving = findViewById(R.id.saveBatteryBtn);
         stopSaving = findViewById(R.id.closeBatteryBtn);
@@ -194,23 +179,15 @@ public class MainActivity extends AppCompatActivity {
         manufacturer = Build.MANUFACTURER;
         BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
         int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        if (batteryPercent > 55) {
-            waveLoadingView.setWaveColor(Color.parseColor("#006C49"));
-            waveLoadingView.setProgressValue(batteryPercent);
-        } else if (batteryPercent > 40 && batteryPercent < 55) {
-            waveLoadingView.setWaveColor(Color.parseColor("#F6D3A1"));
-            waveLoadingView.setProgressValue(batteryPercent);
-        } else if (batteryPercent > 20 && batteryPercent < 40) {
-            waveLoadingView.setWaveColor(Color.parseColor("#E4B284"));
-            waveLoadingView.setProgressValue(batteryPercent);
-        } else if (batteryPercent > 1 && batteryPercent < 20) {
-            waveLoadingView.setWaveColor(Color.parseColor("#FFB4AB"));
-            waveLoadingView.setProgressValue(batteryPercent);
-        }
+        boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
+        setWaveColor(isServiceRunning, batteryPercent);
+        waveLoadingView.setProgressValue(batteryPercent);
+
         Slider batteryLevelSlider = findViewById(R.id.batteryLevelSlider);
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
+
         String productInfoText;
         if (selectedBatteryLevel > 98) {
             productInfoText = "Your " + manufacturer + " " + getString(R.string.productInfo_partThree);
@@ -225,6 +202,9 @@ public class MainActivity extends AppCompatActivity {
             public void onValueChange(Slider slider, float value, boolean fromUser) {
                 selectedBatteryLevel = (int) value;
                 waveLoadingView.setProgressValue(selectedBatteryLevel + 1);
+                if (isServiceRunning(BatteryMonitorService.class)) {
+                    setWaveColor(true, selectedBatteryLevel);
+                }
                 String progressText = selectedBatteryLevel + "%";
                 seekBarValueOverlay.setText(progressText);
                 vibrateTouch();
@@ -262,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 seekBarValueOverlay.setVisibility(View.GONE);
             }
         });
+
         final String PREF_SHARE_DIALOG_SHOWN = "share_dialog_shown";
         if (counter > 9) {
             SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -269,15 +250,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (!isShareDialogShown) {
                 showShareDialog();
-
-                // Mark the dialog as shown in SharedPreferences to avoid showing it again
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(PREF_SHARE_DIALOG_SHOWN, true);
                 editor.apply();
             }
         }
         productInfo.setText(productInfoText);
-        boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
         if (isServiceRunning) {
             startSaving.setVisibility(View.GONE);
             stopSaving.setVisibility(View.VISIBLE);
@@ -287,17 +265,16 @@ public class MainActivity extends AppCompatActivity {
             stopSaving.setVisibility(View.GONE);
             hideSwitchToggle();
         }
+
         MaterialButton enableDaydreamBtn = findViewById(R.id.enableDaydreamBtn);
         enableDaydreamBtn.setOnClickListener(v -> {
             vibrate();
             boolean isFirstTime = prefs.getBoolean("first_time_enable_daydream", true);
 
-            // Show a popup with two options: start screensaver OR set as phone screensaver
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Welcome to DayDream ☁️")
                     .setMessage("Would you like to preview DayDream or set it as your phone's system screensaver?\n\nP.S. After setting as screensaver, allow your phone to be locked automatically for DayDream to kick-in, don't force lock using power button ;)")
                     .setPositiveButton("Preview Screensaver", (dialog, which) -> {
-                        // Preview: first time always show intro with image, else just start activity
                         if (isFirstTime) {
                             prefs.edit().putBoolean("first_time_enable_daydream", false).apply();
                             View dialogView = getLayoutInflater().inflate(R.layout.dialog_daydream_intro, null);
@@ -333,7 +310,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     })
                     .setNegativeButton("Set as Phone Screensaver", (dialog, which) -> {
-                        // Always open daydream settings for this option
                         try {
                             Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
                             startActivity(settingsIntent);
@@ -343,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
                     })
                     .show();
         });
+
         MaterialButton batterySaveText = findViewById(R.id.batterySaveText);
         batterySaveText.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(this)
@@ -360,6 +337,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkNotificationPermission();
         }
+
         startSaving.setOnClickListener(view -> {
             try {
                 SharedPreferences.Editor editor = prefs.edit();
@@ -369,29 +347,28 @@ public class MainActivity extends AppCompatActivity {
                 boolean switchedState = sharedPreferences.getBoolean(SWITCH_STATE, false);
                 if (switchedState) {
                     buttonToggleGroup.setVisibility(View.VISIBLE);
-                    if (selectedTime != 1) {
-                        switch (selectedTime) {
-                            case 1:
-                                // Button for 1 minute
-                                oneMin.setChecked(true);
-                                break;
-                            case 2:
-                                // Button for 2 minutes
-                                twoMin.setChecked(true);
-                                break;
-                            case 3:
-                                // Button for 3 minutes
-                                threeMin.setChecked(true);
-                                break;
-                        }
+                    switch (selectedTime) {
+                        case 1:
+                            oneMin.setChecked(true);
+                            break;
+                        case 2:
+                            twoMin.setChecked(true);
+                            break;
+                        case 3:
+                            threeMin.setChecked(true);
+                            break;
                     }
                 } else {
                     buttonToggleGroup.setVisibility(View.GONE);
                 }
+                int currentBatteryPercent = getCurrentBatteryPercent();
+                setWaveColor(true, currentBatteryPercent);
+                waveLoadingView.setProgressValue(currentBatteryPercent);
             } catch (Exception e) {
                 showIntentErrorDialog();
             }
         });
+
         stopSaving.setOnClickListener(view -> {
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Disable SafeCharge?")
@@ -403,10 +380,12 @@ public class MainActivity extends AppCompatActivity {
                         startSaving.setVisibility(View.VISIBLE);
                         hideSwitchToggle();
                         vibrate();
+                        waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
         });
+
         if (counter > 0) {
             TextView usedTime;
             usedTime = findViewById(R.id.usedTime);
@@ -417,6 +396,11 @@ public class MainActivity extends AppCompatActivity {
                 usedTime.setText("SafeCharged " + counter + " times");
             }
         }
+    }
+
+    private int getCurrentBatteryPercent() {
+        BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
+        return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
     }
 
     private void handleButtonSelection(MaterialButton selectedButton, int timeValue) {
@@ -432,8 +416,8 @@ public class MainActivity extends AppCompatActivity {
 
         vibrateTouch();
 
-        // Only show message if auto-dismiss is enabled
-        if (switchToggle.isChecked()) {
+        // Only show message if auto-dismiss is enabled AND the service is running
+        if (switchToggle.isChecked() && isServiceRunning(BatteryMonitorService.class)) {
             String message = getDismissMessage(timeValue);
             Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
         }
@@ -476,43 +460,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showBottomSheet() {
-        // Inflate the layout for the Bottom Sheet Dialog
         View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_new, null);
-
-        // Create BottomSheetDialog
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(bottomSheetView);
-        // Get views from the Bottom Sheet layout
         final TextView textWhatsNew = bottomSheetView.findViewById(R.id.textWhatsNew);
         final MaterialButton btnConfirm = bottomSheetView.findViewById(R.id.btnConfirm);
-
-        // Set button click listener
         btnConfirm.setOnClickListener(v -> {
-            // Save user confirmation
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isConfirmed", false);
             editor.apply();
-
-            // Dismiss the Bottom Sheet Dialog
             bottomSheetDialog.dismiss();
         });
-        //On Dismiss
         bottomSheetDialog.setOnDismissListener(dialog -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isConfirmed", false);
             editor.apply();
         });
-        // Show the Bottom Sheet Dialog
         bottomSheetDialog.show();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == REQUEST_CODE_APP_UPDATE) {
             if (resultCode != RESULT_OK) {
                 //DO NOT REMOVE THIS
+            }
+        }
+    }
+
+    private void setWaveColor(boolean serviceEnabled, int batteryPercent) {
+        if (!serviceEnabled) {
+            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
+        } else {
+            if (batteryPercent > 55) {
+                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREEN));
+            } else if (batteryPercent > 40 && batteryPercent <= 55) {
+                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_YELLOW));
+            } else if (batteryPercent > 20 && batteryPercent <= 40) {
+                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_ORANGE));
+            } else if (batteryPercent > 1 && batteryPercent <= 20) {
+                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_RED));
+            } else {
+                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
             }
         }
     }
@@ -528,8 +518,7 @@ public class MainActivity extends AppCompatActivity {
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scaleX, scaleY);
-        animatorSet.setDuration(200); // Adjust the duration as needed
-
+        animatorSet.setDuration(200);
         animatorSet.start();
     }
 
@@ -549,31 +538,26 @@ public class MainActivity extends AppCompatActivity {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
         } else {
-            // For versions lower than Oreo
             vibrator.vibrate(pattern, -1);
         }
     }
 
     private void vibrateKeys() {
         long[] customPattern = {14, 0, 10, 9, 10, 15, 0, 11};
-        // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(customPattern, -1);
             vibrator.vibrate(vibrationEffect);
         } else {
-            // For versions lower than Oreo
             vibrator.vibrate(customPattern, -1);
         }
     }
 
     private void vibrateTouch() {
         long[] pattern = {7, 0, 8, 1, 6, 6, 6, 11, 5};
-        // Create a VibrationEffect
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
             vibrator.vibrate(vibrationEffect);
         } else {
-            // For versions lower than Oreo
             vibrator.vibrate(pattern, -1);
         }
     }
@@ -582,10 +566,8 @@ public class MainActivity extends AppCompatActivity {
         String permission = Manifest.permission.POST_NOTIFICATIONS;
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
         } else if (shouldShowRequestPermissionRationale(permission)) {
-            // Permission denied previously, show rationale dialog
             showPermissionRationaleDialog();
         } else {
-            // Request notification permission
             showPermissionRationaleDialog();
         }
     }
@@ -669,8 +651,7 @@ public class MainActivity extends AppCompatActivity {
         // Step 1: Battery optimization
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Step 1: Disable Battery Optimization")
-                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
-                        "• Find SafeCharge in the list\n" +
+                .setMessage("• Find SafeCharge in the list\n" +
                         "• Select 'Unrestricted' or 'Allow'\n\n" +
                         "After finishing, return to the app for step 2.")
                 .setCancelable(false)
@@ -691,12 +672,11 @@ public class MainActivity extends AppCompatActivity {
         View customSamsungView = getLayoutInflater().inflate(R.layout.custom_samsung_view, null);
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Step 2: Allow Background Activity")
-                .setMessage("Tap 'Open Settings'. In the next screen:\n" +
+                .setMessage(
                         "• Find 'Background usage limits'\n" +
-                        "• Click 'Never sleeping apps'\n" +
-                        "• Add 'SafeCharge' to the list\n\n" +
-                        "• Ignore if 'SafeCharge' is not present in the list\n" +
-                        "This helps SafeCharge work reliably even when your screen is off.")
+                                "• Click 'Never sleeping apps'\n" +
+                                "• Add 'SafeCharge' to the list\n" +
+                                "• Ignore if 'SafeCharge' is not present in the list\n")
                 .setCancelable(false)
                 .setView(customSamsungView)
                 .setPositiveButton("Open Settings", (dialog, which) -> {
@@ -954,25 +934,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void animateSwitchToggle() {
         switchToggle.setVisibility(View.VISIBLE);
-        float startY = -100f; // Adjust this value based on your desired starting position
-
-        // Define the animation - falling from a lower position
+        float startY = -100f;
         ObjectAnimator animator = ObjectAnimator.ofFloat(switchToggle, "translationY", startY, 0);
-        animator.setDuration(200); // Duration in milliseconds
+        animator.setDuration(200);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.start();
     }
 
     private void hideSwitchToggle() {
-        float endY = -100f; // Adjust this value based on your desired ending position
-        // Define the animation - moving upwards before disappearing
+        float endY = -100f;
         ObjectAnimator animator = ObjectAnimator.ofFloat(switchToggle, "translationY", 0, endY);
-        animator.setDuration(110); // Duration in milliseconds
+        animator.setDuration(110);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
                 switchToggle.setVisibility(View.GONE);
                 buttonToggleGroup.setVisibility(View.GONE);
             }
@@ -981,12 +957,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateSegmentedButtonVisibility(boolean switchState) {
-        if (switchState) {
-            // Switch is ON, show the segmented buttons
-            buttonToggleGroup.setVisibility(View.VISIBLE);
-        } else {
-            // Switch is OFF, hide the segmented buttons
-            buttonToggleGroup.setVisibility(View.GONE);
-        }
+        buttonToggleGroup.setVisibility(switchState ? View.VISIBLE : View.GONE);
+    }
+
+    public static int getThemeColor(Context context, int colorResId) {
+        TypedValue typedValue = new TypedValue();
+        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
+        int color = typedArray.getColor(0, 0);
+        typedArray.recycle();
+        return color;
     }
 }
