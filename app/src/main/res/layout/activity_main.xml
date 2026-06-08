@@ -17,8 +17,7 @@
         app:wlv_borderColor="@color/md_theme_light_primary"
         app:wlv_borderWidth="2dp"
         app:wlv_shapeType="rectangle"
-        app:wlv_waveAmplitude="20"
-        app:wlv_waveColor="#4CAF50" />
+        app:wlv_waveAmplitude="20" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/layoutHolder"

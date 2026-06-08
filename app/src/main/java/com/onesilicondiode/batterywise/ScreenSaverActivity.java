@@ -66,6 +66,14 @@ public class ScreenSaverActivity extends AppCompatActivity {
                     String formattedDate = new SimpleDateFormat("EEEE, d'" + suffix + "' MMMM", Locale.getDefault()).format(now);
                     clockDateView.setText(formattedDate);
                 }
+
+                // Live battery percentage update
+                if (batteryPercentLabel != null) {
+                    int batteryPercent = getBatteryPercentage();
+                    if (batteryPercent != -1) {
+                        batteryPercentLabel.setText(batteryPercent + "%");
+                    }
+                }
             }
             handler.postDelayed(this, 1000);
         }

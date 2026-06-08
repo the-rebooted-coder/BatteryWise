@@ -619,16 +619,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void animateSwitchToggle() {
         switchToggle.setVisibility(View.VISIBLE);
-        float startY = -100f;
-        ObjectAnimator animator = ObjectAnimator.ofFloat(switchToggle, "translationY", startY, 0);
+        switchToggle.setAlpha(0f);
+        switchToggle.setScaleY(0.8f);
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(switchToggle,
+                android.animation.PropertyValuesHolder.ofFloat("alpha", 0f, 1f),
+                android.animation.PropertyValuesHolder.ofFloat("scaleY", 0.8f, 1f));
         animator.setDuration(200);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.start();
     }
 
     private void hideSwitchToggle() {
-        float endY = -100f;
-        ObjectAnimator animator = ObjectAnimator.ofFloat(switchToggle, "translationY", 0, endY);
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(switchToggle,
+                android.animation.PropertyValuesHolder.ofFloat("alpha", 1f, 0f),
+                android.animation.PropertyValuesHolder.ofFloat("scaleY", 1f, 0.8f));
         animator.setDuration(110);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.addListener(new AnimatorListenerAdapter() {
