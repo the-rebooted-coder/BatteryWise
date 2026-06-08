@@ -13,7 +13,6 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
@@ -45,6 +44,9 @@ public class StopAlert extends AppCompatActivity {
     private WaveLoadingView stopLoadingView;
     private CountDownTimer countDownTimer;
     private BroadcastReceiver unplugReceiver;
+    // Guards to prevent double-incrementing the counter and double-releasing resources
+    private boolean counterIncremented = false;
+    private boolean colorChanged = false;
 
     public static int getThemeColor(Context context, int colorResId) {
         TypedValue typedValue = new TypedValue();
@@ -170,10 +172,8 @@ public class StopAlert extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG, "setupMusic: Error starting MediaPlayer", e);
         }
-        mediaPlayer.setOnCompletionListener(mp -> {
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
-            Log.d(TAG, "setupMusic: MediaPlayer completed, volume restored");
-        });
+        // Note: onCompletionListener will never fire while looping is true,
+        // so volume restore is handled in stopAlertAndCleanup() instead.
     }
 
     private void startAutoStopTimer(int selectedTime) {
@@ -203,17 +203,27 @@ public class StopAlert extends AppCompatActivity {
                 break;
         }
 
+        final long startTimeMs = System.currentTimeMillis();
+        colorChanged = false;
+
         countDownTimer = new CountDownTimer(duration, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int progress = (int) (millisUntilFinished * 100 / duration);
                 stopLoadingView.setProgressValue(progress);
-                new Handler().postDelayed(() -> {
-                    if (appName != null && belowAppName != null) {
-                        appName.setTextColor(Color.parseColor("#FFFFFF"));
-                        belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                // Change text color once after the delay using a time-delta check.
+                // Avoids spawning a new Handler on every tick (was creating ~180 handlers
+                // for a 3-minute timer, piling up in the message queue).
+                if (!colorChanged) {
+                    long elapsed = System.currentTimeMillis() - startTimeMs;
+                    if (elapsed >= textColorChangeDelay) {
+                        colorChanged = true;
+                        if (appName != null && belowAppName != null) {
+                            appName.setTextColor(Color.parseColor("#FFFFFF"));
+                            belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
+                        }
                     }
-                }, textColorChangeDelay);
+                }
             }
 
             @Override
@@ -242,23 +252,39 @@ public class StopAlert extends AppCompatActivity {
 
     private void stopAlertAndCleanup() {
         Log.d(TAG, "stopAlertAndCleanup: Cleaning up resources");
-        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
+        // Cancel the countdown timer if it's still running (prevents double-fire)
         if (countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
         }
+        NotificationManagerCompat.from(this).cancel(STOP_ACTION_NOTIFICATION_ID);
         if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+            } catch (IllegalStateException ignored) {
+                // MediaPlayer was already in an invalid state
             }
             mediaPlayer.release();
             mediaPlayer = null;
         }
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("counter", currentValue + 1);
-        editor.apply();
+        // Restore the user's original media volume
+        try {
+            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, previousVolume, 0);
+            }
+        } catch (Exception ignored) {
+            // Best-effort volume restore
+        }
+        // Increment the SafeCharged counter exactly once across all exit paths
+        if (!counterIncremented) {
+            counterIncremented = true;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("counter", currentValue + 1);
+            editor.apply();
+        }
         finish();
     }
 

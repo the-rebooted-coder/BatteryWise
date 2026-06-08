@@ -34,6 +34,12 @@ public class BatteryMonitorService extends Service {
     private static final String ALERT_PLAYED_KEY = "alertPlayed";
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
 
+    /**
+     * Static flag for MainActivity to check service state without using the
+     * deprecated ActivityManager.getRunningServices() API (unreliable on API 26+).
+     */
+    public static boolean isRunning = false;
+
     private static final boolean DEFAULT_USER_STARTED = false;
     private static final String TAG = "BatteryMonitorService";
     private SharedPreferences prefs;
@@ -50,11 +56,15 @@ public class BatteryMonitorService extends Service {
         // Fix 2: App updated - make service STICKY so it restarts after update
         // This is handled in onStartCommand below
 
+        // Mark service as running (for MainActivity state check and BootReceiver guard)
+        isRunning = true;
+
         // Initialize SharedPreferences
         prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(USER_STARTED_KEY, false);
         editor.putBoolean(ALERT_PLAYED_KEY, false);
+        editor.putBoolean("serviceRunning", true); // Persisted for BootReceiver on reboot/update
         editor.apply();
 
         // Create notification channel for StopAlert
@@ -205,8 +215,17 @@ public class BatteryMonitorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        // Mark service as stopped
+        isRunning = false;
+        if (prefs != null) {
+            prefs.edit().putBoolean("serviceRunning", false).apply();
+        }
         if (batteryReceiver != null) {
-            unregisterReceiver(batteryReceiver);
+            try {
+                unregisterReceiver(batteryReceiver);
+            } catch (IllegalArgumentException ignored) {
+                // Receiver was already unregistered
+            }
             batteryReceiver = null;
             Log.d(TAG, "onDestroy: Unregistered batteryReceiver");
         }

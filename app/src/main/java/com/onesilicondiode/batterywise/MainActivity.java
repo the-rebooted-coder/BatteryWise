@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -521,13 +520,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
+        // Uses the static flag set by BatteryMonitorService in its onCreate/onDestroy,
+        // replacing the deprecated ActivityManager.getRunningServices() API (unreliable on API 26+).
+        return BatteryMonitorService.isRunning;
     }
 
     private void vibrate() {
