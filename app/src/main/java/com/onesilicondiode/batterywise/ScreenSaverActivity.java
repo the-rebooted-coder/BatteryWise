@@ -126,18 +126,27 @@ public class ScreenSaverActivity extends AppCompatActivity {
         if (clockDateView != null) {
             clockDateView.setTextColor(color);
         }
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         updateClockRunnable.run();
         moveClockRunnable.run();
         moveSafeChargeRunnable.run();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         handler.removeCallbacks(updateClockRunnable);
         handler.removeCallbacks(moveClockRunnable);
         handler.removeCallbacks(moveSafeChargeRunnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private String getDaySuffix(int day) {
@@ -200,6 +209,12 @@ public class ScreenSaverActivity extends AppCompatActivity {
 
     private void animateSafeChargeMove() {
         if (safeChargeLabelContainer == null || rootLayout == null) return;
+
+        int offset;
+        do {
+            offset = random.nextInt(SAFECHARGE_OFFSET_PX * 2 + 1) - SAFECHARGE_OFFSET_PX;
+        } while (offset == safeChargePrevOffset);
+        safeChargePrevOffset = offset;
 
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(safeChargeLabelContainer, "alpha", 0.9f, 0f);
         fadeOut.setDuration(SAFECHARGE_FADE_OUT);

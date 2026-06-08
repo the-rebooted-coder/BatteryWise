@@ -62,8 +62,10 @@
             android:name=".BatteryMonitorService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse"
-            android:value="Required to run the Battery Monitor Service and alert user of overcharging.">
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Required to run the Battery Monitor Service and alert user of overcharging." />
             <intent-filter>
                 <action android:name="com.onesilicondiode.batterywise.STOP_ACTION" />
             </intent-filter>
