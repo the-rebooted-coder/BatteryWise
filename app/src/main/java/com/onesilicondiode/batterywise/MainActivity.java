@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         reviewManager = ReviewManagerFactory.create(this);
         waveLoadingView = findViewById(R.id.waveLoadingView);
+        int primaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorPrimary);
+        waveLoadingView.setBorderColor(primaryColor);
         buttonToggleGroup = findViewById(R.id.buttonToggleGroup);
         appUpdateManager = AppUpdateManagerFactory.create(this);
         oneMin = findViewById(R.id.button_1m);
@@ -408,9 +410,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleButtonSelection(MaterialButton selectedButton, int timeValue, boolean showSnackbar) {
         resetAllButtons();
-        selectedButton.setBackgroundColor(ContextCompat.getColor(this, R.color.md_theme_light_primary));
-        selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white));
-        selectedButton.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.md_theme_light_primary)));
+        int primaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorPrimary);
+        int onPrimaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnPrimary);
+        selectedButton.setBackgroundColor(primaryColor);
+        selectedButton.setTextColor(onPrimaryColor);
+        selectedButton.setStrokeColor(ColorStateList.valueOf(primaryColor));
 
         currentSelectedButton = selectedButton;
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -442,8 +446,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetAllButtons() {
-        int defaultTextColor = ContextCompat.getColor(this, R.color.md_theme_light_onSurface);
-        int strokeColor = ContextCompat.getColor(this, R.color.md_theme_light_primary);
+        int defaultTextColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurface);
+        int strokeColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOutline);
 
         thirtySec.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
         thirtySec.setTextColor(defaultTextColor);

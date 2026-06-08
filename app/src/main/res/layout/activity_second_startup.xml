@@ -28,6 +28,7 @@
         android:paddingEnd="20dp"
         android:text="@string/productInfo"
         android:textAlignment="center"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="21sp" />
 
     <TextView
@@ -51,7 +52,7 @@
         android:fontFamily="@font/productsans"
         android:text="@string/learn_how_safecharge_helps"
         android:textAlignment="center"
-        android:textColor="#37608F" />
+        android:textColor="?attr/colorPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -74,6 +75,7 @@
                 android:paddingEnd="50dp"
                 android:text="@string/disclaimer_extended"
                 android:textAlignment="center"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="16sp"
                 android:visibility="gone" />
         </LinearLayout>
@@ -87,5 +89,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
         android:fontFamily="@font/psb"
-        android:text="START" />
+        android:text="START"
+        android:textColor="?attr/colorOnPrimary"
+        app:backgroundTint="?attr/colorPrimary"
+        app:cornerRadius="24dp" />
 </RelativeLayout>

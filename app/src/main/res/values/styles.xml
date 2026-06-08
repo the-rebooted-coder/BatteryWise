@@ -10,7 +10,7 @@
     <style name="ToggleButtonGroupStyleDark" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="backgroundTint">@color/custom_selectordark</item>
     </style>
-    <style name="Theme.Transparents" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.Transparents" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/trasnslucent</item>
         <item name="android:windowContentOverlay">@null</item>

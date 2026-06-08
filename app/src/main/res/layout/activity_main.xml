@@ -5,7 +5,7 @@
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_theme_light_background"
+    android:background="?attr/colorSurface"
     tools:context=".MainActivity">
 
     <me.itangqi.waveloadingview.WaveLoadingView
@@ -15,7 +15,7 @@
         android:layout_gravity="top"
         app:layout_constraintTop_toTopOf="parent"
         app:wlv_borderColor="@color/md_theme_light_primary"
-        app:wlv_borderWidth="2dp"
+        app:wlv_borderWidth="1dp"
         app:wlv_shapeType="rectangle"
         app:wlv_waveAmplitude="20" />
 
@@ -25,9 +25,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="16dp"
-        app:cardBackgroundColor="@color/md_theme_light_surface"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp">
+        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="8dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorSurfaceVariant">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,7 +46,7 @@
                 android:fontFamily="@font/productsansbold"
                 android:text="@string/productInfo"
                 android:textAlignment="center"
-                android:textColor="@color/md_theme_light_onSurface"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -52,9 +54,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/md_theme_light_surfaceVariant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -70,7 +73,7 @@
                         android:layout_marginBottom="8dp"
                         android:fontFamily="@font/productsansbold"
                         android:text="0%"
-                        android:textColor="@color/md_theme_light_onSurface"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         android:visibility="gone" />
 
@@ -83,9 +86,9 @@
                         android:valueFrom="80.0"
                         android:valueTo="99.0"
                         app:labelBehavior="gone"
-                        app:thumbColor="@color/md_theme_light_primary"
-                        app:trackColorActive="@color/md_theme_light_primary"
-                        app:trackColorInactive="@color/md_theme_light_surfaceVariant" />
+                        app:thumbColor="?attr/colorPrimary"
+                        app:trackColorActive="?attr/colorPrimary"
+                        app:trackColorInactive="?attr/colorSurfaceVariant" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -96,19 +99,19 @@
                 android:layout_marginBottom="16dp"
                 android:fontFamily="@font/productsans"
                 android:text="@string/dismiss_alert_after_1_minute"
-                android:textColor="@color/md_theme_light_onSurface"
+                android:textColor="?attr/colorOnSurface"
                 android:visibility="gone"
-                app:thumbTint="@color/md_theme_light_primary"
-                app:trackTint="@color/md_theme_light_surfaceVariant" />
+                app:thumbTint="?attr/colorPrimary"
+                app:trackTint="?attr/colorSurfaceVariant" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/md_theme_light_surfaceVariant"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/md_theme_light_primary"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -135,9 +138,9 @@
                             android:fontFamily="@font/productsans"
                             android:text="30 secs"
                             android:textAllCaps="false"
-                            android:textColor="@color/md_theme_light_onSurface"
-                            app:cornerRadius="8dp"
-                            app:strokeColor="@color/md_theme_light_primary" />
+                            android:textColor="?attr/colorOnSurface"
+                            app:cornerRadius="16dp"
+                            app:strokeColor="?attr/colorOutline" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/button_1m"
@@ -148,9 +151,9 @@
                             android:fontFamily="@font/productsans"
                             android:text="1 min"
                             android:textAllCaps="false"
-                            android:textColor="@color/md_theme_light_onSurface"
-                            app:cornerRadius="8dp"
-                            app:strokeColor="@color/md_theme_light_primary" />
+                            android:textColor="?attr/colorOnSurface"
+                            app:cornerRadius="16dp"
+                            app:strokeColor="?attr/colorOutline" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -168,9 +171,9 @@
                             android:fontFamily="@font/productsans"
                             android:text="2 min"
                             android:textAllCaps="false"
-                            android:textColor="@color/md_theme_light_onSurface"
-                            app:cornerRadius="8dp"
-                            app:strokeColor="@color/md_theme_light_primary" />
+                            android:textColor="?attr/colorOnSurface"
+                            app:cornerRadius="16dp"
+                            app:strokeColor="?attr/colorOutline" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/button_3m"
@@ -181,9 +184,9 @@
                             android:fontFamily="@font/productsans"
                             android:text="3 min"
                             android:textAllCaps="false"
-                            android:textColor="@color/md_theme_light_onSurface"
-                            app:cornerRadius="8dp"
-                            app:strokeColor="@color/md_theme_light_primary" />
+                            android:textColor="?attr/colorOnSurface"
+                            app:cornerRadius="16dp"
+                            app:strokeColor="?attr/colorOutline" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -197,9 +200,9 @@
                 android:fontFamily="@font/productsans"
                 android:text="@string/enable"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
-                app:backgroundTint="@color/md_theme_light_primary"
-                app:cornerRadius="12dp" />
+                android:textColor="?attr/colorOnPrimary"
+                app:backgroundTint="?attr/colorPrimary"
+                app:cornerRadius="24dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/closeBatteryBtn"
@@ -210,10 +213,10 @@
                 android:fontFamily="@font/productsans"
                 android:text="@string/disable"
                 android:textAllCaps="false"
-                android:textColor="@color/md_theme_light_onSurface"
+                android:textColor="?attr/colorOnSurface"
                 android:visibility="gone"
-                app:cornerRadius="12dp"
-                app:strokeColor="@color/md_theme_light_primary" />
+                app:cornerRadius="24dp"
+                app:strokeColor="?attr/colorOutline" />
 
             <TextView
                 android:id="@+id/usedTime"
@@ -224,7 +227,7 @@
                 android:fontFamily="@font/productsansbold"
                 android:text="Used"
                 android:textAlignment="center"
-                android:textColor="@color/md_theme_light_onSurface"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -243,10 +246,10 @@
                     android:fontFamily="@font/productsans"
                     android:text="@string/start_daydream"
                     android:textAllCaps="false"
-                    android:textColor="@color/md_theme_light_primary"
-                    app:backgroundTint="@color/md_theme_light_surfaceVariant"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/md_theme_light_primary" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    app:backgroundTint="?attr/colorSurfaceVariant"
+                    app:cornerRadius="24dp"
+                    app:strokeColor="?attr/colorOutlineVariant" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/batterySaveText"
@@ -257,14 +260,14 @@
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/productsans"
                     android:text="@string/learn_more"
-                    android:textColor="@color/md_theme_light_primary"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp"
-                    app:backgroundTint="@color/md_theme_light_surfaceVariant"
-                    app:chipBackgroundColor="@color/md_theme_light_surfaceVariant"
-                    app:chipStrokeColor="@color/md_theme_light_primary"
+                    app:backgroundTint="?attr/colorSurfaceVariant"
+                    app:chipBackgroundColor="?attr/colorSurfaceVariant"
+                    app:chipStrokeColor="?attr/colorOutlineVariant"
                     app:chipStrokeWidth="1dp"
-                    app:cornerRadius="12dp"
-                    app:strokeColor="@color/md_theme_light_primary" />
+                    app:cornerRadius="24dp"
+                    app:strokeColor="?attr/colorOutlineVariant" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
