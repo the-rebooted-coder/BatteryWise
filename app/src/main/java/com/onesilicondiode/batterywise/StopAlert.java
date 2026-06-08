@@ -39,7 +39,6 @@ public class StopAlert extends AppCompatActivity {
     private int previousVolume;
     private SharedPreferences sharedPreferences, sharedMyPrefs;
     private boolean shouldAutoStop;
-    private Vibrator vibrator;
     private int currentValue;
     private WaveLoadingView stopLoadingView;
     private CountDownTimer countDownTimer;
@@ -48,21 +47,13 @@ public class StopAlert extends AppCompatActivity {
     private boolean counterIncremented = false;
     private boolean colorChanged = false;
 
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Starting StopAlert activity");
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(ThemeUtils.getThemeColor(this, android.R.attr.colorPrimaryDark));
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -116,8 +107,6 @@ public class StopAlert extends AppCompatActivity {
             belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
             stopLoadingView.setVisibility(View.GONE);
         }
-
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         // Register receiver for unplug event (auto-dismiss if unplugged)
         unplugReceiver = new BroadcastReceiver() {
@@ -236,18 +225,9 @@ public class StopAlert extends AppCompatActivity {
     }
 
     private void vibrate() {
-        if (vibrator != null && vibrator.hasVibrator()) {
-            long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3};
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-                vibrator.vibrate(vibrationEffect);
-            } else {
-                vibrator.vibrate(pattern, -1);
-            }
-            Log.d(TAG, "vibrate: Vibration triggered");
-        } else {
-            Log.w(TAG, "vibrate: Vibrator not available");
-        }
+        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3};
+        HapticUtils.playCustomVibration(this, pattern);
+        Log.d(TAG, "vibrate: Vibration triggered");
     }
 
     private void stopAlertAndCleanup() {

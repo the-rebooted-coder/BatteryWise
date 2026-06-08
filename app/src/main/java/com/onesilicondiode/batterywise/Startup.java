@@ -32,22 +32,13 @@ public class Startup extends AppCompatActivity {
     TextView appName;
     SwipeButton startApp;
     RipplePulseLayout mRipplePulseLayout;
-    private Vibrator vibrator;
-
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(ThemeUtils.getThemeColor(this, android.R.attr.colorPrimaryDark));
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         boolean firstLaunch = settings.getBoolean(FIRST_LAUNCH_KEY, true);
         if(!firstLaunch){
@@ -57,7 +48,6 @@ public class Startup extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         ImageView sharedImageView = findViewById(R.id.sharedImageView);
         appName = findViewById(R.id.appName);
         startApp = findViewById(R.id.startButton);
@@ -96,22 +86,7 @@ public class Startup extends AppCompatActivity {
     }
 
     private void vibrate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            vibrator.vibrate(
-                    VibrationEffect.startComposition()
-                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.3f)
-                            .addPrimitive(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL, 0.3f)
-                            .compose());
-        } else {
-            long[] pattern = {5,0,5,0,5,1,5,1,5,2,5,2,5,3,5,4,5,4,5,5,5,6,5,6,5,7,5,8,5,8,5,9,5,10,5,10,5,11,5,11,5,12,5,13,5,13,5,14,5,14,5,15,5,15,5,16,5,16,5,17,5,17,5,17,5,18,5,18,5,19,5,19,5,19,5,20,5,20,5,20,5};
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-                vibrator.vibrate(vibrationEffect);
-            } else {
-                // For versions lower than Oreo
-                vibrator.vibrate(pattern, -1);
-            }
-        }
+        long[] pattern = {5,0,5,0,5,1,5,1,5,2,5,2,5,3,5,4,5,4,5,5,5,6,5,6,5,7,5,8,5,8,5,9,5,10,5,10,5,11,5,11,5,12,5,13,5,13,5,14,5,14,5,15,5,15,5,16,5,16,5,17,5,17,5,17,5,18,5,18,5,19,5,19,5,19,5,20,5,20,5,20,5};
+        HapticUtils.playStartupVibration(this, pattern);
     }
 }

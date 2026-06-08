@@ -28,30 +28,20 @@ import com.google.android.material.shape.CornerFamily;
 public class About extends AppCompatActivity {
     SwipeButton moreAbout;
     TextView versionInfo, privacyPolicy, openSource;
-    private Vibrator vibrator;
     ImageView osdLogo;
 
     // Predictive back callback for Android 13+ (U+)
     private OnBackInvokedCallback predictiveBackCallback;
-
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(ThemeUtils.getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         moreAbout = findViewById(R.id.moreAboutSS);
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         privacyPolicy = findViewById(R.id.privacyP);
         openSource = findViewById(R.id.openSourceLicense);
         versionInfo = findViewById(R.id.versionName);
@@ -138,31 +128,16 @@ public class About extends AppCompatActivity {
 
     private void vibrate() {
         long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5};
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-            vibrator.vibrate(vibrationEffect);
-        } else {
-            vibrator.vibrate(pattern, -1);
-        }
+        HapticUtils.playCustomVibration(this, pattern);
     }
 
     private void vibrateOSD() {
         long[] pattern = {17, 4, 14, 17, 0, 22, 21, 8, 22, 0, 18, 0, 16};
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-            vibrator.vibrate(vibrationEffect);
-        } else {
-            vibrator.vibrate(pattern, -1);
-        }
+        HapticUtils.playCustomVibration(this, pattern);
     }
 
     private void vibrateOtherButton() {
         long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3};
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-            vibrator.vibrate(vibrationEffect);
-        } else {
-            vibrator.vibrate(pattern, -1);
-        }
+        HapticUtils.playCustomVibration(this, pattern);
     }
 }

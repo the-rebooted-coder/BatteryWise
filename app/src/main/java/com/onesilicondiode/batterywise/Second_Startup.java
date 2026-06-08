@@ -30,16 +30,6 @@ public class Second_Startup extends AppCompatActivity {
     private static final String FIRST_LAUNCH_KEY = "firstLaunch";
     MaterialButton finalLaunch;
     private TextView moreProductInfo, learnMore;
-    private Vibrator vibrator;
-
-
-    public static int getThemeColor(Context context, int colorResId) {
-        TypedValue typedValue = new TypedValue();
-        TypedArray typedArray = context.obtainStyledAttributes(typedValue.data, new int[]{colorResId});
-        int color = typedArray.getColor(0, 0);
-        typedArray.recycle();
-        return color;
-    }
 
     @Override
     public void onBackPressed() {
@@ -54,11 +44,10 @@ public class Second_Startup extends AppCompatActivity {
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(ThemeUtils.getThemeColor(this, android.R.attr.colorPrimaryDark));
         super.onCreate(savedInstanceState);
         getWindow().setEnterTransition(null);
         setContentView(R.layout.activity_second_startup);
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         moreProductInfo = findViewById(R.id.moreProductInfo);
         finalLaunch = findViewById(R.id.finalLaunch);
         finalLaunch.setOnClickListener(new View.OnClickListener() {
@@ -97,13 +86,6 @@ public class Second_Startup extends AppCompatActivity {
 
     private void vibrate() {
         long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3, 10, 5, 0, 6, 0, 7, 11, 9, 14, 10, 13, 10, 11, 11, 0, 11, 11, 11, 11, 11, 13, 11, 14, 10, 10, 10, 0, 10, 11, 10, 14, 9, 10, 9, 11, 10, 0, 10, 10, 11, 13, 11, 11, 13, 12, 14, 11, 15, 0, 17, 10, 18, 11, 20, 13, 21, 13, 23, 11, 24, 10, 25, 16};
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            VibrationEffect vibrationEffect = VibrationEffect.createWaveform(pattern, -1);
-            vibrator.vibrate(vibrationEffect);
-        } else {
-            // For versions lower than Oreo
-            vibrator.vibrate(pattern, -1);
-        }
+        HapticUtils.playCustomVibration(this, pattern);
     }
 }
