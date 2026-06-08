@@ -113,27 +113,27 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
-        boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, true);
+        boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, false);
         int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
         switch (selectedTime) {
             case 1:
-                handleButtonSelection(oneMin, 1);
+                handleButtonSelection(oneMin, 1, false);
                 break;
             case 2:
-                handleButtonSelection(twoMin, 2);
+                handleButtonSelection(twoMin, 2, false);
                 break;
             case 3:
-                handleButtonSelection(threeMin, 3);
+                handleButtonSelection(threeMin, 3, false);
                 break;
             case 4:
-                handleButtonSelection(thirtySec, 4);
+                handleButtonSelection(thirtySec, 4, false);
                 break;
         }
         updateSegmentedButtonVisibility(switchState);
-        thirtySec.setOnClickListener(v -> handleButtonSelection(thirtySec, 4));
-        oneMin.setOnClickListener(v -> handleButtonSelection(oneMin, 1));
-        twoMin.setOnClickListener(v -> handleButtonSelection(twoMin, 2));
-        threeMin.setOnClickListener(v -> handleButtonSelection(threeMin, 3));
+        thirtySec.setOnClickListener(v -> handleButtonSelection(thirtySec, 4, true));
+        oneMin.setOnClickListener(v -> handleButtonSelection(oneMin, 1, true));
+        twoMin.setOnClickListener(v -> handleButtonSelection(twoMin, 2, true));
+        threeMin.setOnClickListener(v -> handleButtonSelection(threeMin, 3, true));
         switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 buttonToggleGroup.setVisibility(View.VISIBLE);
@@ -254,6 +254,12 @@ public class MainActivity extends AppCompatActivity {
         }
         productInfo.setText(productInfoText);
         if (isServiceRunning) {
+            Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
             startSaving.setVisibility(View.GONE);
             stopSaving.setVisibility(View.VISIBLE);
             animateSwitchToggle();
@@ -400,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
         return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
     }
 
-    private void handleButtonSelection(MaterialButton selectedButton, int timeValue) {
+    private void handleButtonSelection(MaterialButton selectedButton, int timeValue, boolean showSnackbar) {
         resetAllButtons();
         selectedButton.setBackgroundColor(ContextCompat.getColor(this, R.color.md_theme_light_primary));
         selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white));
@@ -414,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
         vibrateTouch();
 
         // Only show message if auto-dismiss is enabled AND the service is running
-        if (switchToggle.isChecked() && isServiceRunning(BatteryMonitorService.class)) {
+        if (showSnackbar && switchToggle.isChecked() && isServiceRunning(BatteryMonitorService.class)) {
             String message = getDismissMessage(timeValue);
             Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
         }
@@ -520,9 +526,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {
-        // Uses the static flag set by BatteryMonitorService in its onCreate/onDestroy,
-        // replacing the deprecated ActivityManager.getRunningServices() API (unreliable on API 26+).
-        return BatteryMonitorService.isRunning;
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+        return prefs.getBoolean("serviceRunning", false);
     }
 
     private void vibrate() {
