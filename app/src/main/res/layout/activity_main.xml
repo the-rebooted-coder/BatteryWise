@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
@@ -8,267 +8,148 @@
     android:background="?attr/colorSurface"
     tools:context=".MainActivity">
 
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- LAYER 1 · The Living Wave — full-screen canvas  -->
+    <!-- ═══════════════════════════════════════════════ -->
     <me.itangqi.waveloadingview.WaveLoadingView
         android:id="@+id/waveLoadingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="top"
-        app:layout_constraintTop_toTopOf="parent"
         app:wlv_borderColor="@color/md_theme_light_primary"
-        app:wlv_borderWidth="1dp"
+        app:wlv_borderWidth="0dp"
         app:wlv_shapeType="rectangle"
-        app:wlv_waveAmplitude="20" />
+        app:wlv_waveAmplitude="18" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/layoutHolder"
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- LAYER 2 · Transparent overlay with all UI       -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-        app:cardCornerRadius="32dp"
-        app:cardElevation="8dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="?attr/colorSurfaceVariant">
+        android:layout_height="match_parent">
 
+        <!-- ─── TOP BAR ─── -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/topBarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="56dp"
+            android:fontFamily="@font/productsansbold"
+            android:text="SafeCharge"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="22sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/settingsIconBtn"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="16dp"
+            app:icon="@drawable/more_information"
+            app:iconTint="?attr/colorOnSurfaceVariant" />
+
+        <!-- ─── CENTER BLOCK · hero number + labels ─── -->
+        <LinearLayout
+            android:id="@+id/heroCenterBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="-48dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- 80sp hero battery percentage -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/heroBatteryNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsansbold"
+                android:text="—%"
+                android:textColor="#FFFFFF"
+                android:textSize="80sp" />
+
+            <!-- "Current battery" subtitle -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/heroSubLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsans"
+                android:text="Current battery"
+                android:textColor="#B3FFFFFF"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- ─── BOTTOM BLOCK · pill + buttons + ghost link ─── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="24dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
 
-            <TextView
-                android:id="@+id/productInfo"
+            <!-- Status pill — animated in when monitoring starts -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/statusPill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="@font/productsansbold"
-                android:text="@string/productInfo"
-                android:textAlignment="center"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
-                app:cardCornerRadius="24dp"
+                android:layout_marginBottom="12dp"
+                android:alpha="0"
+                android:visibility="invisible"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/seekBarValueOverlay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="8dp"
-                        android:fontFamily="@font/productsansbold"
-                        android:text="0%"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="16sp"
-                        android:visibility="gone" />
-
-                    <com.google.android.material.slider.Slider
-                        android:id="@+id/batteryLevelSlider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:value="85.0"
-                        android:valueFrom="80.0"
-                        android:valueTo="99.0"
-                        app:labelBehavior="gone"
-                        app:thumbColor="?attr/colorPrimary"
-                        app:trackColorActive="?attr/colorPrimary"
-                        app:trackColorInactive="?attr/colorSurfaceVariant" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/switchToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="@font/productsans"
-                android:text="@string/dismiss_alert_after_1_minute"
-                android:textColor="?attr/colorOnSurface"
-                android:visibility="gone"
-                app:thumbTint="?attr/colorPrimary"
-                app:trackTint="?attr/colorSurfaceVariant" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:id="@+id/buttonToggleGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_45s"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="4dp"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/productsans"
-                            android:text="30 secs"
-                            android:textAllCaps="false"
-                            android:textColor="?attr/colorOnSurface"
-                            app:cornerRadius="16dp"
-                            app:strokeColor="?attr/colorOutline" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_1m"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/productsans"
-                            android:text="1 min"
-                            android:textAllCaps="false"
-                            android:textColor="?attr/colorOnSurface"
-                            app:cornerRadius="16dp"
-                            app:strokeColor="?attr/colorOutline" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_2m"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="4dp"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/productsans"
-                            android:text="2 min"
-                            android:textAllCaps="false"
-                            android:textColor="?attr/colorOnSurface"
-                            app:cornerRadius="16dp"
-                            app:strokeColor="?attr/colorOutline" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/button_3m"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/productsans"
-                            android:text="3 min"
-                            android:textAllCaps="false"
-                            android:textColor="?attr/colorOnSurface"
-                            app:cornerRadius="16dp"
-                            app:strokeColor="?attr/colorOutline" />
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/saveBatteryBtn"
-                style="@style/Widget.Material3.Button.ElevatedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/productsans"
-                android:text="@string/enable"
-                android:textAllCaps="false"
-                android:textColor="?attr/colorOnPrimary"
-                app:backgroundTint="?attr/colorPrimary"
-                app:cornerRadius="24dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/closeBatteryBtn"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/productsans"
-                android:text="@string/disable"
-                android:textAllCaps="false"
-                android:textColor="?attr/colorOnSurface"
-                android:visibility="gone"
-                app:cornerRadius="24dp"
-                app:strokeColor="?attr/colorOutline" />
-
-            <TextView
-                android:id="@+id/usedTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/productsansbold"
-                android:text="Used"
-                android:textAlignment="center"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:visibility="gone" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/enableDaydreamBtn"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/productsans"
-                    android:text="@string/start_daydream"
-                    android:textAllCaps="false"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    app:backgroundTint="?attr/colorSurfaceVariant"
-                    app:cornerRadius="24dp"
-                    app:strokeColor="?attr/colorOutlineVariant" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/batterySaveText"
-                    style="@style/ThemeOverlay.Material3.Button.TonalButton"
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/statusPillText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="8dp"
                     android:fontFamily="@font/productsans"
-                    android:text="@string/learn_more"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp"
-                    app:backgroundTint="?attr/colorSurfaceVariant"
-                    app:chipBackgroundColor="?attr/colorSurfaceVariant"
-                    app:chipStrokeColor="?attr/colorOutlineVariant"
-                    app:chipStrokeWidth="1dp"
-                    app:cornerRadius="24dp"
-                    app:strokeColor="?attr/colorOutlineVariant" />
-            </LinearLayout>
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="10dp"
+                    android:text="● Monitoring"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:textSize="14sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Ghost settings link -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/settingsGhostLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/productsans"
+                android:padding="8dp"
+                android:text="≡  Settings"
+                android:textColor="#66FFFFFF"
+                android:textSize="13sp" />
+
+            <!-- Enable SafeCharge button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveBatteryBtn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:fontFamily="@font/productsans"
+                android:text="Enable SafeCharge"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="16sp"
+                app:backgroundTint="?attr/colorPrimary"
+                app:cornerRadius="30dp" />
+
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </RelativeLayout>
+
+</FrameLayout>

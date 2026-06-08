@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings_sheet_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="32dp">
+
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/drag_handle_shape"
+        android:alpha="0.4" />
+
+    <!-- Sheet Title -->
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/productsansbold"
+        android:text="Settings"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="22sp" />
+
+    <!-- ─────────────────────────────────── -->
+    <!-- THRESHOLD SECTION                  -->
+    <!-- ─────────────────────────────────── -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Section label -->
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsans"
+                android:letterSpacing="0.08"
+                android:text="ALERT THRESHOLD"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="11sp" />
+
+            <!-- Large threshold number -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/sheet_threshold_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/productsansbold"
+                android:text="85%"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="48sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/productsans"
+                android:text="Charge level to trigger alert"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp" />
+
+            <!-- Slider -->
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sheet_battery_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:value="85.0"
+                android:valueFrom="80.0"
+                android:valueTo="99.0"
+                app:labelBehavior="gone"
+                app:thumbColor="?attr/colorPrimary"
+                app:trackColorActive="?attr/colorPrimary"
+                app:trackColorInactive="?attr/colorSurfaceVariant"
+                app:trackHeight="6dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- ─────────────────────────────────── -->
+    <!-- AUTO DISMISS SECTION               -->
+    <!-- ─────────────────────────────────── -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Toggle row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/productsansbold"
+                        android:text="Auto Dismiss Alerts"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/productsans"
+                        android:text="Dismiss alert after a set time"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/sheet_switch_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:thumbTint="?attr/colorPrimary"
+                    app:trackTint="?attr/colorSurfaceVariant" />
+            </LinearLayout>
+
+            <!-- Time chips — only visible when switch ON -->
+            <HorizontalScrollView
+                android:id="@+id/sheet_time_chips_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sheet_btn_30s"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:fontFamily="@font/productsans"
+                        android:minWidth="0dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="30 sec"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/colorOnSurface"
+                        app:cornerRadius="20dp"
+                        app:strokeColor="?attr/colorOutline" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sheet_btn_1m"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:fontFamily="@font/productsans"
+                        android:minWidth="0dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="1 min"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/colorOnSurface"
+                        app:cornerRadius="20dp"
+                        app:strokeColor="?attr/colorOutline" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sheet_btn_2m"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:fontFamily="@font/productsans"
+                        android:minWidth="0dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="2 min"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/colorOnSurface"
+                        app:cornerRadius="20dp"
+                        app:strokeColor="?attr/colorOutline" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/sheet_btn_3m"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:fontFamily="@font/productsans"
+                        android:minWidth="0dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="3 min"
+                        android:textAllCaps="false"
+                        android:textColor="?attr/colorOnSurface"
+                        app:cornerRadius="20dp"
+                        app:strokeColor="?attr/colorOutline" />
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- ─────────────────────────────────── -->
+    <!-- UTILITY ROWS                       -->
+    <!-- ─────────────────────────────────── -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- DayDream row -->
+            <LinearLayout
+                android:id="@+id/sheet_daydream_row"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawablePadding="14dp"
+                    android:fontFamily="@font/productsans"
+                    android:gravity="center_vertical"
+                    android:text="DayDream Mode"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="15sp"
+                    app:drawableStartCompat="@drawable/ic_daydream"
+                    app:drawableTint="?attr/colorPrimary" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsans"
+                    android:text="›"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                app:dividerColor="?attr/colorOutlineVariant" />
+
+            <!-- More info row -->
+            <LinearLayout
+                android:id="@+id/sheet_info_row"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawablePadding="14dp"
+                    android:fontFamily="@font/productsans"
+                    android:gravity="center_vertical"
+                    android:text="Learn More"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="15sp"
+                    app:drawableStartCompat="@drawable/baseline_info_24"
+                    app:drawableTint="?attr/colorPrimary" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsans"
+                    android:text="›"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="22sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- ─────────────────────────────────── -->
+    <!-- STOP MONITORING ACTION             -->
+    <!-- ─────────────────────────────────── -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/sheet_stop_monitoring_btn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/productsans"
+        android:text="Stop SafeCharge Monitoring"
+        android:textAllCaps="false"
+        android:textColor="?attr/colorOnErrorContainer"
+        android:textSize="15sp"
+        android:visibility="gone"
+        app:backgroundTint="?attr/colorErrorContainer"
+        app:cornerRadius="28dp" />
+
+    <!-- ─────────────────────────────────── -->
+    <!-- FOOTER COUNTER                     -->
+    <!-- ─────────────────────────────────── -->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/sheet_used_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/productsans"
+        android:text=""
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+</LinearLayout>

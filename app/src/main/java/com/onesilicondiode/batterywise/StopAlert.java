@@ -99,6 +99,18 @@ public class StopAlert extends AppCompatActivity {
         setupMusic();
         setupButton();
 
+        // Spring-bounce entry animation for the content block
+        android.view.View alertContentBlock = findViewById(R.id.alertContentBlock);
+        alertContentBlock.setAlpha(0f);
+        alertContentBlock.setTranslationY(120f);
+        alertContentBlock.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(600)
+                .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
+                .setStartDelay(150)
+                .start();
+
         // Handle auto-stop
         if (shouldAutoStop && selectedTime != -1) {
             startAutoStopTimer(selectedTime);

@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -19,13 +18,9 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,8 +36,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
-import com.google.android.material.slider.Slider;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
@@ -65,20 +58,31 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "SafeCharge will not work, restart app to grant permission", Toast.LENGTH_LONG).show();
                 }
             });
-    MaterialButton startSaving, stopSaving, oneMin, twoMin, threeMin, thirtySec;
-    TextView productInfo;
+
+    // Liquid Canvas UI references
+    private MaterialButton startSaving;
+    private com.google.android.material.textview.MaterialTextView heroBatteryNumber;
+    private com.google.android.material.textview.MaterialTextView heroSubLabel;
+    private com.google.android.material.textview.MaterialTextView settingsGhostLink;
+    private com.google.android.material.card.MaterialCardView statusPill;
+    private com.google.android.material.textview.MaterialTextView statusPillText;
+
+    // Settings bottom sheet references
+    private MaterialButton sheetBtn30s, sheetBtn1m, sheetBtn2m, sheetBtn3m;
+    private MaterialButton currentSelectedButton;
+    private com.google.android.material.materialswitch.MaterialSwitch sheetSwitchToggle;
+    private android.widget.HorizontalScrollView sheetTimeChipsContainer;
+
     int selectedBatteryLevel = 85;
     private WaveLoadingView waveLoadingView;
-    private final float scaleFactorStretched = 1.2f;
-    private final float scaleFactorOriginal = 1.0f;
     private FirebaseAnalytics mFirebaseAnalytics;
     private boolean seekTouch = false;
     private Vibrator vibrator;
-    private String manufacturer;
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String SWITCH_STATE = "switchState";
     private AppUpdateManager appUpdateManager;
     private ReviewManager reviewManager;
+    private SharedPreferences sharedPreferences;
 
     private static final String WAVE_COLOR_GREY = "#B0B0B0";
     private static final String WAVE_COLOR_GREEN = "#006C49";
@@ -86,175 +90,49 @@ public class MainActivity extends AppCompatActivity {
     private static final String WAVE_COLOR_ORANGE = "#E4B284";
     private static final String WAVE_COLOR_RED = "#FFB4AB";
 
-    private MaterialSwitch switchToggle;
-    private SharedPreferences sharedPreferences;
-    private LinearLayout buttonToggleGroup;
-    private MaterialButton currentSelectedButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(ThemeUtils.getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         reviewManager = ReviewManagerFactory.create(this);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        // ── Wire Liquid Canvas views ──
         waveLoadingView = findViewById(R.id.waveLoadingView);
+        heroBatteryNumber = findViewById(R.id.heroBatteryNumber);
+        heroSubLabel = findViewById(R.id.heroSubLabel);
+        statusPill = findViewById(R.id.statusPill);
+        statusPillText = findViewById(R.id.statusPillText);
+        settingsGhostLink = findViewById(R.id.settingsGhostLink);
+        startSaving = findViewById(R.id.saveBatteryBtn);
+
+        // ── Dynamic wave border colour ──
         int primaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorPrimary);
         waveLoadingView.setBorderColor(primaryColor);
-        buttonToggleGroup = findViewById(R.id.buttonToggleGroup);
-        appUpdateManager = AppUpdateManagerFactory.create(this);
-        oneMin = findViewById(R.id.button_1m);
-        twoMin = findViewById(R.id.button_2m);
-        threeMin = findViewById(R.id.button_3m);
-        thirtySec = findViewById(R.id.button_45s);
-        switchToggle = findViewById(R.id.switchToggle);
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
-        switchToggle.setChecked(sharedPreferences.getBoolean(SWITCH_STATE, false));
-        boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, false);
-        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
-        switch (selectedTime) {
-            case 1:
-                handleButtonSelection(oneMin, 1, false);
-                break;
-            case 2:
-                handleButtonSelection(twoMin, 2, false);
-                break;
-            case 3:
-                handleButtonSelection(threeMin, 3, false);
-                break;
-            case 4:
-                handleButtonSelection(thirtySec, 4, false);
-                break;
-        }
-        updateSegmentedButtonVisibility(switchState);
-        thirtySec.setOnClickListener(v -> handleButtonSelection(thirtySec, 4, true));
-        oneMin.setOnClickListener(v -> handleButtonSelection(oneMin, 1, true));
-        twoMin.setOnClickListener(v -> handleButtonSelection(twoMin, 2, true));
-        threeMin.setOnClickListener(v -> handleButtonSelection(threeMin, 3, true));
-        switchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                buttonToggleGroup.setVisibility(View.VISIBLE);
-            } else {
-                buttonToggleGroup.setVisibility(View.GONE);
-            }
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(SWITCH_STATE, isChecked);
-            editor.apply();
-            vibrateTouch();
-        });
-
-        if (!sharedPreferences.getBoolean("isConfirmed", true)) {
-            showBottomSheet();
-        }
-
-        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                try {
-                    appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            AppUpdateType.FLEXIBLE,
-                            this,
-                            REQUEST_CODE_APP_UPDATE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        int counter = getCounterFromSharedPreferences();
-        startSaving = findViewById(R.id.saveBatteryBtn);
-        stopSaving = findViewById(R.id.closeBatteryBtn);
-        productInfo = findViewById(R.id.productInfo);
-        Animation showAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_show);
-        Animation hideAnimation = AnimationUtils.loadAnimation(this, R.anim.popup_hide);
-        TextView seekBarValueOverlay = findViewById(R.id.seekBarValueOverlay);
-        manufacturer = Build.MANUFACTURER;
+        // ── Battery info ──
         BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
         int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
-        setWaveColor(isServiceRunning, batteryPercent);
+
+        // Hero battery number
+        heroBatteryNumber.setText(batteryPercent + "%");
         waveLoadingView.setProgressValue(batteryPercent);
 
-        Slider batteryLevelSlider = findViewById(R.id.batteryLevelSlider);
+        // Threshold sub-label
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
 
-        String productInfoText;
-        if (selectedBatteryLevel > 98) {
-            productInfoText = "Your " + manufacturer + " " + getString(R.string.productInfo_partThree);
-        } else {
-            productInfoText = "Your " + manufacturer + " " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
-        }
-        productInfo.setText(productInfoText);
+        // ── Service state ──
+        appUpdateManager = AppUpdateManagerFactory.create(this);
+        boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
+        setWaveColor(isServiceRunning, batteryPercent);
 
-        batteryLevelSlider.setValue(selectedBatteryLevel);
-        batteryLevelSlider.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(Slider slider, float value, boolean fromUser) {
-                selectedBatteryLevel = (int) value;
-                waveLoadingView.setProgressValue(selectedBatteryLevel + 1);
-                if (isServiceRunning(BatteryMonitorService.class)) {
-                    setWaveColor(true, selectedBatteryLevel);
-                }
-                String progressText = selectedBatteryLevel + "%";
-                seekBarValueOverlay.setText(progressText);
-                vibrateTouch();
-                seekBarValueOverlay.startAnimation(showAnimation);
-                seekBarValueOverlay.setVisibility(View.VISIBLE);
-                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-                editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
-                editor.apply();
-
-                String productInfoText;
-                if (selectedBatteryLevel > 98) {
-                    productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partThree);
-                } else {
-                    productInfoText = "Your " + manufacturer + " phone " + getString(R.string.productInfo_partTwo) + " " + selectedBatteryLevel + "%";
-                }
-                productInfo.setText(productInfoText);
-            }
-        });
-
-        batteryLevelSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(Slider slider) {
-                scaleSeekBar(slider, 1.2f);
-            }
-
-            @Override
-            public void onStopTrackingTouch(Slider slider) {
-                if (!seekTouch) {
-                    seekTouch = true;
-                }
-                waveLoadingView.setProgressValue(batteryPercent);
-                vibrateTouch();
-                scaleSeekBar(slider, 1.0f);
-                seekBarValueOverlay.startAnimation(hideAnimation);
-                seekBarValueOverlay.setVisibility(View.GONE);
-            }
-        });
-
-        final String PREF_SHARE_DIALOG_SHOWN = "share_dialog_shown";
-        if (counter > 9) {
-            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-            boolean isShareDialogShown = sharedPreferences.getBoolean(PREF_SHARE_DIALOG_SHOWN, false);
-
-            if (!isShareDialogShown) {
-                showShareDialog();
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(PREF_SHARE_DIALOG_SHOWN, true);
-                editor.apply();
-            }
-        }
-        productInfo.setText(productInfoText);
         if (isServiceRunning) {
             Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -262,110 +140,31 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 startService(serviceIntent);
             }
-            startSaving.setVisibility(View.GONE);
-            stopSaving.setVisibility(View.VISIBLE);
-            animateSwitchToggle();
+            showActiveState();
         } else {
-            startSaving.setVisibility(View.VISIBLE);
-            stopSaving.setVisibility(View.GONE);
-            hideSwitchToggle();
+            showIdleState();
         }
 
-        MaterialButton enableDaydreamBtn = findViewById(R.id.enableDaydreamBtn);
-        enableDaydreamBtn.setOnClickListener(v -> {
-            vibrate();
-            boolean isFirstTime = prefs.getBoolean("first_time_enable_daydream", true);
-
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle("Welcome to DayDream ☁️")
-                    .setMessage("Would you like to preview DayDream or set it as your phone's system screensaver?\n\nP.S. After setting as screensaver, allow your phone to be locked automatically for DayDream to kick-in, don't force lock using power button ;)")
-                    .setPositiveButton("Preview Screensaver", (dialog, which) -> {
-                        if (isFirstTime) {
-                            prefs.edit().putBoolean("first_time_enable_daydream", false).apply();
-                            View dialogView = getLayoutInflater().inflate(R.layout.dialog_daydream_intro, null);
-                            new MaterialAlertDialogBuilder(this)
-                                    .setTitle("Welcome to DayDream ☁️")
-                                    .setView(dialogView)
-                                    .setCancelable(false)
-                                    .setPositiveButton("Try DayDream", (d, w) -> {
-                                        Intent intent = new Intent(this, ScreenSaverActivity.class);
-                                        startActivity(intent);
-                                    })
-                                    .setNegativeButton("Nope", null)
-                                    .show();
-                        } else {
-                            Intent intent = new Intent(this, ScreenSaverActivity.class);
-                            try {
-                                startActivity(intent);
-                            } catch (Exception e) {
-                                new MaterialAlertDialogBuilder(this)
-                                        .setTitle("Hello DayDream ☁️")
-                                        .setMessage("SafeCharge DayDream brings a gentle, calming clock to your screen while charging. To experience this, open your device’s screensaver settings, find 'Day Dream', and select SafeCharge as your screensaver.\n\nDayDream will then start automatically while charging.")
-                                        .setPositiveButton("Open Screensaver Settings", (d, w) -> {
-                                            try {
-                                                Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
-                                                startActivity(settingsIntent);
-                                            } catch (Exception ex) {
-                                                Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
-                                            }
-                                        })
-                                        .setNegativeButton("OK", null)
-                                        .show();
-                            }
-                        }
-                    })
-                    .setNegativeButton("Set as Phone Screensaver", (dialog, which) -> {
-                        try {
-                            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS);
-                            startActivity(settingsIntent);
-                        } catch (Exception ex) {
-                            Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .show();
+        // ── Settings ghost link → opens settings bottom sheet ──
+        settingsGhostLink.setOnClickListener(v -> {
+            vibrateTouch();
+            showSettingsBottomSheet();
         });
 
-        MaterialButton batterySaveText = findViewById(R.id.batterySaveText);
-        batterySaveText.setOnClickListener(view -> {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle("Important information about your battery")
-                    .setMessage(R.string.disclaimer)
-                    .setPositiveButton("About", (dialog, which) -> {
-                        vibrate();
-                        Intent intent = new Intent(MainActivity.this, About.class);
-                        startActivity(intent);
-                    })
-                    .show();
+        // ── Settings icon (top bar) → same sheet ──
+        MaterialButton settingsIconBtn = findViewById(R.id.settingsIconBtn);
+        settingsIconBtn.setOnClickListener(v -> {
+            vibrateTouch();
+            showSettingsBottomSheet();
         });
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            checkNotificationPermission();
-        }
-
+        // ── Enable button ──
         startSaving.setOnClickListener(view -> {
             try {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putBoolean(USER_STARTED_KEY, true);
                 editor.apply();
                 enableAutoStart();
-                boolean switchedState = sharedPreferences.getBoolean(SWITCH_STATE, false);
-                if (switchedState) {
-                    buttonToggleGroup.setVisibility(View.VISIBLE);
-                    switch (selectedTime) {
-                        case 1:
-                            oneMin.setChecked(true);
-                            break;
-                        case 2:
-                            twoMin.setChecked(true);
-                            break;
-                        case 3:
-                            threeMin.setChecked(true);
-                            break;
-                    }
-                } else {
-                    buttonToggleGroup.setVisibility(View.GONE);
-                }
                 int currentBatteryPercent = getCurrentBatteryPercent();
                 setWaveColor(true, currentBatteryPercent);
                 waveLoadingView.setProgressValue(currentBatteryPercent);
@@ -374,32 +173,265 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        stopSaving.setOnClickListener(view -> {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle("Disable SafeCharge?")
-                    .setMessage("Are you sure you want to turn off SafeCharge service?\n\nBattery monitoring and alerts will be turned off and your device might be prone to overcharging.")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
-                        stopService(serviceIntent);
-                        stopSaving.setVisibility(View.GONE);
-                        startSaving.setVisibility(View.VISIBLE);
-                        hideSwitchToggle();
-                        vibrate();
-                        waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
+
+
+        // ── App update check ──
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo, AppUpdateType.FLEXIBLE, this, REQUEST_CODE_APP_UPDATE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // ── "What's New" bottom sheet (first run) ──
+        if (!sharedPreferences.getBoolean("isConfirmed", true)) {
+            showBottomSheet();
+        }
+
+        // ── Share dialog (after 10 uses) ──
+        int counter = getCounterFromSharedPreferences();
+        if (counter > 9) {
+            SharedPreferences sp = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            if (!sp.getBoolean("share_dialog_shown", false)) {
+                showShareDialog();
+                sp.edit().putBoolean("share_dialog_shown", true).apply();
+            }
+        }
+
+        // ── Firebase ──
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            checkNotificationPermission();
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // LIQUID CANVAS STATE HELPERS
+    // ─────────────────────────────────────────────────────────────────
+
+    private void showActiveState() {
+        startSaving.setVisibility(View.GONE);
+        // Animate status pill in
+        statusPill.setVisibility(View.VISIBLE);
+        statusPill.setAlpha(0f);
+        statusPill.setTranslationY(20f);
+        statusPill.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(350)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .start();
+        updateStatusPillText();
+        // Animate settings ghost in
+        settingsGhostLink.setAlpha(0f);
+        settingsGhostLink.animate().alpha(1f).setDuration(400).setStartDelay(200).start();
+    }
+
+    private void showIdleState() {
+        startSaving.setVisibility(View.VISIBLE);
+        statusPill.setVisibility(View.INVISIBLE);
+        statusPill.setAlpha(0f);
+        settingsGhostLink.setAlpha(0.6f);
+    }
+
+    private void hideActiveState() {
+        startSaving.setVisibility(View.VISIBLE);
+        statusPill.animate()
+                .alpha(0f)
+                .translationY(20f)
+                .setDuration(250)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(() -> statusPill.setVisibility(View.INVISIBLE))
+                .start();
+    }
+
+    private void updateStatusPillText() {
+        statusPillText.setText("● Monitoring  ·  Alert at " + selectedBatteryLevel + "%");
+    }
+
+
+
+    // ─────────────────────────────────────────────────────────────────
+    // SETTINGS BOTTOM SHEET
+    // ─────────────────────────────────────────────────────────────────
+
+    private void showSettingsBottomSheet() {
+        android.view.View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_settings, null);
+        com.google.android.material.bottomsheet.BottomSheetDialog sheetDialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        sheetDialog.setContentView(sheetView);
+
+        // Threshold section
+        com.google.android.material.textview.MaterialTextView sheetThresholdValue =
+                sheetView.findViewById(R.id.sheet_threshold_value);
+        com.google.android.material.slider.Slider sheetSlider =
+                sheetView.findViewById(R.id.sheet_battery_slider);
+        sheetSlider.setValue(selectedBatteryLevel);
+        sheetThresholdValue.setText(selectedBatteryLevel + "%");
+
+        sheetSlider.addOnChangeListener((slider, value, fromUser) -> {
+            selectedBatteryLevel = (int) value;
+            sheetThresholdValue.setText(selectedBatteryLevel + "%");
+            vibrateTouch();
+            SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+            editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
+            editor.apply();
+            updateStatusPillText();
+            if (isServiceRunning(BatteryMonitorService.class)) {
+                setWaveColor(true, getCurrentBatteryPercent());
+            }
+        });
+
+        // Auto-dismiss toggle
+        sheetSwitchToggle = sheetView.findViewById(R.id.sheet_switch_toggle);
+        sheetTimeChipsContainer = sheetView.findViewById(R.id.sheet_time_chips_container);
+        sheetBtn30s = sheetView.findViewById(R.id.sheet_btn_30s);
+        sheetBtn1m = sheetView.findViewById(R.id.sheet_btn_1m);
+        sheetBtn2m = sheetView.findViewById(R.id.sheet_btn_2m);
+        sheetBtn3m = sheetView.findViewById(R.id.sheet_btn_3m);
+
+        boolean switchState = sharedPreferences.getBoolean(SWITCH_STATE, false);
+        sheetSwitchToggle.setChecked(switchState);
+        sheetTimeChipsContainer.setVisibility(switchState ? View.VISIBLE : View.GONE);
+
+        int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
+        switch (selectedTime) {
+            case 1: sheetHandleButtonSelection(sheetBtn1m, 1); break;
+            case 2: sheetHandleButtonSelection(sheetBtn2m, 2); break;
+            case 3: sheetHandleButtonSelection(sheetBtn3m, 3); break;
+            case 4: sheetHandleButtonSelection(sheetBtn30s, 4); break;
+        }
+
+        sheetSwitchToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            sheetTimeChipsContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(SWITCH_STATE, isChecked);
+            editor.apply();
+            vibrateTouch();
+        });
+
+        sheetBtn30s.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn30s, 4));
+        sheetBtn1m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn1m, 1));
+        sheetBtn2m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn2m, 2));
+        sheetBtn3m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn3m, 3));
+
+        // Utility rows
+        android.view.View daydreamRow = sheetView.findViewById(R.id.sheet_daydream_row);
+        daydreamRow.setOnClickListener(v -> {
+            vibrate();
+            sheetDialog.dismiss();
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            boolean isFirstTime = prefs.getBoolean("first_time_enable_daydream", true);
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("Welcome to DayDream ☁️")
+                    .setMessage("Would you like to preview DayDream or set it as your phone's system screensaver?")
+                    .setPositiveButton("Preview Screensaver", (dialog, which) -> {
+                        if (isFirstTime) {
+                            prefs.edit().putBoolean("first_time_enable_daydream", false).apply();
+                            android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_daydream_intro, null);
+                            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                                    .setTitle("Welcome to DayDream ☁️")
+                                    .setView(dialogView)
+                                    .setCancelable(false)
+                                    .setPositiveButton("Try DayDream", (d, w) -> startActivity(new Intent(this, ScreenSaverActivity.class)))
+                                    .setNegativeButton("Nope", null)
+                                    .show();
+                        } else {
+                            try {
+                                startActivity(new Intent(this, ScreenSaverActivity.class));
+                            } catch (Exception e) {
+                                Toast.makeText(this, "Could not open DayDream.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Set as Screensaver", (dialog, which) -> {
+                        try {
+                            startActivity(new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS));
+                        } catch (Exception ex) {
+                            Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
+                        }
+                    })
                     .show();
         });
 
+        android.view.View infoRow = sheetView.findViewById(R.id.sheet_info_row);
+        infoRow.setOnClickListener(v -> {
+            vibrate();
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("Important information about your battery")
+                    .setMessage(R.string.disclaimer)
+                    .setPositiveButton("About", (dialog, which) -> {
+                        vibrate();
+                        startActivity(new Intent(MainActivity.this, About.class));
+                    })
+                    .show();
+        });
+
+        // Stop Monitoring Button
+        MaterialButton sheetStopMonitoringBtn = sheetView.findViewById(R.id.sheet_stop_monitoring_btn);
+        if (isServiceRunning(BatteryMonitorService.class)) {
+            sheetStopMonitoringBtn.setVisibility(View.VISIBLE);
+            sheetStopMonitoringBtn.setOnClickListener(v -> {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                        .setTitle("Disable SafeCharge?")
+                        .setMessage("Battery monitoring and alerts will be turned off.")
+                        .setPositiveButton("Yes, Disable", (dialog, which) -> {
+                            Intent serviceIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
+                            stopService(serviceIntent);
+                            vibrate();
+                            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
+                            hideActiveState();
+                            sheetDialog.dismiss();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            });
+        } else {
+            sheetStopMonitoringBtn.setVisibility(View.GONE);
+        }
+
+        // Footer counter
+        int counter = getCounterFromSharedPreferences();
+        com.google.android.material.textview.MaterialTextView sheetUsedTime =
+                sheetView.findViewById(R.id.sheet_used_time);
         if (counter > 0) {
-            TextView usedTime;
-            usedTime = findViewById(R.id.usedTime);
-            usedTime.setVisibility(View.VISIBLE);
-            if (counter == 1) {
-                usedTime.setText("SafeCharged " + counter + " time");
-            } else {
-                usedTime.setText("SafeCharged " + counter + " times");
-            }
+            sheetUsedTime.setVisibility(View.VISIBLE);
+            sheetUsedTime.setText(counter == 1
+                    ? "SafeCharged " + counter + " time"
+                    : "SafeCharged " + counter + " times");
+        }
+
+        sheetDialog.show();
+    }
+
+    private void sheetHandleButtonSelection(MaterialButton selectedButton, int timeValue) {
+        sheetResetAllButtons();
+        int primaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorPrimary);
+        int onPrimaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnPrimary);
+        selectedButton.setBackgroundColor(primaryColor);
+        selectedButton.setTextColor(onPrimaryColor);
+        selectedButton.setStrokeColor(android.content.res.ColorStateList.valueOf(primaryColor));
+        currentSelectedButton = selectedButton;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(SELECTED_TIME_KEY, timeValue);
+        editor.apply();
+        vibrateTouch();
+    }
+
+    private void sheetResetAllButtons() {
+        if (sheetBtn30s == null) return;
+        int defaultTextColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurface);
+        int strokeColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOutline);
+        for (MaterialButton btn : new MaterialButton[]{sheetBtn30s, sheetBtn1m, sheetBtn2m, sheetBtn3m}) {
+            btn.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+            btn.setTextColor(defaultTextColor);
+            btn.setStrokeColor(android.content.res.ColorStateList.valueOf(strokeColor));
         }
     }
 
@@ -408,62 +440,11 @@ public class MainActivity extends AppCompatActivity {
         return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
     }
 
-    private void handleButtonSelection(MaterialButton selectedButton, int timeValue, boolean showSnackbar) {
-        resetAllButtons();
-        int primaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorPrimary);
-        int onPrimaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnPrimary);
-        selectedButton.setBackgroundColor(primaryColor);
-        selectedButton.setTextColor(onPrimaryColor);
-        selectedButton.setStrokeColor(ColorStateList.valueOf(primaryColor));
 
-        currentSelectedButton = selectedButton;
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(SELECTED_TIME_KEY, timeValue);
-        editor.apply();
 
-        vibrateTouch();
-
-        // Only show message if auto-dismiss is enabled AND the service is running
-        if (showSnackbar && switchToggle.isChecked() && isServiceRunning(BatteryMonitorService.class)) {
-            String message = getDismissMessage(timeValue);
-            Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    private String getDismissMessage(int timeValue) {
-        switch (timeValue) {
-            case 1:
-                return "Alert will dismiss after 1 minute";
-            case 2:
-                return "Alert will dismiss after 2 minutes";
-            case 3:
-                return "Alert will dismiss after 3 minutes";
-            case 4:
-                return "Alert will dismiss after 30 seconds";
-            default:
-                return "Time selection updated";
-        }
-    }
-
-    private void resetAllButtons() {
-        int defaultTextColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurface);
-        int strokeColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOutline);
-
-        thirtySec.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
-        thirtySec.setTextColor(defaultTextColor);
-        thirtySec.setStrokeColor(ColorStateList.valueOf(strokeColor));
-
-        oneMin.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
-        oneMin.setTextColor(defaultTextColor);
-        oneMin.setStrokeColor(ColorStateList.valueOf(strokeColor));
-
-        twoMin.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
-        twoMin.setTextColor(defaultTextColor);
-        twoMin.setStrokeColor(ColorStateList.valueOf(strokeColor));
-
-        threeMin.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
-        threeMin.setTextColor(defaultTextColor);
-        threeMin.setStrokeColor(ColorStateList.valueOf(strokeColor));
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        android.content.SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+        return prefs.getBoolean("serviceRunning", false);
     }
 
     private void showBottomSheet() {
@@ -519,20 +500,6 @@ public class MainActivity extends AppCompatActivity {
         return sharedPreferences.getInt("counter", 0);
     }
 
-    private void scaleSeekBar(Slider seekBar, float scaleFactor) {
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(seekBar, "scaleX", scaleFactor);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(seekBar, "scaleY", scaleFactor);
-
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(scaleX, scaleY);
-        animatorSet.setDuration(200);
-        animatorSet.start();
-    }
-
-    private boolean isServiceRunning(Class<?> serviceClass) {
-        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
-        return prefs.getBoolean("serviceRunning", false);
-    }
 
     private void vibrate() {
         HapticUtils.playCustomVibration(this, new long[]{11, 0, 11, 0, 20, 2, 23});
@@ -615,42 +582,10 @@ public class MainActivity extends AppCompatActivity {
     private void startService() {
         Intent serviceIntent = new Intent(this, BatteryMonitorService.class);
         startService(serviceIntent);
-        startSaving.setVisibility(View.GONE);
         vibrate();
-        stopSaving.setVisibility(View.VISIBLE);
-        animateSwitchToggle();
+        showActiveState();
     }
 
-    private void animateSwitchToggle() {
-        switchToggle.setVisibility(View.VISIBLE);
-        switchToggle.setAlpha(0f);
-        switchToggle.setScaleY(0.8f);
-        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(switchToggle,
-                android.animation.PropertyValuesHolder.ofFloat("alpha", 0f, 1f),
-                android.animation.PropertyValuesHolder.ofFloat("scaleY", 0.8f, 1f));
-        animator.setDuration(200);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.start();
-    }
 
-    private void hideSwitchToggle() {
-        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(switchToggle,
-                android.animation.PropertyValuesHolder.ofFloat("alpha", 1f, 0f),
-                android.animation.PropertyValuesHolder.ofFloat("scaleY", 1f, 0.8f));
-        animator.setDuration(110);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                switchToggle.setVisibility(View.GONE);
-                buttonToggleGroup.setVisibility(View.GONE);
-            }
-        });
-        animator.start();
-    }
-
-    private void updateSegmentedButtonVisibility(boolean switchState) {
-        buttonToggleGroup.setVisibility(switchState ? View.VISIBLE : View.GONE);
-    }
 
 }

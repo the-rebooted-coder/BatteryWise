@@ -8,67 +8,74 @@
     android:keepScreenOn="true"
     tools:context=".StopAlert">
 
+    <!-- Full-screen signature green wave — unchanged by design -->
     <me.itangqi.waveloadingview.WaveLoadingView
         android:id="@+id/stopLoadingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
         app:wlv_borderColor="#3C611C"
         app:wlv_shapeType="rectangle"
         app:wlv_waveAmplitude="15"
         app:wlv_waveColor="#33B864" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/appNamed"
-        android:layout_width="wrap_content"
+    <!-- Content block — centered, springs in on enter -->
+    <LinearLayout
+        android:id="@+id/alertContentBlock"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="300dp"
-        android:fontFamily="@font/productsansbold"
-        android:text="@string/app_name"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:layout_centerInParent="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/appNamedBelow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/appNamed"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/productsans"
-        android:text="@string/unplug_the_charger"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp" />
+        <!-- App name — white on green -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/appNamed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/productsansbold"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp" />
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/dividerLine"
-        android:layout_width="250dp"
-        android:layout_height="2.5dp"
-        android:layout_below="@id/appNamedBelow"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
-        app:dividerColor="@color/black" />
+        <!-- Battery percentage — white, live value -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/appNamedBelow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/productsansbold"
+            android:text="Battery is at —%"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
 
-    <com.example.swipebutton_library.SwipeButton
-        android:id="@+id/stopMusic"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dividerLine"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        ripple:button_background_padding="3dp"
-        ripple:button_background_src="@drawable/stop_ringing"
-        ripple:button_background_tint="@color/swipe_background_tint"
-        ripple:has_active_status="false"
-        ripple:has_finish_animation="true"
-        ripple:inner_text="Swipe to Dismiss"
-        ripple:inner_text_color="@color/white"
-        ripple:inner_text_size="15sp"
-        ripple:outer_background_tint="@color/tint_dismiss_outer"
-        ripple:trail_background_tint="@color/swipe_background_tint"
-        ripple:trail_enabled="true" />
+        <!-- Semi-transparent white divider -->
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/dividerLine"
+            android:layout_width="200dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            app:dividerColor="#40FFFFFF" />
 
+        <!-- Swipe to dismiss pill — dark on green for contrast -->
+        <com.example.swipebutton_library.SwipeButton
+            android:id="@+id/stopMusic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ripple:button_background_padding="3dp"
+            ripple:button_background_src="@drawable/stop_ringing"
+            ripple:button_background_tint="@color/swipe_background_tint"
+            ripple:has_active_status="false"
+            ripple:has_finish_animation="true"
+            ripple:inner_text="Swipe to Dismiss"
+            ripple:inner_text_color="#FFFFFF"
+            ripple:inner_text_size="15sp"
+            ripple:outer_background_tint="@color/tint_dismiss_outer"
+            ripple:trail_background_tint="@color/swipe_background_tint"
+            ripple:trail_enabled="true" />
+    </LinearLayout>
 
 </RelativeLayout>
