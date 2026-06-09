@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private AppUpdateManager appUpdateManager;
     private ReviewManager reviewManager;
     private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     private static final String WAVE_COLOR_GREY = "#B0B0B0";
     private static final String WAVE_COLOR_GREEN = "#006C49";
@@ -148,6 +149,23 @@ public class MainActivity extends AppCompatActivity {
         } else {
             showIdleState();
         }
+
+        // ── Real-time UI Sync for external toggles (e.g., QS Tile) ──
+        prefListener = (p, key) -> {
+            if ("serviceRunning".equals(key)) {
+                boolean running = p.getBoolean("serviceRunning", false);
+                runOnUiThread(() -> {
+                    int percent = getCurrentBatteryPercent();
+                    setWaveColor(running, percent);
+                    if (running) {
+                        showActiveState();
+                    } else {
+                        hideActiveState();
+                    }
+                });
+            }
+        };
+        sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener);
 
         // ── Settings ghost link → opens settings bottom sheet ──
         settingsGhostLink.setOnClickListener(v -> {
@@ -284,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .withEndAction(() -> statusPill.setVisibility(View.INVISIBLE))
                 .start();
+        settingsGhostLink.animate().alpha(0.6f).setDuration(250).start();
     }
 
     private void updateStatusPillText() {

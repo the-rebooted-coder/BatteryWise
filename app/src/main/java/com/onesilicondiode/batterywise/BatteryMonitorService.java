@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.content.ComponentName;
+import android.service.quicksettings.TileService;
+
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
     private static final String NOTIF_CHANNEL_ID = "SafeCharge";
@@ -86,6 +89,12 @@ public class BatteryMonitorService extends Service {
 
         // Mark service as running (for MainActivity state check and BootReceiver guard)
         isRunning = true;
+
+        // Notify QS tile to update its state
+        try {
+            TileService.requestListeningState(this,
+                    new ComponentName(this, SafeChargeTileService.class));
+        } catch (Exception ignored) {}
 
         // Initialize SharedPreferences
         prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
@@ -267,6 +276,12 @@ public class BatteryMonitorService extends Service {
         super.onDestroy();
         // Mark service as stopped
         isRunning = false;
+
+        // Notify QS tile to update its state
+        try {
+            TileService.requestListeningState(this,
+                    new ComponentName(this, SafeChargeTileService.class));
+        } catch (Exception ignored) {}
         if (prefs != null) {
             prefs.edit().putBoolean("serviceRunning", false).apply();
         }
