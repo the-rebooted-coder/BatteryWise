@@ -117,7 +117,8 @@ public class StopAlert extends AppCompatActivity {
         } else {
             appName.setTextColor(Color.parseColor("#FFFFFF"));
             belowAppName.setTextColor(Color.parseColor("#FFFFFF"));
-            stopLoadingView.setVisibility(View.GONE);
+            stopLoadingView.setVisibility(View.VISIBLE);
+            stopLoadingView.setProgressValue(80); // Keep it visible as a background
         }
 
         // Register receiver for unplug event (auto-dismiss if unplugged)

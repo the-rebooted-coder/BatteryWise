@@ -151,9 +151,8 @@ public class MainActivity extends AppCompatActivity {
             showSettingsBottomSheet();
         });
 
-        // ── Settings icon (top bar) → same sheet ──
-        MaterialButton settingsIconBtn = findViewById(R.id.settingsIconBtn);
-        settingsIconBtn.setOnClickListener(v -> {
+        // ── Status pill → also opens settings ──
+        statusPill.setOnClickListener(v -> {
             vibrateTouch();
             showSettingsBottomSheet();
         });
@@ -478,20 +477,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setWaveColor(boolean serviceEnabled, int batteryPercent) {
-        if (!serviceEnabled) {
-            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
+        if (batteryPercent > 55) {
+            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREEN));
+        } else if (batteryPercent > 40 && batteryPercent <= 55) {
+            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_YELLOW));
+        } else if (batteryPercent > 20 && batteryPercent <= 40) {
+            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_ORANGE));
+        } else if (batteryPercent > 1 && batteryPercent <= 20) {
+            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_RED));
         } else {
-            if (batteryPercent > 55) {
-                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREEN));
-            } else if (batteryPercent > 40 && batteryPercent <= 55) {
-                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_YELLOW));
-            } else if (batteryPercent > 20 && batteryPercent <= 40) {
-                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_ORANGE));
-            } else if (batteryPercent > 1 && batteryPercent <= 20) {
-                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_RED));
-            } else {
-                waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
-            }
+            waveLoadingView.setWaveColor(Color.parseColor(WAVE_COLOR_GREY));
         }
     }
 
