@@ -345,15 +345,9 @@ public class MainActivity extends AppCompatActivity {
 
         View infoRow = sheetView.findViewById(R.id.sheet_info_row);
         infoRow.setOnClickListener(v -> {
-            vibrate();
-            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                    .setTitle("Important information about your battery")
-                    .setMessage(R.string.disclaimer)
-                    .setPositiveButton("About", (dialog, which) -> {
-                        vibrate();
-                        startActivity(new Intent(MainActivity.this, About.class));
-                    })
-                    .show();
+            vibrateTouch();
+            sheetDialog.dismiss();
+            showInfoBottomSheet();
         });
 
         // Stop Monitoring Button
@@ -443,6 +437,51 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
             }
+        });
+
+        sheetDialog.show();
+    }
+
+    private void showInfoBottomSheet() {
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_info, null);
+        BottomSheetDialog sheetDialog = new BottomSheetDialog(this);
+        sheetDialog.setContentView(sheetView);
+
+        // Header animation
+        View icon = sheetView.findViewById(R.id.info_icon);
+        icon.setAlpha(0f);
+        icon.setScaleX(0.4f);
+        icon.setScaleY(0.4f);
+        icon.animate()
+                .alpha(1f)
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(400)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                .withEndAction(() -> {
+                    icon.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(200)
+                            .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                            .start();
+                })
+                .setStartDelay(100)
+                .start();
+
+        // About Developer button
+        MaterialButton btnAbout = sheetView.findViewById(R.id.btn_about_dev);
+        btnAbout.setOnClickListener(v -> {
+            vibrateTouch();
+            sheetDialog.dismiss();
+            startActivity(new Intent(MainActivity.this, About.class));
+        });
+
+        // Close button
+        MaterialButton btnClose = sheetView.findViewById(R.id.btn_close_info);
+        btnClose.setOnClickListener(v -> {
+            vibrateTouch();
+            sheetDialog.dismiss();
         });
 
         sheetDialog.show();
