@@ -1,86 +1,205 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSurface"
+    android:paddingBottom="32dp">
 
-    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:id="@+id/bottom_sheet_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
+
+        <!-- Drag Handle -->
+        <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/drag_handle_shape"
+            android:alpha="0.4" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textWhatsNew"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:fontFamily="@font/productsansbold"
-            android:paddingStart="20dp"
-            android:text="@string/what_new"
-            android:textSize="20sp" />
+            android:text="The Volt Update ⚡"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="24sp" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
+        <!-- 1. Battery Lab -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:drawablePadding="5dp"
-            android:fontFamily="@font/productsansbold"
-            android:paddingStart="10dp"
-            android:text="Introducing DayDream"
-            android:textSize="18sp"
-            app:drawableStartCompat="@drawable/ic_daydream"
-            app:drawableTint="@color/green_dark" />
+            android:layout_marginTop="28dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/productsans"
-            android:paddingStart="18dp"
-            android:paddingEnd="10dp"
-            android:text="A calming desk-clock mode that turns your screen into a soothing display while your device is charging. Perfect for your workspace or bedside."
-            android:textSize="18sp" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_lab_flask"
+                app:tint="?attr/colorPrimary" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:drawablePadding="5dp"
-            android:fontFamily="@font/productsansbold"
-            android:paddingStart="10dp"
-            android:text="Auto Dismiss When You Unplug"
-            android:textSize="18sp"
-            app:drawableStartCompat="@drawable/access_time"
-            app:drawableTint="@color/green_dark" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/productsans"
-            android:paddingStart="18dp"
-            android:paddingEnd="10dp"
-            android:text="Alerts now disappear on their own when you unplug the charger. No extra swipes needed."
-            android:textSize="18sp" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnConfirm"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="15dp"
-                android:backgroundTint="#00FFFFFF"
-                android:fontFamily="@font/productsansbold"
-                android:text="Continue"
-                android:textColor="@color/green"
-                app:cornerRadius="8dp" />
-        </RelativeLayout>
-    </LinearLayout>
-</ScrollView>
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsansbold"
+                    android:text="Battery Lab"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/productsans"
+                    android:text="Real-time hardware diagnostics. View your wattage, thermal health, and power source tech in one place."
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 2. Reimagined DayDream -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_daydream"
+                app:tint="?attr/colorPrimary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsansbold"
+                    android:text="Reimagined DayDream"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/productsans"
+                    android:text="A beautiful new setup flow with Zen Mode integration directly in the control center."
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 3. Liquid Glass UI -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_launcher_foreground" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsansbold"
+                    android:text="Fluid Design"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/productsans"
+                    android:text="A sophisticated, minimalist interface featuring intelligent text legibility and smooth motion."
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 4. Under the Hood -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/sparkle"
+                app:tint="?attr/colorPrimary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsansbold"
+                    android:text="Better Performance"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/productsans"
+                    android:text="Enhanced battery saving logic and a more efficient background monitoring system."
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/productsansbold"
+            android:text="Get Started"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorOnPrimary"
+            app:backgroundTint="?attr/colorPrimary"
+            app:cornerRadius="30dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
