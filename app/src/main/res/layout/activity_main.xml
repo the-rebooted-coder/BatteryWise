@@ -58,6 +58,17 @@
                 app:iconSize="22dp"
                 app:iconTint="?attr/colorOnSurfaceVariant" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_chronocell"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_toStartOf="@id/btn_lab"
+                android:layout_centerVertical="true"
+                app:icon="@drawable/ic_chronocell"
+                app:iconSize="22dp"
+                app:iconTint="?attr/colorOnSurfaceVariant" />
+
         </RelativeLayout>
 
         <!-- ─── CENTER BLOCK · hero number + labels ─── -->

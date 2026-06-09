@@ -206,25 +206,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Swipe Action -->
-            <com.example.swipebutton_library.SwipeButton
-                android:id="@+id/moreAboutSS"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:button_background_padding="3dp"
-                app:button_background_src="@drawable/about_me"
-                app:button_background_tint="?attr/colorPrimary"
-                app:has_active_status="false"
-                app:has_finish_animation="true"
-                app:inner_text="Swipe to follow developer"
-                app:inner_text_color="?attr/colorOnPrimaryContainer"
-                app:inner_text_gravity="center"
-                app:inner_text_size="15sp"
-                app:outer_background_tint="?attr/colorPrimaryContainer"
-                app:trail_background_tint="?attr/colorPrimary"
-                app:trail_enabled="true" />
-
             <!-- Footer Logo -->
             <ImageView
                 android:id="@+id/osdLogo"

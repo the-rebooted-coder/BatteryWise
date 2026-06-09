@@ -17,13 +17,25 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+
+import com.onesilicondiode.batterywise.db.BatterySnapshot;
+import com.onesilicondiode.batterywise.db.ChargeSession;
+import com.onesilicondiode.batterywise.db.ChronoDatabase;
+import com.onesilicondiode.batterywise.db.ChronoDao;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BatteryMonitorService extends Service {
     private static final int FOREGROUND_SERVICE_ID = 101;
@@ -46,6 +58,22 @@ public class BatteryMonitorService extends Service {
     private BroadcastReceiver batteryReceiver;
     private PendingIntent pendingIntent;
 
+    // ── ChronoCell data logging ──
+    private ChronoDao chronoDao;
+    private ExecutorService dbExecutor;
+    private Handler snapshotHandler;
+    private static final long SNAPSHOT_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+    private static final long DATA_RETENTION_MS = 180L * 24 * 60 * 60 * 1000; // 6 months
+
+    // Charge session tracking
+    private boolean wasCharging = false;
+    private long sessionStartMs = 0;
+    private int sessionStartPercent = 0;
+    private int sessionChargerType = 0;
+    private final List<Float> sessionTemps = new ArrayList<>();
+    private final List<Float> sessionWattages = new ArrayList<>();
+    private boolean sessionSafeChargeTriggered = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -66,6 +94,22 @@ public class BatteryMonitorService extends Service {
         editor.putBoolean(ALERT_PLAYED_KEY, false);
         editor.putBoolean("serviceRunning", true); // Persisted for BootReceiver on reboot/update
         editor.apply();
+
+        // ── ChronoCell: Initialize database and snapshot scheduler ──
+        chronoDao = ChronoDatabase.getInstance(this).chronoDao();
+        dbExecutor = Executors.newSingleThreadExecutor();
+        snapshotHandler = new Handler(Looper.getMainLooper());
+
+        // Prune old data (older than 6 months)
+        dbExecutor.execute(() -> {
+            long cutoff = System.currentTimeMillis() - DATA_RETENTION_MS;
+            chronoDao.deleteOldSessions(cutoff);
+            chronoDao.deleteOldSnapshots(cutoff);
+            Log.d(TAG, "ChronoCell: Pruned data older than 6 months");
+        });
+
+        // Start periodic snapshots
+        snapshotHandler.post(snapshotRunnable);
 
         // Create notification channel for StopAlert
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -126,6 +170,9 @@ public class BatteryMonitorService extends Service {
                             ", selectedBatteryLevel=" + selectedBatteryLevel + ", userStarted=" + userStarted +
                             ", alertPlayed=" + alertPlayed);
 
+                    // ── ChronoCell: Track charge session lifecycle ──
+                    trackChargeSession(intent, batteryManager, batteryPercent, isPlugged, plugged);
+
                     if (isPlugged && batteryPercent >= selectedBatteryLevel && !alertPlayed && !userStarted) {
                         // Check notification permission first
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -164,6 +211,9 @@ public class BatteryMonitorService extends Service {
                         } catch (SecurityException e) {
                             Log.e(TAG, "Failed to post notification", e);
                         }
+
+                        // ── ChronoCell: Mark SafeCharge triggered for this session ──
+                        sessionSafeChargeTriggered = true;
 
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean(ALERT_PLAYED_KEY, true);
@@ -229,7 +279,151 @@ public class BatteryMonitorService extends Service {
             batteryReceiver = null;
             Log.d(TAG, "onDestroy: Unregistered batteryReceiver");
         }
+
+        // ── ChronoCell: Finalize any in-progress charge session ──
+        if (wasCharging) {
+            finalizeChargeSession(((BatteryManager) getSystemService(BATTERY_SERVICE))
+                    .getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY));
+        }
+        if (snapshotHandler != null) {
+            snapshotHandler.removeCallbacks(snapshotRunnable);
+        }
+        if (dbExecutor != null) {
+            dbExecutor.shutdown();
+        }
+
         stopForeground(true);
         Log.d(TAG, "onDestroy: Service stopped");
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ChronoCell: Charge session tracking & periodic snapshots
+    // ══════════════════════════════════════════════════════════════
+
+    private final Runnable snapshotRunnable = new Runnable() {
+        @Override
+        public void run() {
+            logBatterySnapshot();
+            snapshotHandler.postDelayed(this, SNAPSHOT_INTERVAL_MS);
+        }
+    };
+
+    private void logBatterySnapshot() {
+        if (dbExecutor == null || dbExecutor.isShutdown()) return;
+        dbExecutor.execute(() -> {
+            try {
+                BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+                if (bm == null) return;
+
+                Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+                BatterySnapshot snapshot = new BatterySnapshot();
+                snapshot.timestampMs = System.currentTimeMillis();
+                snapshot.batteryPercent = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+
+                if (batteryIntent != null) {
+                    int temp = batteryIntent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+                    snapshot.temperature = (temp != -1) ? temp / 10f : 0f;
+
+                    int voltageMv = batteryIntent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
+                    snapshot.voltage = (voltageMv != -1) ? voltageMv / 1000f : 0f;
+
+                    int plugged = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+                    snapshot.isCharging = plugged != 0;
+
+                    int health = batteryIntent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
+                    snapshot.healthStatus = health;
+                }
+
+                chronoDao.insertSnapshot(snapshot);
+                Log.d(TAG, "ChronoCell: Snapshot logged - " + snapshot.batteryPercent + "%, "
+                        + snapshot.temperature + "°C");
+            } catch (Exception e) {
+                Log.e(TAG, "ChronoCell: Failed to log snapshot", e);
+            }
+        });
+    }
+
+    private void trackChargeSession(Intent intent, BatteryManager bm,
+                                     int batteryPercent, boolean isPlugged, int pluggedType) {
+        if (isPlugged && !wasCharging) {
+            // ── Charger just connected → start a new session ──
+            wasCharging = true;
+            sessionStartMs = System.currentTimeMillis();
+            sessionStartPercent = batteryPercent;
+            sessionChargerType = pluggedType;
+            sessionSafeChargeTriggered = false;
+            sessionTemps.clear();
+            sessionWattages.clear();
+            Log.d(TAG, "ChronoCell: Charge session started at " + batteryPercent + "%");
+
+            // Log an immediate snapshot at session start
+            logBatterySnapshot();
+        }
+
+        if (isPlugged && wasCharging) {
+            // ── Accumulate temperature & wattage readings during the session ──
+            if (intent != null) {
+                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+                if (temp > 0) sessionTemps.add(temp / 10f);
+
+                try {
+                    long currentNow = bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW);
+                    int voltageMv = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
+                    if (voltageMv > 0) {
+                        double wattage = Math.abs((voltageMv / 1000.0) * (currentNow / 1000000.0));
+                        sessionWattages.add((float) wattage);
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
+        if (!isPlugged && wasCharging) {
+            // ── Charger disconnected → finalize the session ──
+            finalizeChargeSession(batteryPercent);
+        }
+    }
+
+    private void finalizeChargeSession(int endPercent) {
+        wasCharging = false;
+        if (dbExecutor == null || dbExecutor.isShutdown()) return;
+
+        ChargeSession session = new ChargeSession();
+        session.startTimeMs = sessionStartMs;
+        session.endTimeMs = System.currentTimeMillis();
+        session.startPercent = sessionStartPercent;
+        session.endPercent = endPercent;
+        session.chargerType = sessionChargerType;
+        session.safeChargeTriggered = sessionSafeChargeTriggered;
+
+        // Calculate averages
+        if (!sessionTemps.isEmpty()) {
+            float sum = 0, max = 0;
+            for (float t : sessionTemps) {
+                sum += t;
+                if (t > max) max = t;
+            }
+            session.avgTemperature = sum / sessionTemps.size();
+            session.maxTemperature = max;
+        }
+        if (!sessionWattages.isEmpty()) {
+            float sum = 0;
+            for (float w : sessionWattages) sum += w;
+            session.avgWattage = sum / sessionWattages.size();
+        }
+
+        dbExecutor.execute(() -> {
+            try {
+                chronoDao.insertSession(session);
+                Log.d(TAG, "ChronoCell: Session saved - " + session.startPercent
+                        + "% → " + session.endPercent + "%, "
+                        + String.format("%.1f", session.avgTemperature) + "°C avg");
+            } catch (Exception e) {
+                Log.e(TAG, "ChronoCell: Failed to save session", e);
+            }
+        });
+
+        // Log a snapshot at session end too
+        logBatterySnapshot();
     }
 }

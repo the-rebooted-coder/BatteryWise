@@ -19,12 +19,10 @@ import android.window.OnBackInvokedDispatcher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
-import com.example.swipebutton_library.SwipeButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.DynamicColors;
 
 public class About extends AppCompatActivity {
-    private SwipeButton moreAbout;
     private TextView versionInfo;
     private View privacyPolicy;
     private View openSource;
@@ -50,7 +48,6 @@ public class About extends AppCompatActivity {
         setContentView(R.layout.activity_about);
 
         // Bind Views
-        moreAbout = findViewById(R.id.moreAboutSS);
         privacyPolicy = findViewById(R.id.privacyP);
         openSource = findViewById(R.id.openSourceLicense);
         versionInfo = findViewById(R.id.versionName);
@@ -85,13 +82,9 @@ public class About extends AppCompatActivity {
             Toast.makeText(this, "SafeCharge: Built for Eternity (;", Toast.LENGTH_SHORT).show();
         });
 
-        devRow.setOnClickListener(v -> openUrl("https://github.com/the-rebooted-coder"));
+        devRow.setOnClickListener(v -> openUrl("https://the-rebooted-coder.github.io/Digital-TeesShirt/"));
         privacyPolicy.setOnClickListener(v -> openUrl("https://the-rebooted-coder.github.io/BatteryWise/PrivacyPolicy.txt"));
         openSource.setOnClickListener(v -> openUrl("https://github.com/the-rebooted-coder/BatteryWise/blob/main/LICENSE"));
-        moreAbout.setOnActiveListener(() -> {
-            vibrate();
-            openUrl("https://the-rebooted-coder.github.io/Digital-TeesShirt/");
-        });
     }
 
     private void openUrl(String url) {
@@ -115,9 +108,6 @@ public class About extends AppCompatActivity {
         
         devCard.setAlpha(0f);
         devCard.setTranslationY(80f);
-        
-        moreAbout.setAlpha(0f);
-        moreAbout.setTranslationY(80f);
 
         // Core Entrance
         aboutAppIcon.animate()
@@ -132,7 +122,6 @@ public class About extends AppCompatActivity {
 
         animateStaggered(missionCard, 400);
         animateStaggered(devCard, 550);
-        animateStaggered(moreAbout, 700);
     }
 
     private void animateStaggered(View v, long delay) {
@@ -151,10 +140,6 @@ public class About extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && predictiveBackCallback != null) {
             getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(predictiveBackCallback);
         }
-    }
-
-    private void vibrate() {
-        HapticUtils.playCustomVibration(this, new long[]{5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5});
     }
 
     private void vibrateOSD() {

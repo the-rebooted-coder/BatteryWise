@@ -25,8 +25,8 @@ import java.util.Locale;
 public class BatteryLab extends AppCompatActivity {
 
     private static final String TAG = "BatteryLab";
-    private TextView txtWattage, txtTemp, txtHealth, txtVoltage, txtSourceType, txtChargeStatus;
-    private View cardPowerFlow, cardTemp, cardHealth, cardVoltage, cardSource;
+    private TextView txtWattage, txtTemp, txtHealth, txtVoltage, txtSourceType, txtChargeStatus, txtSafeCharged;
+    private View cardPowerFlow, cardTemp, cardHealth, cardVoltage, cardSource, cardSafeCharged;
     
     private BatteryManager batteryManager;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -66,12 +66,14 @@ public class BatteryLab extends AppCompatActivity {
         txtVoltage = findViewById(R.id.txt_voltage);
         txtSourceType = findViewById(R.id.txt_source_type);
         txtChargeStatus = findViewById(R.id.txt_charge_status);
+        txtSafeCharged = findViewById(R.id.txt_safecharged);
 
         cardPowerFlow = findViewById(R.id.card_power_flow);
         cardTemp = findViewById(R.id.card_temp);
         cardHealth = findViewById(R.id.card_health);
         cardVoltage = findViewById(R.id.card_voltage);
         cardSource = findViewById(R.id.card_source);
+        cardSafeCharged = findViewById(R.id.card_safecharged);
     }
 
     private void setupTooltips() {
@@ -79,6 +81,7 @@ public class BatteryLab extends AppCompatActivity {
         findViewById(R.id.info_temp).setOnClickListener(v -> showTooltip("Temperature", "Internal heat level. Batteries hate heat; staying below 40°C is ideal for longevity."));
         findViewById(R.id.info_health).setOnClickListener(v -> showTooltip("Battery Health", "Hardware-level health assessment reported by the system."));
         findViewById(R.id.info_voltage).setOnClickListener(v -> showTooltip("Voltage", "The electrical pressure provided by the battery. Stable voltage indicates a healthy power system."));
+        findViewById(R.id.info_safecharged).setOnClickListener(v -> showTooltip("SafeCharged", "The total number of times SafeCharge successfully monitored your battery and prevented potential overcharging."));
     }
 
     private void showTooltip(String title, String message) {
@@ -187,6 +190,18 @@ public class BatteryLab extends AppCompatActivity {
         super.onResume();
         registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         handler.post(updateRunnable);
+        updateSafeChargedCounter();
+    }
+
+    private void updateSafeChargedCounter() {
+        android.content.SharedPreferences sp = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        int counter = sp.getInt("counter", 0);
+        txtSafeCharged.setText(String.valueOf(counter));
+        if (counter > 0) {
+            cardSafeCharged.setVisibility(View.VISIBLE);
+        } else {
+            cardSafeCharged.setVisibility(View.GONE);
+        }
     }
 
     @Override

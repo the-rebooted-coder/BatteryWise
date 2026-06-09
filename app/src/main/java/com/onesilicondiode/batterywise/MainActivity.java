@@ -44,6 +44,7 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.example.swipebutton_library.SwipeButton;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
 
@@ -166,6 +167,13 @@ public class MainActivity extends AppCompatActivity {
         if (!sharedPreferences.getBoolean("lab_visited", false)) {
             startLabButtonGlow(btnLab);
         }
+
+        // ── ChronoCell (Battery Time Machine) ──
+        MaterialButton btnChrono = findViewById(R.id.btn_chronocell);
+        btnChrono.setOnClickListener(v -> {
+            vibrateTouch();
+            startActivity(new Intent(this, ChronoCellActivity.class));
+        });
 
         // ── Status pill → also opens settings ──
         statusPill.setOnClickListener(v -> {
@@ -386,17 +394,6 @@ public class MainActivity extends AppCompatActivity {
             sheetStopMonitoringBtn.setVisibility(View.GONE);
         }
 
-        // Footer counter
-        int counter = getCounterFromSharedPreferences();
-        com.google.android.material.textview.MaterialTextView sheetUsedTime =
-                sheetView.findViewById(R.id.sheet_used_time);
-        if (counter > 0) {
-            sheetUsedTime.setVisibility(View.VISIBLE);
-            sheetUsedTime.setText(counter == 1
-                    ? "SafeCharged " + counter + " time"
-                    : "SafeCharged " + counter + " times");
-        }
-
         sheetDialog.show();
     }
 
@@ -593,14 +590,17 @@ public class MainActivity extends AppCompatActivity {
         int onSurfaceColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurface);
         int onSurfaceVariantColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant);
         MaterialButton btnLab = findViewById(R.id.btn_lab);
+        MaterialButton btnChrono = findViewById(R.id.btn_chronocell);
 
         // App Name (Top Bar) - threshold around 92% as it's at the very top
         if (batteryPercent >= 92) {
             topBarTitle.setTextColor(Color.WHITE);
             btnLab.setIconTint(ColorStateList.valueOf(Color.WHITE));
+            btnChrono.setIconTint(ColorStateList.valueOf(Color.WHITE));
         } else {
             topBarTitle.setTextColor(onSurfaceColor);
             btnLab.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
+            btnChrono.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
         }
 
         // Hero Battery Number - threshold around 52% (center is 50, wave crests higher)

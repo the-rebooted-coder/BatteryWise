@@ -106,6 +106,9 @@
             android:name=".BatteryLab"
             android:exported="false" />
         <activity
+            android:name=".ChronoCellActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
     </application>

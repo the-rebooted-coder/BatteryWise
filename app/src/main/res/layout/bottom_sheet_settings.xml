@@ -346,19 +346,4 @@
         app:backgroundTint="?attr/colorErrorContainer"
         app:cornerRadius="28dp" />
 
-    <!-- ─────────────────────────────────── -->
-    <!-- FOOTER COUNTER                     -->
-    <!-- ─────────────────────────────────── -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/sheet_used_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/productsans"
-        android:text=""
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="13sp"
-        android:visibility="gone" />
-
 </LinearLayout>

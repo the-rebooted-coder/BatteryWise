@@ -262,7 +262,60 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 5. Charging Source Info (Detailed Card) -->
+                <!-- 5. SafeCharged Counter Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_safecharged"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/productsansbold"
+                                android:text="SafeCharged Times"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/txt_safecharged"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/productsansbold"
+                                android:text="0"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="24sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/info_safecharged"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:alpha="0.4"
+                            android:src="@drawable/baseline_info_24"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 6. Charging Source Info (Detailed Card) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_source"
                     android:layout_width="match_parent"
