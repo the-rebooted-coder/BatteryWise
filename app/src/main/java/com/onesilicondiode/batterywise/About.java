@@ -1,16 +1,15 @@
 package com.onesilicondiode.batterywise;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
-import android.util.TypedValue;
+import android.view.View;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,14 +22,19 @@ import androidx.core.splashscreen.SplashScreen;
 import com.example.swipebutton_library.SwipeButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.DynamicColors;
-import com.google.android.material.shape.CornerFamily;
 
 public class About extends AppCompatActivity {
-    SwipeButton moreAbout;
-    TextView versionInfo, privacyPolicy, openSource;
-    ImageView osdLogo;
+    private SwipeButton moreAbout;
+    private TextView versionInfo;
+    private View privacyPolicy;
+    private View openSource;
+    private View devRow;
+    private ImageView osdLogo;
+    private ImageView aboutAppIcon;
+    private MaterialCardView missionCard;
+    private MaterialCardView devCard;
 
-    // Predictive back callback for Android 13+ (U+)
+    // Predictive back callback
     private OnBackInvokedCallback predictiveBackCallback;
 
     @Override
@@ -38,77 +42,28 @@ public class About extends AppCompatActivity {
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyToActivityIfAvailable(this);
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
-        getWindow().setStatusBarColor(ThemeUtils.getThemeColor(this, android.R.attr.colorPrimaryDark));
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+
+        // Bind Views
         moreAbout = findViewById(R.id.moreAboutSS);
         privacyPolicy = findViewById(R.id.privacyP);
         openSource = findViewById(R.id.openSourceLicense);
         versionInfo = findViewById(R.id.versionName);
         osdLogo = findViewById(R.id.osdLogo);
-        try {
-            PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
-            String version = pInfo.versionName;
-            String productInfoText = version + "\n35.0";
-            versionInfo.setText(productInfoText);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        osdLogo.setOnClickListener(view -> {
-            vibrateOSD();
-            Toast.makeText(About.this, "App developed by OneSiliconDiode (;", Toast.LENGTH_SHORT).show();
-        });
-        privacyPolicy.setOnClickListener(view -> {
-            vibrateOtherButton();
-            try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/BatteryWise/PrivacyPolicy.txt"));
-                startActivity(browserIntent);
-            } catch (Exception e) {
-                Toast.makeText(this, "Cannot Open Browser", Toast.LENGTH_LONG).show();
-            }
-        });
-        openSource.setOnClickListener(view -> {
-            vibrateOtherButton();
-            try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/the-rebooted-coder/BatteryWise/blob/main/LICENSE"));
-                startActivity(browserIntent);
-            } catch (Exception e) {
-                Toast.makeText(this, "Cannot Open Browser", Toast.LENGTH_LONG).show();
-            }
-        });
-        moreAbout.setOnActiveListener(() -> {
-            vibrate();
-            try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://the-rebooted-coder.github.io/Digital-TeesShirt/"));
-                startActivity(browserIntent);
-            } catch (Exception e) {
-                Toast.makeText(this, "Google me up ;)", Toast.LENGTH_LONG).show();
-            }
-        });
+        devRow = findViewById(R.id.dev_row);
+        aboutAppIcon = findViewById(R.id.about_app_icon);
+        missionCard = findViewById(R.id.mission_card);
+        devCard = findViewById(R.id.dev_card);
 
-        MaterialCardView cardView = findViewById(R.id.initialCard);
-        float radius = 30;
-        cardView.setShapeAppearanceModel(
-                cardView.getShapeAppearanceModel()
-                        .toBuilder()
-                        .setTopLeftCorner(CornerFamily.ROUNDED, radius)
-                        .setTopRightCorner(CornerFamily.ROUNDED, radius)
-                        .setBottomRightCornerSize(0)
-                        .setBottomLeftCornerSize(0)
-                        .build());
+        setupLogic();
+        startEntranceAnimations();
 
-        MaterialCardView cardViews = findViewById(R.id.secondaryCard);
-        cardViews.setShapeAppearanceModel(
-                cardViews.getShapeAppearanceModel()
-                        .toBuilder()
-                        .setTopLeftCorner(CornerFamily.ROUNDED, radius)
-                        .setTopRightCorner(CornerFamily.ROUNDED, radius)
-                        .setBottomRightCornerSize(0)
-                        .setBottomLeftCornerSize(0)
-                        .build());
-
-        // Predictive Back Navigation (Android 15+/U+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 15+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             predictiveBackCallback = () -> finish();
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     OnBackInvokedDispatcher.PRIORITY_DEFAULT,
@@ -117,27 +72,96 @@ public class About extends AppCompatActivity {
         }
     }
 
+    private void setupLogic() {
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+            versionInfo.setText("Version " + pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        osdLogo.setOnClickListener(view -> {
+            vibrateOSD();
+            Toast.makeText(this, "SafeCharge: Built for Eternity (;", Toast.LENGTH_SHORT).show();
+        });
+
+        devRow.setOnClickListener(v -> openUrl("https://github.com/the-rebooted-coder"));
+        privacyPolicy.setOnClickListener(v -> openUrl("https://the-rebooted-coder.github.io/BatteryWise/PrivacyPolicy.txt"));
+        openSource.setOnClickListener(v -> openUrl("https://github.com/the-rebooted-coder/BatteryWise/blob/main/LICENSE"));
+        moreAbout.setOnActiveListener(() -> {
+            vibrate();
+            openUrl("https://the-rebooted-coder.github.io/Digital-TeesShirt/");
+        });
+    }
+
+    private void openUrl(String url) {
+        vibrateOtherButton();
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (Exception e) {
+            Toast.makeText(this, "Could not open link", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void startEntranceAnimations() {
+        // Initial state
+        aboutAppIcon.setAlpha(0f);
+        aboutAppIcon.setTranslationY(100f);
+        aboutAppIcon.setScaleX(0.8f);
+        aboutAppIcon.setScaleY(0.8f);
+
+        missionCard.setAlpha(0f);
+        missionCard.setTranslationY(80f);
+        
+        devCard.setAlpha(0f);
+        devCard.setTranslationY(80f);
+        
+        moreAbout.setAlpha(0f);
+        moreAbout.setTranslationY(80f);
+
+        // Core Entrance
+        aboutAppIcon.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(800)
+                .setInterpolator(new AnticipateOvershootInterpolator(1.0f))
+                .setStartDelay(200)
+                .start();
+
+        animateStaggered(missionCard, 400);
+        animateStaggered(devCard, 550);
+        animateStaggered(moreAbout, 700);
+    }
+
+    private void animateStaggered(View v, long delay) {
+        v.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(700)
+                .setInterpolator(new DecelerateInterpolator())
+                .setStartDelay(delay)
+                .start();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Unregister predictive back callback
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && predictiveBackCallback != null) {
             getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(predictiveBackCallback);
         }
     }
 
     private void vibrate() {
-        long[] pattern = {5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5};
-        HapticUtils.playCustomVibration(this, pattern);
+        HapticUtils.playCustomVibration(this, new long[]{5, 0, 5, 0, 5, 1, 5, 1, 5, 2, 5, 2, 5, 3, 5, 4, 5, 4, 5});
     }
 
     private void vibrateOSD() {
-        long[] pattern = {17, 4, 14, 17, 0, 22, 21, 8, 22, 0, 18, 0, 16};
-        HapticUtils.playCustomVibration(this, pattern);
+        HapticUtils.playCustomVibration(this, new long[]{17, 4, 14, 17, 0, 22, 21, 8, 22, 0, 18, 0, 16});
     }
 
     private void vibrateOtherButton() {
-        long[] pattern = {10, 0, 11, 1, 16, 2, 11, 3};
-        HapticUtils.playCustomVibration(this, pattern);
+        HapticUtils.playCustomVibration(this, new long[]{10, 0, 11, 1, 16, 2, 11, 3});
     }
 }
