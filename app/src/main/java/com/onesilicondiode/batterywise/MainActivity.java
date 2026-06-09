@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private com.google.android.material.textview.MaterialTextView heroBatteryNumber;
     private com.google.android.material.textview.MaterialTextView heroSubLabel;
     private com.google.android.material.textview.MaterialTextView settingsGhostLink;
+    private com.google.android.material.textview.MaterialTextView topBarTitle;
     private com.google.android.material.card.MaterialCardView statusPill;
     private com.google.android.material.textview.MaterialTextView statusPillText;
 
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         statusPill = findViewById(R.id.statusPill);
         statusPillText = findViewById(R.id.statusPillText);
         settingsGhostLink = findViewById(R.id.settingsGhostLink);
+        topBarTitle = findViewById(R.id.topBarTitle);
         startSaving = findViewById(R.id.saveBatteryBtn);
 
         // ── Dynamic wave border colour ──
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         // Hero battery number
         heroBatteryNumber.setText(batteryPercent + "%");
         waveLoadingView.setProgressValue(batteryPercent);
+        updateUIColors(batteryPercent);
 
         // Threshold sub-label
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -167,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 int currentBatteryPercent = getCurrentBatteryPercent();
                 setWaveColor(true, currentBatteryPercent);
                 waveLoadingView.setProgressValue(currentBatteryPercent);
+                updateUIColors(currentBatteryPercent);
             } catch (Exception e) {
                 showIntentErrorDialog();
             }
@@ -208,6 +212,17 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkNotificationPermission();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int batteryPercent = getCurrentBatteryPercent();
+        heroBatteryNumber.setText(batteryPercent + "%");
+        waveLoadingView.setProgressValue(batteryPercent);
+        boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
+        setWaveColor(isServiceRunning, batteryPercent);
+        updateUIColors(batteryPercent);
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -473,6 +488,34 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode != RESULT_OK) {
                 //DO NOT REMOVE THIS
             }
+        }
+    }
+
+    private void updateUIColors(int batteryPercent) {
+        int onSurfaceColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurface);
+        int onSurfaceVariantColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant);
+
+        // App Name (Top Bar) - threshold around 92% as it's at the very top
+        if (batteryPercent >= 92) {
+            topBarTitle.setTextColor(Color.WHITE);
+        } else {
+            topBarTitle.setTextColor(onSurfaceColor);
+        }
+
+        // Hero Battery Number - threshold around 52% (center is 50, wave crests higher)
+        if (batteryPercent >= 52) {
+            heroBatteryNumber.setTextColor(Color.WHITE);
+            heroSubLabel.setTextColor(Color.parseColor("#B3FFFFFF"));
+        } else {
+            heroBatteryNumber.setTextColor(onSurfaceColor);
+            heroSubLabel.setTextColor(onSurfaceVariantColor);
+        }
+
+        // Ghost settings link - at the bottom (~10-15% height)
+        if (batteryPercent >= 15) {
+            settingsGhostLink.setTextColor(Color.parseColor("#66FFFFFF"));
+        } else {
+            settingsGhostLink.setTextColor(onSurfaceVariantColor);
         }
     }
 
