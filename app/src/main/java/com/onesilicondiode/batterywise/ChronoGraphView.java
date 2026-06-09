@@ -193,11 +193,16 @@ public class ChronoGraphView extends View {
             if (dp.timestampMs < minX) minX = dp.timestampMs;
             if (dp.timestampMs > maxX) maxX = dp.timestampMs;
         }
-        // Add some Y padding
+        // If all values are the same (flat line), add a small symmetric range
         float yRange = maxY - minY;
-        if (yRange < 1f) yRange = 10f;
-        minY -= yRange * 0.1f;
-        maxY += yRange * 0.1f;
+        if (yRange < 1f) {
+            minY -= 5f;
+            maxY += 5f;
+        } else {
+            // Only add a tiny bottom margin so the lowest point isn't clipped;
+            // the top stays at the real max (no phantom values above data)
+            minY -= yRange * 0.05f;
+        }
     }
 
     private void animateEntry() {

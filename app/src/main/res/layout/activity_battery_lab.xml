@@ -19,18 +19,67 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Activity Title -->
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
+        <!-- ═══════════════════════════════════════ -->
+        <!-- HERO HEADER                             -->
+        <!-- ═══════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/lab_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="56dp"
-            android:layout_marginBottom="16dp"
-            android:fontFamily="@font/productsansbold"
-            android:text="Battery Lab"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="28sp" />
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="56dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/lab_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/productsansbold"
+                    android:text="Battery Lab"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="28sp" />
+
+                <!-- Live pulse dot -->
+                <View
+                    android:id="@+id/live_pulse_dot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/live_dot" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsans"
+                    android:text="LIVE"
+                    android:letterSpacing="0.08"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/lab_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/productsans"
+                android:text="Real-time hardware insights"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SCROLLABLE CONTENT                      -->
+        <!-- ═══════════════════════════════════════ -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -45,15 +94,16 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <!-- 1. Power Flow Card (Previously Hero) -->
+                <!-- ═══════════════════════════════════════ -->
+                <!-- HERO POWER CARD                         -->
+                <!-- ═══════════════════════════════════════ -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_power_flow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="20dp"
                     android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
                     app:cardCornerRadius="28dp"
                     app:cardElevation="0dp"
                     tools:visibility="visible">
@@ -61,268 +111,67 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="20dp">
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:fontFamily="@font/productsansbold"
-                                android:text="Power Flow"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="13sp" />
+                                android:letterSpacing="0.06"
+                                android:text="POWER FLOW"
+                                android:textColor="?attr/colorOnPrimaryContainer"
+                                android:textSize="11sp" />
 
-                            <TextView
-                                android:id="@+id/txt_wattage"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="0.0 W"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="24sp" />
+                            <ImageView
+                                android:id="@+id/info_power_flow"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/baseline_info_24"
+                                app:tint="?attr/colorOnPrimaryContainer" />
                         </LinearLayout>
 
-                        <ImageView
-                            android:id="@+id/info_power_flow"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:alpha="0.4"
-                            android:src="@drawable/baseline_info_24"
-                            app:tint="?attr/colorOnSurfaceVariant" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/txt_wattage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/productsansbold"
+                            android:text="0.0 W"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="42sp" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/txt_power_direction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/productsans"
+                            android:text="Energy flowing into battery"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:alpha="0.7"
+                            android:textSize="13sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 2. Temperature Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_temp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    tools:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="20dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="Temperature"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="13sp" />
-
-                            <TextView
-                                android:id="@+id/txt_temp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="0.0 °C"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="24sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:id="@+id/info_temp"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:alpha="0.4"
-                            android:src="@drawable/baseline_info_24"
-                            app:tint="?attr/colorOnSurfaceVariant" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 3. Health Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_health"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    tools:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="20dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="Hardware Health"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="13sp" />
-
-                            <TextView
-                                android:id="@+id/txt_health"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="Good"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="24sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:id="@+id/info_health"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:alpha="0.4"
-                            android:src="@drawable/baseline_info_24"
-                            app:tint="?attr/colorOnSurfaceVariant" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 4. Voltage Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_voltage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    tools:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="20dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="Current Voltage"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="13sp" />
-
-                            <TextView
-                                android:id="@+id/txt_voltage"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="0.0 V"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="24sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:id="@+id/info_voltage"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:alpha="0.4"
-                            android:src="@drawable/baseline_info_24"
-                            app:tint="?attr/colorOnSurfaceVariant" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 5. SafeCharged Counter Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_safecharged"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="20dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="SafeCharged Times"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="13sp" />
-
-                            <TextView
-                                android:id="@+id/txt_safecharged"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/productsansbold"
-                                android:text="0"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="24sp" />
-                        </LinearLayout>
-
-                        <ImageView
-                            android:id="@+id/info_safecharged"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:alpha="0.4"
-                            android:src="@drawable/baseline_info_24"
-                            app:tint="?attr/colorOnSurfaceVariant" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 6. Charging Source Info (Detailed Card) -->
+                <!-- ═══════════════════════════════════════ -->
+                <!-- CHARGING SOURCE CARD                    -->
+                <!-- ═══════════════════════════════════════ -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_source"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorSecondaryContainer"
                     app:cardCornerRadius="28dp"
                     app:cardElevation="0dp"
                     tools:visibility="visible">
@@ -339,7 +188,7 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@drawable/baseline_start_24"
-                            app:tint="?attr/colorPrimary" />
+                            app:tint="?attr/colorOnSecondaryContainer" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -348,26 +197,270 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/txt_source_type"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/productsansbold"
                                 android:text="AC Charger"
-                                android:textColor="?attr/colorOnSurface"
+                                android:textColor="?attr/colorOnSecondaryContainer"
                                 android:textSize="16sp" />
 
-                            <TextView
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/txt_charge_status"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/productsans"
                                 android:text="Charging Rapidly"
-                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textColor="?attr/colorOnSecondaryContainer"
+                                android:alpha="0.7"
                                 android:textSize="13sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <!-- ═══════════════════════════════════════ -->
+                <!-- 2×2 METRICS GRID                        -->
+                <!-- ═══════════════════════════════════════ -->
+
+                <!-- Row 1: Temperature + Voltage -->
+                <LinearLayout
+                    android:id="@+id/grid_row_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <!-- Temperature -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_temp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="18dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/productsansbold"
+                                    android:text="Temp"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="11sp" />
+
+                                <ImageView
+                                    android:id="@+id/info_temp"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:alpha="0.4"
+                                    android:src="@drawable/baseline_info_24"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/txt_temp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/productsansbold"
+                                android:text="0.0 °C"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="26sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Voltage -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_voltage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="18dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/productsansbold"
+                                    android:text="Voltage"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="11sp" />
+
+                                <ImageView
+                                    android:id="@+id/info_voltage"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:alpha="0.4"
+                                    android:src="@drawable/baseline_info_24"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/txt_voltage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/productsansbold"
+                                android:text="0.0 V"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="26sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Row 2: Health + SafeCharged -->
+                <LinearLayout
+                    android:id="@+id/grid_row_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <!-- Health -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_health"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="18dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/productsansbold"
+                                    android:text="Health"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="11sp" />
+
+                                <ImageView
+                                    android:id="@+id/info_health"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:alpha="0.4"
+                                    android:src="@drawable/baseline_info_24"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/txt_health"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/productsansbold"
+                                android:text="Good"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="26sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- SafeCharged -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_safecharged"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="18dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.textview.MaterialTextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/productsansbold"
+                                    android:text="SafeCharged"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="11sp" />
+
+                                <ImageView
+                                    android:id="@+id/info_safecharged"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:alpha="0.4"
+                                    android:src="@drawable/baseline_info_24"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/txt_safecharged"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/productsansbold"
+                                android:text="0"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="26sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
 
                 <!-- Footer -->
                 <TextView

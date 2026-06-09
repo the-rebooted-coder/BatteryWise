@@ -213,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // ── "What's New" bottom sheet (Volt Update) ──
-        if (!sharedPreferences.getBoolean("isVoltUpdateConfirmed", false)) {
+        // ── "What's New" bottom sheet (ChronoCell Update) ──
+        if (!sharedPreferences.getBoolean("isChronoCellUpdateConfirmed", false)) {
             showBottomSheet();
         }
 
@@ -542,13 +542,13 @@ public class MainActivity extends AppCompatActivity {
         final MaterialButton btnConfirm = bottomSheetView.findViewById(R.id.btnConfirm);
         btnConfirm.setOnClickListener(v -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isVoltUpdateConfirmed", true);
+            editor.putBoolean("isChronoCellUpdateConfirmed", true);
             editor.apply();
             bottomSheetDialog.dismiss();
         });
         bottomSheetDialog.setOnDismissListener(dialog -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isVoltUpdateConfirmed", true);
+            editor.putBoolean("isChronoCellUpdateConfirmed", true);
             editor.apply();
         });
         bottomSheetDialog.show();

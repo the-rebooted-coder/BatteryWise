@@ -150,7 +150,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 4. Under the Hood -->
+        <!-- 4. ChronoCell -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -161,7 +161,7 @@
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/sparkle"
+                android:src="@drawable/ic_chronocell"
                 app:tint="?attr/colorPrimary" />
 
             <LinearLayout
@@ -174,7 +174,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/productsansbold"
-                    android:text="Better Performance"
+                    android:text="ChronoCell"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="17sp" />
 
@@ -183,7 +183,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/productsans"
-                    android:text="Enhanced battery saving logic and a more efficient background monitoring system."
+                    android:text="Your battery's time machine. Every charge session is logged with temperature, wattage, and graphs that predict your battery's lifespan."
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp" />
             </LinearLayout>
