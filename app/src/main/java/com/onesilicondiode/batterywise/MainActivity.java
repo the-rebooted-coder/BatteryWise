@@ -336,45 +336,14 @@ public class MainActivity extends AppCompatActivity {
         sheetBtn3m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn3m, 3));
 
         // Utility rows
-        android.view.View daydreamRow = sheetView.findViewById(R.id.sheet_daydream_row);
+        View daydreamRow = sheetView.findViewById(R.id.sheet_daydream_row);
         daydreamRow.setOnClickListener(v -> {
-            vibrate();
+            vibrateTouch();
             sheetDialog.dismiss();
-            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-            boolean isFirstTime = prefs.getBoolean("first_time_enable_daydream", true);
-            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                    .setTitle("Welcome to DayDream ☁️")
-                    .setMessage("Would you like to preview DayDream or set it as your phone's system screensaver?")
-                    .setPositiveButton("Preview Screensaver", (dialog, which) -> {
-                        if (isFirstTime) {
-                            prefs.edit().putBoolean("first_time_enable_daydream", false).apply();
-                            android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_daydream_intro, null);
-                            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                                    .setTitle("Welcome to DayDream ☁️")
-                                    .setView(dialogView)
-                                    .setCancelable(false)
-                                    .setPositiveButton("Try DayDream", (d, w) -> startActivity(new Intent(this, ScreenSaverActivity.class)))
-                                    .setNegativeButton("Nope", null)
-                                    .show();
-                        } else {
-                            try {
-                                startActivity(new Intent(this, ScreenSaverActivity.class));
-                            } catch (Exception e) {
-                                Toast.makeText(this, "Could not open DayDream.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    })
-                    .setNegativeButton("Set as Screensaver", (dialog, which) -> {
-                        try {
-                            startActivity(new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS));
-                        } catch (Exception ex) {
-                            Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .show();
+            showDayDreamBottomSheet();
         });
 
-        android.view.View infoRow = sheetView.findViewById(R.id.sheet_info_row);
+        View infoRow = sheetView.findViewById(R.id.sheet_info_row);
         infoRow.setOnClickListener(v -> {
             vibrate();
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
@@ -420,6 +389,61 @@ public class MainActivity extends AppCompatActivity {
                     ? "SafeCharged " + counter + " time"
                     : "SafeCharged " + counter + " times");
         }
+
+        sheetDialog.show();
+    }
+
+    private void showDayDreamBottomSheet() {
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_daydream, null);
+        BottomSheetDialog sheetDialog = new BottomSheetDialog(this);
+        sheetDialog.setContentView(sheetView);
+
+        // Header animation
+        View icon = sheetView.findViewById(R.id.daydream_icon);
+        icon.setAlpha(0f);
+        icon.setTranslationY(40f);
+        icon.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(600)
+                .setInterpolator(new android.view.animation.OvershootInterpolator(1.2f))
+                .setStartDelay(200)
+                .start();
+
+        // Zen Mode setup
+        MaterialSwitch zenSwitch = sheetView.findViewById(R.id.daydream_zen_switch);
+        SharedPreferences ddPrefs = getSharedPreferences(SafeChargeSettingsActivity.PREFS_NAME, MODE_PRIVATE);
+        boolean zenEnabled = ddPrefs.getBoolean(SafeChargeSettingsActivity.ZEN_MODE_KEY, false);
+        zenSwitch.setChecked(zenEnabled);
+
+        zenSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            vibrateTouch();
+            ddPrefs.edit().putBoolean(SafeChargeSettingsActivity.ZEN_MODE_KEY, isChecked).apply();
+        });
+
+        // Preview button
+        MaterialButton btnPreview = sheetView.findViewById(R.id.btn_preview_daydream);
+        btnPreview.setOnClickListener(v -> {
+            vibrateTouch();
+            sheetDialog.dismiss();
+            try {
+                startActivity(new Intent(this, ScreenSaverActivity.class));
+            } catch (Exception e) {
+                Toast.makeText(this, "Could not open DayDream.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // System Settings button
+        MaterialButton btnSystem = sheetView.findViewById(R.id.btn_system_screensaver);
+        btnSystem.setOnClickListener(v -> {
+            vibrateTouch();
+            sheetDialog.dismiss();
+            try {
+                startActivity(new Intent(android.provider.Settings.ACTION_DREAM_SETTINGS));
+            } catch (Exception ex) {
+                Toast.makeText(this, "Could not open screensaver settings.", Toast.LENGTH_LONG).show();
+            }
+        });
 
         sheetDialog.show();
     }
