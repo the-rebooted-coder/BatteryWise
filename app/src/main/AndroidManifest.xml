@@ -103,6 +103,9 @@
         </receiver>
 
         <activity
+            android:name=".BatteryLab"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
     </application>

@@ -154,6 +154,19 @@ public class MainActivity extends AppCompatActivity {
             showSettingsBottomSheet();
         });
 
+        // ── Battery Lab ──
+        MaterialButton btnLab = findViewById(R.id.btn_lab);
+        btnLab.setOnClickListener(v -> {
+            vibrateTouch();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("lab_visited", true);
+            editor.apply();
+            startActivity(new Intent(this, BatteryLab.class));
+        });
+        if (!sharedPreferences.getBoolean("lab_visited", false)) {
+            startLabButtonGlow(btnLab);
+        }
+
         // ── Status pill → also opens settings ──
         statusPill.setOnClickListener(v -> {
             vibrateTouch();
@@ -554,15 +567,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startLabButtonGlow(View btn) {
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(btn, "scaleX", 1f, 1.15f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(btn, "scaleY", 1f, 1.15f);
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(btn, "alpha", 1f, 0.7f);
+
+        scaleX.setDuration(1000);
+        scaleY.setDuration(1000);
+        alpha.setDuration(1000);
+
+        scaleX.setRepeatCount(3); // Pulse twice (Forward-Reverse = 1, so 4 states total)
+        scaleY.setRepeatCount(3);
+        alpha.setRepeatCount(3);
+
+        scaleX.setRepeatMode(ObjectAnimator.REVERSE);
+        scaleY.setRepeatMode(ObjectAnimator.REVERSE);
+        alpha.setRepeatMode(ObjectAnimator.REVERSE);
+
+        AnimatorSet breathing = new AnimatorSet();
+        breathing.playTogether(scaleX, scaleY, alpha);
+        breathing.start();
+    }
+
     private void updateUIColors(int batteryPercent) {
         int onSurfaceColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurface);
         int onSurfaceVariantColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant);
+        MaterialButton btnLab = findViewById(R.id.btn_lab);
 
         // App Name (Top Bar) - threshold around 92% as it's at the very top
         if (batteryPercent >= 92) {
             topBarTitle.setTextColor(Color.WHITE);
+            btnLab.setIconTint(ColorStateList.valueOf(Color.WHITE));
         } else {
             topBarTitle.setTextColor(onSurfaceColor);
+            btnLab.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
         }
 
         // Hero Battery Number - threshold around 52% (center is 50, wave crests higher)
