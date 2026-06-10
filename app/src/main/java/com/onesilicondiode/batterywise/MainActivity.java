@@ -487,6 +487,10 @@ public class MainActivity extends AppCompatActivity {
             updateHeroSubLabel(isServiceRunning(BatteryMonitorService.class));
             if (isServiceRunning(BatteryMonitorService.class)) {
                 setWaveColor(true, getCurrentBatteryPercent());
+                // Tell the service to dynamically update its notification with the new threshold
+                Intent updateIntent = new Intent(MainActivity.this, BatteryMonitorService.class);
+                updateIntent.setAction("UPDATE_NOTIFICATION");
+                startService(updateIntent);
             }
         });
 
@@ -839,12 +843,18 @@ public class MainActivity extends AppCompatActivity {
         MaterialButton btnChrono = findViewById(R.id.btn_chronocell);
         MaterialButton btnSettings = findViewById(R.id.btn_settings);
 
+        // The wave is only "dark" when it's green (> 55%).
+        // For grey (inactive) or yellow/orange/red (<= 55%), the wave is a light pastel.
+        boolean isDarkWave = isServiceRunning(BatteryMonitorService.class) && batteryPercent > 55;
+        int waveContrastColor = isDarkWave ? Color.WHITE : Color.parseColor("#1C1B1F");
+        int waveContrastVariantColor = isDarkWave ? Color.parseColor("#B3FFFFFF") : Color.parseColor("#B31C1B1F");
+
         // Zenith bar — threshold around 92% as it's at the very top
         if (batteryPercent >= 92) {
-            topBarTitle.setTextColor(Color.WHITE);
-            btnLab.setIconTint(ColorStateList.valueOf(Color.WHITE));
-            btnChrono.setIconTint(ColorStateList.valueOf(Color.WHITE));
-            btnSettings.setIconTint(ColorStateList.valueOf(Color.WHITE));
+            topBarTitle.setTextColor(waveContrastColor);
+            btnLab.setIconTint(ColorStateList.valueOf(waveContrastColor));
+            btnChrono.setIconTint(ColorStateList.valueOf(waveContrastColor));
+            btnSettings.setIconTint(ColorStateList.valueOf(waveContrastColor));
         } else {
             topBarTitle.setTextColor(onSurfaceColor);
             btnLab.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
@@ -854,16 +864,40 @@ public class MainActivity extends AppCompatActivity {
 
         // Hero Battery Number — threshold around 52%
         if (batteryPercent >= 52) {
-            heroBatteryNumber.setTextColor(Color.WHITE);
-            heroSubLabel.setTextColor(Color.parseColor("#B3FFFFFF"));
+            heroBatteryNumber.setTextColor(waveContrastColor);
+            heroSubLabel.setTextColor(waveContrastVariantColor);
         } else {
             heroBatteryNumber.setTextColor(onSurfaceColor);
             heroSubLabel.setTextColor(onSurfaceVariantColor);
         }
 
+        // Command Dock — threshold around 20% (sits at bottom)
+        android.widget.LinearLayout dockInfoCard = findViewById(R.id.dockInfoCard);
+        if (batteryPercent >= 20) {
+            dockStatusTitle.setTextColor(waveContrastColor);
+            dockStatusSub.setTextColor(waveContrastVariantColor);
+            dockSafechargedCount.setTextColor(waveContrastColor);
+            
+            // Alter glass card background: dark wave gets white tint, light wave gets black tint
+            if (isDarkWave) {
+                dockInfoCard.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#26FFFFFF")));
+                dockSafechargedCount.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#26FFFFFF")));
+            } else {
+                dockInfoCard.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#4D000000")));
+                dockSafechargedCount.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#4D000000")));
+            }
+        } else {
+            dockStatusTitle.setTextColor(Color.WHITE);
+            dockStatusSub.setTextColor(Color.parseColor("#99FFFFFF"));
+            dockSafechargedCount.setTextColor(Color.WHITE);
+            
+            dockInfoCard.setBackgroundTintList(null);
+            dockSafechargedCount.setBackgroundTintList(null);
+        }
+
         // Footer branding — at the bottom (~10-15% height)
         if (batteryPercent >= 15) {
-            footerBranding.setTextColor(Color.WHITE);
+            footerBranding.setTextColor(waveContrastVariantColor);
         } else {
             footerBranding.setTextColor(onSurfaceVariantColor);
         }

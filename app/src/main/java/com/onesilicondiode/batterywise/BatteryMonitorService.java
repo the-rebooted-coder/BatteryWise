@@ -158,6 +158,15 @@ public class BatteryMonitorService extends Service {
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Dynamically update ongoing notification if requested
+        if (intent != null && "UPDATE_NOTIFICATION".equals(intent.getAction())) {
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.notify(FOREGROUND_SERVICE_ID, createNotification());
+            }
+            return START_STICKY;
+        }
+
         // Fix 1: Service killed by system - re-register receiver if null
         if (batteryReceiver == null) {
             batteryReceiver = new BroadcastReceiver() {

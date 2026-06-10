@@ -211,6 +211,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_glass_card"
                     android:clickable="true"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:gravity="center_vertical"
