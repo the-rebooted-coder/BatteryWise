@@ -532,6 +532,13 @@ public class MainActivity extends AppCompatActivity {
             showDayDreamBottomSheet();
         });
 
+        View feedbackRow = sheetView.findViewById(R.id.sheet_feedback_row);
+        feedbackRow.setOnClickListener(v -> {
+            vibrateTouch();
+            sheetDialog.dismiss();
+            showFeedbackBottomSheet();
+        });
+
         View infoRow = sheetView.findViewById(R.id.sheet_info_row);
         infoRow.setOnClickListener(v -> {
             vibrateTouch();
@@ -658,6 +665,79 @@ public class MainActivity extends AppCompatActivity {
         // Close button
         MaterialButton btnClose = sheetView.findViewById(R.id.btn_close_info);
         btnClose.setOnClickListener(v -> {
+            vibrateTouch();
+            sheetDialog.dismiss();
+        });
+
+        sheetDialog.show();
+    }
+
+    private void showFeedbackBottomSheet() {
+        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_feedback, null);
+        BottomSheetDialog sheetDialog = new BottomSheetDialog(this);
+        sheetDialog.setContentView(sheetView);
+
+        // Animate icon entrance
+        android.widget.ImageView feedbackIcon = sheetView.findViewById(R.id.feedback_icon);
+        feedbackIcon.setAlpha(0f);
+        feedbackIcon.setScaleX(0.4f);
+        feedbackIcon.setScaleY(0.4f);
+        feedbackIcon.animate()
+                .alpha(1f).scaleX(1.1f).scaleY(1.1f)
+                .setDuration(400)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                .withEndAction(() -> feedbackIcon.animate()
+                        .scaleX(1f).scaleY(1f).setDuration(200)
+                        .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                        .start())
+                .setStartDelay(100).start();
+
+        // Chip group
+        com.google.android.material.chip.ChipGroup chipGroup =
+                sheetView.findViewById(R.id.feedback_chip_group);
+
+        // Send button
+        MaterialButton btnSend = sheetView.findViewById(R.id.btn_send_feedback);
+        btnSend.setOnClickListener(v -> {
+            vibrateTouch();
+            com.google.android.material.textfield.TextInputEditText editText =
+                    sheetView.findViewById(R.id.feedback_edit_text);
+            String body = editText.getText() != null ? editText.getText().toString().trim() : "";
+
+            if (body.isEmpty()) {
+                editText.setError("Please write something first ✍️");
+                return;
+            }
+
+            // Resolve chip label
+            int checkedId = chipGroup.getCheckedChipId();
+            String category;
+            if      (checkedId == R.id.chip_bug)   category = "🐛 Bug Report";
+            else if (checkedId == R.id.chip_love)  category = "❤️ Love It";
+            else if (checkedId == R.id.chip_other) category = "✉️ Other";
+            else                                    category = "💡 Idea / Feature Request";
+
+            String subject = "[SafeCharge Feedback] " + category;
+            String emailBody = body + "\n\n---\nDevice: " + android.os.Build.MANUFACTURER
+                    + " " + android.os.Build.MODEL
+                    + "\nAndroid: " + android.os.Build.VERSION.RELEASE;
+
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                    android.net.Uri.parse("mailto:connectwithspandan@gmail.com"));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            emailIntent.putExtra(Intent.EXTRA_TEXT, emailBody);
+
+            try {
+                startActivity(Intent.createChooser(emailIntent, "Send feedback via…"));
+                sheetDialog.dismiss();
+            } catch (android.content.ActivityNotFoundException e) {
+                Toast.makeText(this, "No email app found. Please email connectwithspandan@gmail.com directly.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Cancel button
+        MaterialButton btnCancel = sheetView.findViewById(R.id.btn_cancel_feedback);
+        btnCancel.setOnClickListener(v -> {
             vibrateTouch();
             sheetDialog.dismiss();
         });

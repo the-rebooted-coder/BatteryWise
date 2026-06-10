@@ -324,6 +324,46 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="22sp" />
             </LinearLayout>
+
+            <!-- Divider -->
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                app:dividerColor="?attr/colorOutlineVariant" />
+
+            <!-- Feedback row -->
+            <LinearLayout
+                android:id="@+id/sheet_feedback_row"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="16dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawablePadding="14dp"
+                    android:fontFamily="@font/productsans"
+                    android:gravity="center_vertical"
+                    android:text="Send Feedback"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="15sp"
+                    app:drawableStartCompat="@drawable/sparkle"
+                    app:drawableTint="?attr/colorPrimary" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/productsans"
+                    android:text="›"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="22sp" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
