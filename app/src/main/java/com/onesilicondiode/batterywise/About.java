@@ -8,13 +8,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.window.OnBackInvokedCallback;
-import android.window.OnBackInvokedDispatcher;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
@@ -31,9 +30,6 @@ public class About extends AppCompatActivity {
     private ImageView aboutAppIcon;
     private MaterialCardView missionCard;
     private MaterialCardView devCard;
-
-    // Predictive back callback
-    private OnBackInvokedCallback predictiveBackCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +56,11 @@ public class About extends AppCompatActivity {
         setupLogic();
         startEntranceAnimations();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            predictiveBackCallback = () -> finish();
-            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
-                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                    predictiveBackCallback
-            );
-        }
+        // Back navigation
+        findViewById(R.id.btn_back).setOnClickListener(v -> {
+            HapticUtils.vibrateTouch(this);
+            getOnBackPressedDispatcher().onBackPressed();
+        });
     }
 
     private void setupLogic() {
@@ -137,9 +131,6 @@ public class About extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && predictiveBackCallback != null) {
-            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(predictiveBackCallback);
-        }
     }
 
     private void vibrateOSD() {

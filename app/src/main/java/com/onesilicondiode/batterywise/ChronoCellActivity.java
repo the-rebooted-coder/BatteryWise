@@ -73,6 +73,12 @@ public class ChronoCellActivity extends AppCompatActivity {
         collectAnimatableCards();
         runStaggeredEntryAnimation();
         loadData();
+
+        // Back navigation
+        findViewById(R.id.btn_back).setOnClickListener(v -> {
+            HapticUtils.vibrateTouch(this);
+            getOnBackPressedDispatcher().onBackPressed();
+        });
     }
 
     private void initViews() {

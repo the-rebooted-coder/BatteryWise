@@ -19,16 +19,28 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingStart="24dp"
+            android:paddingStart="8dp"
             android:paddingEnd="24dp">
 
+            <!-- Back button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_back"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="start"
+                android:contentDescription="Navigate back"
+                app:icon="@drawable/ic_arrow_back"
+                app:iconSize="20dp"
+                app:iconTint="?attr/colorOnSurface" />
             <!-- Hero Section -->
             <ImageView
                 android:id="@+id/about_app_icon"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="24dp"
+                android:contentDescription="SafeCharge app icon"
                 android:src="@drawable/ic_launcher_foreground" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -214,6 +226,7 @@
                 android:layout_marginTop="48dp"
                 android:layout_marginBottom="24dp"
                 android:alpha="0.5"
+                android:contentDescription="OneSiliconDiode logo"
                 android:src="@drawable/osd_light"
                 app:tint="?attr/colorOnSurfaceVariant" />
 

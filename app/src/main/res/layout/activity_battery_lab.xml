@@ -27,15 +27,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="24dp"
+            android:paddingStart="8dp"
             android:paddingEnd="24dp"
-            android:paddingTop="56dp">
+            android:paddingTop="48dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_back"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:contentDescription="Navigate back"
+                    app:icon="@drawable/ic_arrow_back"
+                    app:iconSize="20dp"
+                    app:iconTint="?attr/colorOnSurface" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/lab_title"
@@ -45,7 +55,7 @@
                     android:fontFamily="@font/productsansbold"
                     android:text="Battery Lab"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="28sp" />
+                    android:textSize="22sp" />
 
                 <!-- Live pulse dot -->
                 <View
@@ -53,6 +63,7 @@
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:layout_marginEnd="6dp"
+                    android:contentDescription="Live data indicator"
                     android:background="@drawable/live_dot" />
 
                 <com.google.android.material.textview.MaterialTextView
@@ -69,6 +80,7 @@
                 android:id="@+id/lab_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/productsans"
                 android:text="Real-time hardware insights"
@@ -135,6 +147,7 @@
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:alpha="0.5"
+                                android:contentDescription="Power flow info"
                                 android:src="@drawable/baseline_info_24"
                                 app:tint="?attr/colorOnPrimaryContainer" />
                         </LinearLayout>
@@ -271,6 +284,7 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:alpha="0.4"
+                                    android:contentDescription="Temperature info"
                                     android:src="@drawable/baseline_info_24"
                                     app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
@@ -326,6 +340,7 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:alpha="0.4"
+                                    android:contentDescription="Voltage info"
                                     android:src="@drawable/baseline_info_24"
                                     app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
@@ -391,6 +406,7 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:alpha="0.4"
+                                    android:contentDescription="Battery health info"
                                     android:src="@drawable/baseline_info_24"
                                     app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
@@ -445,6 +461,7 @@
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:alpha="0.4"
+                                    android:contentDescription="SafeCharged count info"
                                     android:src="@drawable/baseline_info_24"
                                     app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
