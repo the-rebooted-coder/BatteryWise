@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ripple="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
@@ -21,67 +22,78 @@
         app:wlv_waveAmplitude="18" />
 
     <!-- ═══════════════════════════════════════════════ -->
-    <!-- LAYER 2 · Transparent overlay with all UI       -->
+    <!-- LAYER 2 · Three-zone overlay                    -->
     <!-- ═══════════════════════════════════════════════ -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- ─── TOP BAR ─── -->
-        <RelativeLayout
-            android:id="@+id/topBar"
+        <!-- ─────────────────────────────────────────── -->
+        <!-- ZONE 1 · ZENITH BAR (top)                   -->
+        <!-- ─────────────────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/zenithBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingStart="24dp"
-            android:paddingEnd="16dp">
+            android:paddingEnd="8dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topBarTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:layout_weight="1"
                 android:fontFamily="@font/productsansbold"
                 android:text="SafeCharge"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="22sp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_lab"
+                android:id="@+id/btn_chronocell"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                app:icon="@drawable/ic_lab_flask"
-                app:iconSize="22dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:icon="@drawable/ic_chronocell"
+                app:iconSize="20dp"
                 app:iconTint="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_chronocell"
+                android:id="@+id/btn_lab"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_toStartOf="@id/btn_lab"
-                android:layout_centerVertical="true"
-                app:icon="@drawable/ic_chronocell"
-                app:iconSize="22dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:icon="@drawable/ic_lab_flask"
+                app:iconSize="20dp"
                 app:iconTint="?attr/colorOnSurfaceVariant" />
 
-        </RelativeLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_settings"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:icon="@drawable/ic_settings_gear"
+                app:iconSize="20dp"
+                app:iconTint="?attr/colorOnSurfaceVariant" />
 
-        <!-- ─── CENTER BLOCK · hero number + labels ─── -->
+        </LinearLayout>
+
+        <!-- ─────────────────────────────────────────── -->
+        <!-- ZONE 2 · HERO CORE (center)                 -->
+        <!-- ─────────────────────────────────────────── -->
         <LinearLayout
             android:id="@+id/heroCenterBlock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginTop="-48dp"
+            android:layout_marginTop="-36dp"
             android:gravity="center"
             android:orientation="vertical">
 
-            <!-- 80sp hero battery percentage -->
+            <!-- Giant battery percentage -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/heroBatteryNumber"
                 android:layout_width="wrap_content"
@@ -89,13 +101,14 @@
                 android:fontFamily="@font/productsansbold"
                 android:text="—%"
                 android:textColor="#FFFFFF"
-                android:textSize="80sp" />
+                android:textSize="86sp" />
 
-            <!-- "Current battery" subtitle -->
+            <!-- Dynamic contextual status line -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/heroSubLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="-4dp"
                 android:fontFamily="@font/productsans"
                 android:text="Current battery"
                 android:textColor="#B3FFFFFF"
@@ -103,70 +116,22 @@
 
         </LinearLayout>
 
-        <!-- ─── BOTTOM BLOCK · pill + buttons + ghost link ─── -->
+        <!-- ─────────────────────────────────────────── -->
+        <!-- ZONE 3 · COMMAND DOCK (bottom)              -->
+        <!-- ─────────────────────────────────────────── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="28dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <!-- Action Buttons Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <!-- Status pill — animated in when monitoring starts -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/statusPill"
-                    android:layout_width="wrap_content"
-                    android:layout_height="56dp"
-                    android:alpha="0"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:visibility="invisible"
-                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/statusPillText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:fontFamily="@font/productsans"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:text="● Monitoring"
-                        android:textColor="?attr/colorOnPrimaryContainer"
-                        android:textSize="14sp" />
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-            <!-- Ghost settings link -->
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/settingsGhostLink"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/productsans"
-                android:padding="8dp"
-                android:text="≡  Settings"
-                android:textColor="#66FFFFFF"
-                android:textSize="13sp" />
-
-            <!-- Enable SafeCharge button -->
+            <!-- ── IDLE STATE: Tap to start ── -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/saveBatteryBtn"
+                android:id="@+id/startBtn"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:fontFamily="@font/productsans"
@@ -174,8 +139,94 @@
                 android:textAllCaps="false"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="16sp"
+                android:visibility="visible"
                 app:backgroundTint="?attr/colorPrimary"
                 app:cornerRadius="30dp" />
+
+            <!-- ── ACTIVE STATE: Glass card + swipe to stop ── -->
+            <LinearLayout
+                android:id="@+id/commandDockActive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- Info card (tappable → opens settings) -->
+                <LinearLayout
+                    android:id="@+id/dockInfoCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_glass_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <!-- Pulsing live dot -->
+                    <View
+                        android:id="@+id/dockPulseDot"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/live_dot" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/dockStatusTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/productsansbold"
+                            android:text="Monitoring"
+                            android:textColor="#FFFFFF"
+                            android:textSize="15sp" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/dockStatusSub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:fontFamily="@font/productsans"
+                            android:text="Alert at 85%"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- SafeCharged counter badge -->
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/dockSafechargedCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_card"
+                        android:fontFamily="@font/productsansbold"
+                        android:paddingStart="12dp"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="6dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        tools:text="🛡 147" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Subtle branding footer -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/footerBranding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:alpha="0.3"
+                android:fontFamily="@font/productsans"
+                android:text="SafeCharge"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp" />
 
         </LinearLayout>
 

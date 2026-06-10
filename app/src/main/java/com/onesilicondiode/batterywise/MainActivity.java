@@ -1,13 +1,11 @@
 package com.onesilicondiode.batterywise;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -15,12 +13,13 @@ import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +43,7 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.example.swipebutton_library.SwipeButton;
+
 
 import me.itangqi.waveloadingview.WaveLoadingView;
 
@@ -60,14 +59,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-    // Liquid Canvas UI references
-    private MaterialButton startSaving;
+    // ── Zone 1: Zenith Bar ──
+    private com.google.android.material.textview.MaterialTextView topBarTitle;
+
+    // ── Zone 2: Hero Core ──
     private com.google.android.material.textview.MaterialTextView heroBatteryNumber;
     private com.google.android.material.textview.MaterialTextView heroSubLabel;
-    private com.google.android.material.textview.MaterialTextView settingsGhostLink;
-    private com.google.android.material.textview.MaterialTextView topBarTitle;
-    private com.google.android.material.card.MaterialCardView statusPill;
-    private com.google.android.material.textview.MaterialTextView statusPillText;
+
+    // ── Zone 3: Command Dock ──
+    private MaterialButton startBtn;
+    private LinearLayout commandDockActive;
+    private com.google.android.material.textview.MaterialTextView dockStatusTitle;
+    private com.google.android.material.textview.MaterialTextView dockStatusSub;
+    private com.google.android.material.textview.MaterialTextView dockSafechargedCount;
+    private View dockPulseDot;
+    private com.google.android.material.textview.MaterialTextView footerBranding;
 
     // Settings bottom sheet references
     private MaterialButton sheetBtn30s, sheetBtn1m, sheetBtn2m, sheetBtn3m;
@@ -79,9 +85,6 @@ public class MainActivity extends AppCompatActivity {
     private WaveLoadingView waveLoadingView;
     private FirebaseAnalytics mFirebaseAnalytics;
     private boolean seekTouch = false;
-    private Vibrator vibrator;
-    private static final String PREFS_NAME = "MyPrefsFile";
-    private static final String SWITCH_STATE = "switchState";
     private AppUpdateManager appUpdateManager;
     private ReviewManager reviewManager;
     private SharedPreferences sharedPreferences;
@@ -93,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String WAVE_COLOR_ORANGE = "#E4B284";
     private static final String WAVE_COLOR_RED = "#FFB4AB";
 
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String SWITCH_STATE = "switchState";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
@@ -102,33 +108,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         reviewManager = ReviewManagerFactory.create(this);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        // ── Wire Liquid Canvas views ──
+
+        // ── Wire views ──
         waveLoadingView = findViewById(R.id.waveLoadingView);
+        topBarTitle = findViewById(R.id.topBarTitle);
         heroBatteryNumber = findViewById(R.id.heroBatteryNumber);
         heroSubLabel = findViewById(R.id.heroSubLabel);
-        statusPill = findViewById(R.id.statusPill);
-        statusPillText = findViewById(R.id.statusPillText);
-        settingsGhostLink = findViewById(R.id.settingsGhostLink);
-        topBarTitle = findViewById(R.id.topBarTitle);
-        startSaving = findViewById(R.id.saveBatteryBtn);
+        startBtn = findViewById(R.id.startBtn);
+        commandDockActive = findViewById(R.id.commandDockActive);
+        dockStatusTitle = findViewById(R.id.dockStatusTitle);
+        dockStatusSub = findViewById(R.id.dockStatusSub);
+        dockSafechargedCount = findViewById(R.id.dockSafechargedCount);
+        dockPulseDot = findViewById(R.id.dockPulseDot);
+        footerBranding = findViewById(R.id.footerBranding);
 
-        // ── Dynamic wave border colour ──
+        // ── Dynamic wave border ──
         int primaryColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorPrimary);
         waveLoadingView.setBorderColor(primaryColor);
 
         // ── Battery info ──
         BatteryManager batteryManager = (BatteryManager) this.getSystemService(Context.BATTERY_SERVICE);
         int batteryPercent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-
-        // Hero battery number
         heroBatteryNumber.setText(batteryPercent + "%");
         waveLoadingView.setProgressValue(batteryPercent);
         updateUIColors(batteryPercent);
 
-        // Threshold sub-label
+        // ── Threshold ──
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         seekTouch = prefs.getBoolean(PREF_SEEK_TOUCH, false);
         selectedBatteryLevel = prefs.getInt("selectedBatteryLevel", 85);
@@ -167,13 +175,7 @@ public class MainActivity extends AppCompatActivity {
         };
         sharedPreferences.registerOnSharedPreferenceChangeListener(prefListener);
 
-        // ── Settings ghost link → opens settings bottom sheet ──
-        settingsGhostLink.setOnClickListener(v -> {
-            vibrateTouch();
-            showSettingsBottomSheet();
-        });
-
-        // ── Battery Lab ──
+        // ── Zone 1: Zenith Bar Buttons ──
         MaterialButton btnLab = findViewById(R.id.btn_lab);
         btnLab.setOnClickListener(v -> {
             vibrateTouch();
@@ -186,21 +188,26 @@ public class MainActivity extends AppCompatActivity {
             startLabButtonGlow(btnLab);
         }
 
-        // ── ChronoCell (Battery Time Machine) ──
         MaterialButton btnChrono = findViewById(R.id.btn_chronocell);
         btnChrono.setOnClickListener(v -> {
             vibrateTouch();
             startActivity(new Intent(this, ChronoCellActivity.class));
         });
 
-        // ── Status pill → also opens settings ──
-        statusPill.setOnClickListener(v -> {
+        MaterialButton btnSettings = findViewById(R.id.btn_settings);
+        btnSettings.setOnClickListener(v -> {
             vibrateTouch();
             showSettingsBottomSheet();
         });
 
-        // ── Enable button ──
-        startSaving.setOnClickListener(view -> {
+        // ── Zone 3: Command Dock ──
+        LinearLayout dockInfoCard = findViewById(R.id.dockInfoCard);
+        dockInfoCard.setOnClickListener(v -> {
+            vibrateTouch();
+            showSettingsBottomSheet();
+        });
+
+        startBtn.setOnClickListener(view -> {
             try {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putBoolean(USER_STARTED_KEY, true);
@@ -214,8 +221,6 @@ public class MainActivity extends AppCompatActivity {
                 showIntentErrorDialog();
             }
         });
-
-
 
         // ── App update check ──
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
@@ -262,54 +267,146 @@ public class MainActivity extends AppCompatActivity {
         boolean isServiceRunning = isServiceRunning(BatteryMonitorService.class);
         setWaveColor(isServiceRunning, batteryPercent);
         updateUIColors(batteryPercent);
+
+        // Update dock info on resume
+        if (isServiceRunning) {
+            updateDockInfo();
+        }
+
+        // Update contextual hero label
+        updateHeroSubLabel(isServiceRunning);
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // LIQUID CANVAS STATE HELPERS
+    // THREE-ZONE STATE MANAGEMENT
     // ─────────────────────────────────────────────────────────────────
 
     private void showActiveState() {
-        startSaving.setVisibility(View.GONE);
-        // Animate status pill in
-        statusPill.setVisibility(View.VISIBLE);
-        statusPill.setAlpha(0f);
-        statusPill.setTranslationY(20f);
-        statusPill.animate()
+        // Hide start button, show dock
+        startBtn.setVisibility(View.GONE);
+        commandDockActive.setVisibility(View.VISIBLE);
+
+        // Animate dock in
+        commandDockActive.setAlpha(0f);
+        commandDockActive.setTranslationY(30f);
+        commandDockActive.setScaleX(0.95f);
+        commandDockActive.setScaleY(0.95f);
+        commandDockActive.animate()
                 .alpha(1f)
                 .translationY(0f)
-                .setDuration(350)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(400)
+                .setInterpolator(new OvershootInterpolator(0.8f))
                 .start();
-        updateStatusPillText();
-        // Animate settings ghost in
-        settingsGhostLink.setAlpha(0f);
-        settingsGhostLink.animate().alpha(1f).setDuration(400).setStartDelay(200).start();
+
+        // Start pulsing dot
+        startDockPulse();
+
+        // Update data
+        updateDockInfo();
+        updateHeroSubLabel(true);
     }
 
     private void showIdleState() {
-        startSaving.setVisibility(View.VISIBLE);
-        statusPill.setVisibility(View.INVISIBLE);
-        statusPill.setAlpha(0f);
-        settingsGhostLink.setAlpha(0.6f);
+        startBtn.setVisibility(View.VISIBLE);
+        commandDockActive.setVisibility(View.GONE);
+        updateHeroSubLabel(false);
     }
 
     private void hideActiveState() {
-        startSaving.setVisibility(View.VISIBLE);
-        statusPill.animate()
+        // Animate dock out
+        commandDockActive.animate()
                 .alpha(0f)
-                .translationY(20f)
+                .translationY(30f)
+                .scaleX(0.95f)
+                .scaleY(0.95f)
                 .setDuration(250)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
-                .withEndAction(() -> statusPill.setVisibility(View.INVISIBLE))
+                .withEndAction(() -> {
+                    commandDockActive.setVisibility(View.GONE);
+                    startBtn.setVisibility(View.VISIBLE);
+                })
                 .start();
-        settingsGhostLink.animate().alpha(0.6f).setDuration(250).start();
+
+        updateHeroSubLabel(false);
     }
 
-    private void updateStatusPillText() {
-        statusPillText.setText("● Monitoring  ·  Alert at " + selectedBatteryLevel + "%");
+    /**
+     * Updates the hero sub-label based on service + charging state.
+     */
+    private void updateHeroSubLabel(boolean monitoring) {
+        if (!monitoring) {
+            heroSubLabel.setText("Tap below to protect your battery");
+            return;
+        }
+
+        // Check if charging
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (batteryIntent != null) {
+            int plugged = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+            if (plugged != 0) {
+                heroSubLabel.setText("Charging · Alert at " + selectedBatteryLevel + "%");
+                return;
+            }
+        }
+        heroSubLabel.setText("Monitoring · Alert at " + selectedBatteryLevel + "%");
     }
 
+    /**
+     * Updates the dock card with current config and counter.
+     */
+    private void updateDockInfo() {
+        dockStatusTitle.setText("Monitoring");
 
+        // Build subtitle with config details
+        boolean autoDismiss = sharedPreferences.getBoolean(SWITCH_STATE, false);
+        String sub = "Alert at " + selectedBatteryLevel + "%";
+        if (autoDismiss) {
+            int selectedTime = sharedPreferences.getInt(SELECTED_TIME_KEY, 2);
+            String timeLabel;
+            switch (selectedTime) {
+                case 4: timeLabel = "30s"; break;
+                case 1: timeLabel = "1m"; break;
+                case 3: timeLabel = "3m"; break;
+                default: timeLabel = "2m"; break;
+            }
+            sub += " · Auto-dismiss " + timeLabel;
+        }
+        dockStatusSub.setText(sub);
+
+        // SafeCharged counter
+        SharedPreferences sp = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        int counter = sp.getInt("counter", 0);
+        if (counter > 0) {
+            dockSafechargedCount.setVisibility(View.VISIBLE);
+            dockSafechargedCount.setText("🛡 " + counter);
+        } else {
+            dockSafechargedCount.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Pulsing live dot on the dock card.
+     */
+    private void startDockPulse() {
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(dockPulseDot, "scaleX", 1f, 1.5f, 1f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(dockPulseDot, "scaleY", 1f, 1.5f, 1f);
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(dockPulseDot, "alpha", 1f, 0.4f, 1f);
+
+        AnimatorSet pulseSet = new AnimatorSet();
+        pulseSet.playTogether(scaleX, scaleY, alpha);
+        pulseSet.setDuration(1500);
+        pulseSet.addListener(new android.animation.AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                if (commandDockActive.getVisibility() == View.VISIBLE) {
+                    pulseSet.start();
+                }
+            }
+        });
+        pulseSet.start();
+    }
 
     // ─────────────────────────────────────────────────────────────────
     // SETTINGS BOTTOM SHEET
@@ -336,7 +433,8 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
             editor.putInt("selectedBatteryLevel", selectedBatteryLevel);
             editor.apply();
-            updateStatusPillText();
+            updateDockInfo();
+            updateHeroSubLabel(isServiceRunning(BatteryMonitorService.class));
             if (isServiceRunning(BatteryMonitorService.class)) {
                 setWaveColor(true, getCurrentBatteryPercent());
             }
@@ -368,12 +466,13 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean(SWITCH_STATE, isChecked);
             editor.apply();
             vibrateTouch();
+            updateDockInfo();
         });
 
-        sheetBtn30s.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn30s, 4));
-        sheetBtn1m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn1m, 1));
-        sheetBtn2m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn2m, 2));
-        sheetBtn3m.setOnClickListener(v -> sheetHandleButtonSelection(sheetBtn3m, 3));
+        sheetBtn30s.setOnClickListener(v -> { sheetHandleButtonSelection(sheetBtn30s, 4); updateDockInfo(); });
+        sheetBtn1m.setOnClickListener(v -> { sheetHandleButtonSelection(sheetBtn1m, 1); updateDockInfo(); });
+        sheetBtn2m.setOnClickListener(v -> { sheetHandleButtonSelection(sheetBtn2m, 2); updateDockInfo(); });
+        sheetBtn3m.setOnClickListener(v -> { sheetHandleButtonSelection(sheetBtn3m, 3); updateDockInfo(); });
 
         // Utility rows
         View daydreamRow = sheetView.findViewById(R.id.sheet_daydream_row);
@@ -546,8 +645,6 @@ public class MainActivity extends AppCompatActivity {
         return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
     }
 
-
-
     private boolean isServiceRunning(Class<?> serviceClass) {
         android.content.SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         return prefs.getBoolean("serviceRunning", false);
@@ -592,7 +689,7 @@ public class MainActivity extends AppCompatActivity {
         scaleY.setDuration(1000);
         alpha.setDuration(1000);
 
-        scaleX.setRepeatCount(3); // Pulse twice (Forward-Reverse = 1, so 4 states total)
+        scaleX.setRepeatCount(3);
         scaleY.setRepeatCount(3);
         alpha.setRepeatCount(3);
 
@@ -610,19 +707,22 @@ public class MainActivity extends AppCompatActivity {
         int onSurfaceVariantColor = ThemeUtils.getThemeColor(this, com.google.android.material.R.attr.colorOnSurfaceVariant);
         MaterialButton btnLab = findViewById(R.id.btn_lab);
         MaterialButton btnChrono = findViewById(R.id.btn_chronocell);
+        MaterialButton btnSettings = findViewById(R.id.btn_settings);
 
-        // App Name (Top Bar) - threshold around 92% as it's at the very top
+        // Zenith bar — threshold around 92% as it's at the very top
         if (batteryPercent >= 92) {
             topBarTitle.setTextColor(Color.WHITE);
             btnLab.setIconTint(ColorStateList.valueOf(Color.WHITE));
             btnChrono.setIconTint(ColorStateList.valueOf(Color.WHITE));
+            btnSettings.setIconTint(ColorStateList.valueOf(Color.WHITE));
         } else {
             topBarTitle.setTextColor(onSurfaceColor);
             btnLab.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
             btnChrono.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
+            btnSettings.setIconTint(ColorStateList.valueOf(onSurfaceVariantColor));
         }
 
-        // Hero Battery Number - threshold around 52% (center is 50, wave crests higher)
+        // Hero Battery Number — threshold around 52%
         if (batteryPercent >= 52) {
             heroBatteryNumber.setTextColor(Color.WHITE);
             heroSubLabel.setTextColor(Color.parseColor("#B3FFFFFF"));
@@ -631,11 +731,11 @@ public class MainActivity extends AppCompatActivity {
             heroSubLabel.setTextColor(onSurfaceVariantColor);
         }
 
-        // Ghost settings link - at the bottom (~10-15% height)
+        // Footer branding — at the bottom (~10-15% height)
         if (batteryPercent >= 15) {
-            settingsGhostLink.setTextColor(Color.parseColor("#66FFFFFF"));
+            footerBranding.setTextColor(Color.WHITE);
         } else {
-            settingsGhostLink.setTextColor(onSurfaceVariantColor);
+            footerBranding.setTextColor(onSurfaceVariantColor);
         }
     }
 
@@ -657,7 +757,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         return sharedPreferences.getInt("counter", 0);
     }
-
 
     private void vibrate() {
         HapticUtils.playCustomVibration(this, new long[]{11, 0, 11, 0, 20, 2, 23});
@@ -743,7 +842,5 @@ public class MainActivity extends AppCompatActivity {
         vibrate();
         showActiveState();
     }
-
-
 
 }

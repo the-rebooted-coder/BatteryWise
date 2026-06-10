@@ -276,6 +276,7 @@
                             android:padding="18dp">
 
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/txt_stat_cycles_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/productsansbold"
@@ -359,10 +360,11 @@
                             android:padding="18dp">
 
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/txt_stat_hours_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/productsansbold"
-                                android:text="Hours Monitored"
+                                android:text="Time Monitored"
                                 android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="11sp" />
 

@@ -43,6 +43,7 @@ public class ChronoCellActivity extends AppCompatActivity {
     private ChronoGraphView graphBatteryLevel;
     private ChronoGraphView graphSessions;
     private MaterialTextView txtStatCycles, txtStatTemp, txtStatHours, txtStatSafeCharged;
+    private MaterialTextView txtStatCyclesLabel, txtStatHoursLabel;
     private MaterialTextView txtPrediction, txtHealthPercent;
     private CircularProgressIndicator progressHealth;
     private ChipGroup timeChips;
@@ -83,6 +84,8 @@ public class ChronoCellActivity extends AppCompatActivity {
         txtStatTemp = findViewById(R.id.txt_stat_temp);
         txtStatHours = findViewById(R.id.txt_stat_hours);
         txtStatSafeCharged = findViewById(R.id.txt_stat_safecharged);
+        txtStatCyclesLabel = findViewById(R.id.txt_stat_cycles_label);
+        txtStatHoursLabel = findViewById(R.id.txt_stat_hours_label);
 
         txtPrediction = findViewById(R.id.txt_prediction);
         txtHealthPercent = findViewById(R.id.txt_health_percent);
@@ -239,7 +242,7 @@ public class ChronoCellActivity extends AppCompatActivity {
                         .format(cal.getTime());
                 predictionText = "≈ 80% capacity by " + dateStr
                         + "\nBased on " + totalCycles + " cycles over "
-                        + daysSinceFirst + " days";
+                        + daysSinceFirst + " " + (daysSinceFirst == 1 ? "day" : "days");
             }
 
             // Final copies for lambda
@@ -260,6 +263,7 @@ public class ChronoCellActivity extends AppCompatActivity {
 
                 // Update stats
                 txtStatCycles.setText(String.valueOf(fTotalCycles));
+                txtStatCyclesLabel.setText(fTotalCycles == 1 ? "Charge Cycle" : "Charge Cycles");
                 animateStatBounce(txtStatCycles);
 
                 if (fAvgTemp > 0) {
@@ -272,9 +276,16 @@ public class ChronoCellActivity extends AppCompatActivity {
                 long totalHours = fTotalDuration / (60 * 60 * 1000);
                 if (totalHours > 0) {
                     txtStatHours.setText(totalHours + "h");
+                    txtStatHoursLabel.setText(totalHours == 1 ? "Hour Monitored" : "Hours Monitored");
                 } else {
                     long totalMins = fTotalDuration / (60 * 1000);
-                    txtStatHours.setText(totalMins > 0 ? totalMins + "m" : "—");
+                    if (totalMins > 0) {
+                        txtStatHours.setText(totalMins + "m");
+                        txtStatHoursLabel.setText(totalMins == 1 ? "Minute Monitored" : "Minutes Monitored");
+                    } else {
+                        txtStatHours.setText("—");
+                        txtStatHoursLabel.setText("Time Monitored");
+                    }
                 }
                 animateStatBounce(txtStatHours);
 
