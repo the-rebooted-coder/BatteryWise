@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/productsansbold"
-                    android:text="Battery Lab"
+                    android:text="BatteryLab"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="22sp" />
 

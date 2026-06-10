@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace 'com.onesilicondiode.batterywise'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.onesilicondiode.batterywise"
         minSdk 25
-        targetSdk 34
-        versionCode 36
+        targetSdk 35
+        versionCode 37
         versionName "Volt"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
