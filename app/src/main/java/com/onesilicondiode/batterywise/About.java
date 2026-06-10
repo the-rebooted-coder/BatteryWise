@@ -128,11 +128,6 @@ public class About extends AppCompatActivity {
                 .start();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     private void vibrateOSD() {
         HapticUtils.playCustomVibration(this, new long[]{17, 4, 14, 17, 0, 22, 21, 8, 22, 0, 18, 0, 16});
     }

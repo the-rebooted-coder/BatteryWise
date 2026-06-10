@@ -252,16 +252,15 @@ public class BatteryMonitorService extends Service {
     }
 
     private Notification createNotification() {
+        int alertLevel = prefs.getInt("selectedBatteryLevel", 85);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
-                .setContentTitle("Monitoring Charge Levels")
-                .setContentText("You may tap on this notification and then disable it")
+                .setContentTitle("SafeCharge Active")
+                .setContentText("Monitoring · Alert at " + alertLevel + "%")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        Uri customSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.subtle);
-        builder.setSound(customSoundUri);
+                .setOngoing(true)
+                .setShowWhen(false);
 
         return builder.build();
     }
