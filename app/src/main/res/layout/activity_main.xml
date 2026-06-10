@@ -133,6 +133,53 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
+            <!-- ── ERROR STATE: Notifications Disabled ── -->
+            <LinearLayout
+                android:id="@+id/commandDockError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_error_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_notification"
+                    app:tint="@color/md_theme_dark_error" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/productsansbold"
+                        android:text="Notifications Disabled"
+                        android:textColor="@color/md_theme_dark_error"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/productsans"
+                        android:text="SafeCharge requires notifications to alert you. Tap to fix."
+                        android:textColor="@color/md_theme_dark_errorContainer"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- ── IDLE STATE: Tap to start ── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/startBtn"

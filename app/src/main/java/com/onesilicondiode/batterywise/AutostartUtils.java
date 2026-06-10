@@ -21,18 +21,36 @@ public class AutostartUtils {
         String brand = Build.BRAND;
         String manufacturer = Build.MANUFACTURER;
 
-        if (brand.equalsIgnoreCase("xiaomi") || brand.equalsIgnoreCase("redmi")) {
-            showSingleStepDialog(context, inflater, callback, "Xiaomi", "com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
+        if (brand.equalsIgnoreCase("xiaomi") || brand.equalsIgnoreCase("redmi") || brand.equalsIgnoreCase("poco")) {
+            showMultiIntentDialog(context, inflater, callback, "Xiaomi/Poco", new Intent[]{
+                    new Intent().setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")),
+                    new Intent().setComponent(new ComponentName("com.miui.powerchecker", "com.miui.powerchecker.ui.PowerHideModeActivity"))
+            });
         } else if (brand.equalsIgnoreCase("Letv")) {
-            showSingleStepDialog(context, inflater, callback, "Letv", "com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity");
-        } else if (brand.equalsIgnoreCase("Honor")) {
+            showMultiIntentDialog(context, inflater, callback, "Letv", new Intent[]{
+                    new Intent().setComponent(new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.AutobootManageActivity")),
+                    new Intent().setComponent(new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.BackgroundAppManageActivity"))
+            });
+        } else if (brand.equalsIgnoreCase("Honor") || manufacturer.equalsIgnoreCase("huawei")) {
             showHonorDialog(context, inflater, callback);
-        } else if (manufacturer.equalsIgnoreCase("oppo")) {
+        } else if (manufacturer.equalsIgnoreCase("oppo") || manufacturer.equalsIgnoreCase("realme")) {
             showOppoDialog(context, inflater, callback);
-        } else if (manufacturer.contains("vivo")) {
+        } else if (manufacturer.contains("vivo") || manufacturer.contains("iqoo")) {
             showVivoDialog(context, inflater, callback);
         } else if (manufacturer.contains("asus")) {
-            showSingleStepDialog(context, inflater, callback, "Asus", "com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity");
+            showMultiIntentDialog(context, inflater, callback, "Asus", new Intent[]{
+                    new Intent().setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.MainActivity")),
+                    new Intent().setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.autostart.AutoStartActivity")),
+                    new Intent().setComponent(new ComponentName("com.asus.mobilemanager", "com.asus.mobilemanager.entry.FunctionActivity"))
+            });
+        } else if (manufacturer.contains("oneplus")) {
+            showMultiIntentDialog(context, inflater, callback, "OnePlus", new Intent[]{
+                    new Intent().setComponent(new ComponentName("com.oneplus.security", "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity"))
+            });
+        } else if (manufacturer.contains("meizu")) {
+            showMultiIntentDialog(context, inflater, callback, "Meizu", new Intent[]{
+                    new Intent().setComponent(new ComponentName("com.meizu.safe", "com.meizu.safe.security.SHOW_APPSEC"))
+            });
         } else if (manufacturer.contains("samsung")) {
             showSamsungDialog(context, inflater, callback);
         } else {
@@ -40,7 +58,7 @@ public class AutostartUtils {
         }
     }
 
-    private static void showSingleStepDialog(Context context, LayoutInflater inflater, AutostartCallback callback, String brandName, String pkg, String cls) {
+    private static void showMultiIntentDialog(Context context, LayoutInflater inflater, AutostartCallback callback, String brandName, Intent[] intents) {
         View customView = inflater.inflate(R.layout.request_autostart_dialog, null);
         callback.onServiceStarted();
         new MaterialAlertDialogBuilder(context)
@@ -48,15 +66,7 @@ public class AutostartUtils {
                 .setMessage("You're using a " + brandName + " Phone, AutoStart is required to enable SafeCharge on your device.")
                 .setCancelable(false)
                 .setView(customView)
-                .setPositiveButton("Continue", (dialog, which) -> {
-                    Intent intent = new Intent();
-                    intent.setComponent(new ComponentName(pkg, cls));
-                    try {
-                        context.startActivity(intent);
-                    } catch (Exception e) {
-                        callback.onIntentError();
-                    }
-                })
+                .setPositiveButton("Continue", (dialog, which) -> launchAnyIntent(context, intents, callback))
                 .show();
     }
 
@@ -71,7 +81,8 @@ public class AutostartUtils {
                 .setPositiveButton("Continue", (dialog, which) -> {
                     Intent[] intents = {
                             new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity")),
-                            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"))
+                            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")),
+                            new Intent().setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity"))
                     };
                     launchAnyIntent(context, intents, callback);
                 })
@@ -100,7 +111,8 @@ public class AutostartUtils {
                             new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startupapp.StartupAppListActivity")),
                             new Intent().setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.startup.StartupAppListActivity")),
                             new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startup.StartupAppListActivity")),
-                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupapp.StartupAppListActivity"))
+                            new Intent().setComponent(new ComponentName("com.coloros.safe", "com.coloros.safe.permission.startupapp.StartupAppListActivity")),
+                            new Intent().setComponent(new ComponentName("com.oppo.safe", "com.oppo.safe.permission.startup.StartupAppListActivity"))
                     };
                     launchAnyIntent(context, intents, callback);
                     showStep2(context, callback);
@@ -119,7 +131,8 @@ public class AutostartUtils {
                     Intent[] intents = {
                             new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")),
                             new Intent().setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.BgStartUpManagerActivity")),
-                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager"))
+                            new Intent().setComponent(new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager")),
+                            new Intent().setComponent(new ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.PurviewTabActivity"))
                     };
                     launchAnyIntent(context, intents, callback);
                     showStep2(context, callback);

@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     // ── Zone 3: Command Dock ──
     private MaterialButton startBtn;
     private LinearLayout commandDockActive;
+    private LinearLayout commandDockError;
     private com.google.android.material.textview.MaterialTextView dockStatusTitle;
     private com.google.android.material.textview.MaterialTextView dockStatusSub;
     private com.google.android.material.textview.MaterialTextView dockSafechargedCount;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         heroSubLabel = findViewById(R.id.heroSubLabel);
         startBtn = findViewById(R.id.startBtn);
         commandDockActive = findViewById(R.id.commandDockActive);
+        commandDockError = findViewById(R.id.commandDockError);
         dockStatusTitle = findViewById(R.id.dockStatusTitle);
         dockStatusSub = findViewById(R.id.dockStatusSub);
         dockSafechargedCount = findViewById(R.id.dockSafechargedCount);
@@ -207,6 +209,17 @@ public class MainActivity extends AppCompatActivity {
             showSettingsBottomSheet();
         });
 
+        commandDockError.setOnClickListener(v -> {
+            vibrateTouch();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+            } else {
+                Intent intent = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, getPackageName());
+                startActivity(intent);
+            }
+        });
+
         startBtn.setOnClickListener(view -> {
             try {
                 SharedPreferences.Editor editor = prefs.edit();
@@ -273,17 +286,53 @@ public class MainActivity extends AppCompatActivity {
             updateDockInfo();
         }
 
-        // Update contextual hero label
-        updateHeroSubLabel(isServiceRunning);
+        // Check Notification Permission (Android 13+)
+        boolean notificationsDisabled = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                notificationsDisabled = true;
+            }
+        }
+
+        if (notificationsDisabled) {
+            showErrorState();
+        } else if (isServiceRunning) {
+            showActiveState();
+        } else {
+            showIdleState();
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────
     // THREE-ZONE STATE MANAGEMENT
     // ─────────────────────────────────────────────────────────────────
 
-    private void showActiveState() {
-        // Hide start button, show dock
+    private void showErrorState() {
         startBtn.setVisibility(View.GONE);
+        commandDockActive.setVisibility(View.GONE);
+        commandDockError.setVisibility(View.VISIBLE);
+        
+        // Animate error dock in
+        commandDockError.setAlpha(0f);
+        commandDockError.setTranslationY(30f);
+        commandDockError.setScaleX(0.95f);
+        commandDockError.setScaleY(0.95f);
+        commandDockError.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(400)
+                .setInterpolator(new OvershootInterpolator(0.8f))
+                .start();
+
+        heroSubLabel.setText("App cannot function without notifications");
+    }
+
+    private void showActiveState() {
+        // Hide start button/error dock, show active dock
+        startBtn.setVisibility(View.GONE);
+        commandDockError.setVisibility(View.GONE);
         commandDockActive.setVisibility(View.VISIBLE);
 
         // Animate dock in
@@ -311,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
     private void showIdleState() {
         startBtn.setVisibility(View.VISIBLE);
         commandDockActive.setVisibility(View.GONE);
+        commandDockError.setVisibility(View.GONE);
         updateHeroSubLabel(false);
     }
 
